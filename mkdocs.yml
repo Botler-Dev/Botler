@@ -1,0 +1,61 @@
+site_name: Exon
+site_description: Wiki for everything about Exon, a general purpose Discord bot
+repo_url: https://github.com/Exon-Development/Exon
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  palette:
+    scheme: slate
+    primary: blue
+    accent: blue
+  features:
+    - instant
+    - tabs
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      type: date
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Exon-Development/Exon
+
+markdown_extensions:
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - admonition
+  - meta
+  - footnotes
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tilde
+
+nav:
+  - Home:
+      - Introduction: index.md
+      - Commands List: Commands.md
+      - License: License.md
+  - Setup Guides:
+      - Production:
+          - Linux: Setup-Guides/Production/Linux-Prod-Setup-Guide.md
+      - Development:
+        - Linux: Setup-Guides/Development/Linux-Dev-Setup-Guide.md
+      - Helpful Guides:
+          - Create A Bot: Helpful-Guides/Creating-&-Inviting-A-Bot.md
+          - Invite A Bot: Helpful-Guides/Creating-&-Inviting-A-Bot.md
+          - Bot Token: Helpful-Guides/Bot-Token.md
