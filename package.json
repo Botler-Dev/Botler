@@ -4,7 +4,8 @@
   "description": "Exon multipurpose discord bot",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint . --ext .ts || exit 0",
+    "fix": "eslint . --ext .ts --fix || exit 0"
   },
   "repository": {
     "type": "git",
@@ -21,13 +22,14 @@
   },
   "homepage": "https://github.com/Exon-Development/Exon#readme",
   "dependencies": {
-    "@types/node": "^14.6.0",
     "console-stamp": "^0.2.9",
     "discord.js": "^12.3.1",
+    "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.3.0",
     "typeorm": "^0.2.25"
   },
   "devDependencies": {
+    "@types/node": "^14.6.0",
     "@typescript-eslint/eslint-plugin": "^3.6.1",
     "@typescript-eslint/parser": "^3.9.1",
     "eslint": "^7.7.0",

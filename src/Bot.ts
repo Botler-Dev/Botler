@@ -1,21 +1,30 @@
 import { Client } from 'discord.js';
 import { container } from 'tsyringe';
-import botConfig from './botconfig.json';
+
+import BotConfig, { BotConfigType } from './BotConfig';
 import GlobalSettings from './entities/transient/GlobalSettings';
 
 export default class Bot {
-      private client: Client;
+  private client: Client;
 
-      public async initializeBot() {
-        const globalSettings: GlobalSettings = new GlobalSettings(botConfig);
+  private botConfig: BotConfig;
 
-        this.client = new Client({
-          disableMentions: 'everyone', partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
-        });
+  constructor(botConfig: BotConfigType) {
+    this.botConfig = new BotConfig(botConfig);
+  }
 
-        this.client.login(globalSettings.discordToken);
+  public async initializeBot() {
+    // Temporary error fix
+    // Montori will implement database global settings
+    const globalSettings: GlobalSettings = new GlobalSettings({});
 
-        container.register(GlobalSettings, { useValue: globalSettings });
-        container.register(Client, { useValue: this.client });
-      }
+    this.client = new Client({
+      disableMentions: 'everyone', partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
+    });
+
+    this.client.login(globalSettings.discordToken);
+
+    container.register(GlobalSettings, { useValue: globalSettings });
+    container.register(Client, { useValue: this.client });
+  }
 }
