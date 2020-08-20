@@ -1,14 +1,21 @@
 import { Client } from 'discord.js';
+import { container } from 'tsyringe';
 import botConfig from './botconfig.json';
+import GlobalSettings from './entities/transient/GlobalSettings';
 
 export default class Bot {
-      public client: Client;
+      private client: Client;
 
-      async initializeBot() {
+      public async initializeBot() {
+        const globalSettings: GlobalSettings = new GlobalSettings(botConfig);
+
         this.client = new Client({
           disableMentions: 'everyone', partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
         });
 
-        this.client.login(botConfig.token);
+        this.client.login(globalSettings.discordToken);
+
+        container.register(GlobalSettings, { useValue: globalSettings });
+        container.register(Client, { useValue: this.client });
       }
 }
