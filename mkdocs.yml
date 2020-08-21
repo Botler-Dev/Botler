@@ -1,6 +1,6 @@
-site_name: Exon
-site_description: Wiki for everything about Exon, a general purpose Discord bot
-repo_url: https://github.com/Exon-Development/Exon
+site_name: Botler
+site_description: Wiki for everything about Botler, a general purpose Discord bot
+repo_url: https://github.com/Botler-Dev/Botler.git
 
 theme:
   name: material
@@ -25,7 +25,7 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/Exon-Development/Exon
+      link: https://github.com/Botler-Dev/Botler.gitr
 
 markdown_extensions:
   - codehilite:
