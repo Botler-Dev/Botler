@@ -1,6 +1,6 @@
 site_name: Botler
 site_description: Wiki for everything about Botler, a general purpose Discord bot
-repo_url: https://github.com/Botler-Dev/Botler.git
+repo_url: https://github.com/Botler-Dev/Botler
 
 theme:
   name: material
@@ -25,8 +25,8 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/Botler-Dev/Botler.gitr
-
+      link: https://github.com/Botler-Dev/Botler
+  
 markdown_extensions:
   - codehilite:
       guess_lang: false
