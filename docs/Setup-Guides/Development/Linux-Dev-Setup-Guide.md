@@ -1,10 +1,10 @@
 # Linux Development Setup Guide
 
-This guide is meant for those who want to do the development work on Exon, or wish to set Exon up manually. It will instruct and explain the process in which Exon is manually set up on a Linux based distribution
+This guide is meant for those who want to do the development work on Botler, or wish to set Botler up manually. It will instruct and explain the process in which Botler is manually set up on a Linux based distribution
 
 ## Officially Supported Linux Distributions
 
-Below is a list of Linux Distributions that Exon is officially supported on:
+Below is a list of Linux Distributions that Botler is officially supported on:
 
 | Distributions | Distro Versions  | Architecture |
 |---------------|------------------|--------------|
