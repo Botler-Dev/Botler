@@ -5,7 +5,10 @@
   "main": "main.js",
   "scripts": {
     "lint": "eslint . --ext .ts || exit 0",
-    "fix": "eslint . --ext .ts --fix || exit 0"
+    "fix": "eslint . --ext .ts --fix || exit 0",
+    "build": "tsc || exit 0",
+    "watch": "tsc --watch || exit 0",
+    "bot": "node ./dist/main.js || exit 0"
   },
   "repository": {
     "type": "git",
