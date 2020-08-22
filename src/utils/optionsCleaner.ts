@@ -9,9 +9,8 @@ export type OptionsDefinition<Options extends object> = {
   [Key in keyof Options]-?: OptionValueDefinition<Options[Key]>;
 };
 
-export type OptionsCompiledDefinition<Options extends object> = {
-  [Key in keyof Options]-?: OptionValueGenerator<Options[Key]>;
-}
+export type OptionsCompiledDefinition<Options extends object> =
+  Map<keyof Options, OptionValueGenerator<Options[keyof Options]>>;
 
 export default class OptionsCleaner<Options extends object> {
   private definition: OptionsCompiledDefinition<Options>;
@@ -21,7 +20,7 @@ export default class OptionsCleaner<Options extends object> {
   }
 
   private static compileDefinition<Options extends object>(definition: OptionsDefinition<Options>) {
-    const compiled: Partial<OptionsCompiledDefinition<Options>> = {};
+    const compiled: OptionsCompiledDefinition<Options> = new Map();
     Object.entries(definition).forEach(([key, value]) => {
       let generator: any = value;
       if (value === Error) {
@@ -32,14 +31,14 @@ export default class OptionsCleaner<Options extends object> {
       } else if (typeof value !== 'function') {
         generator = (r: any) => r ?? value;
       }
-      compiled[<keyof Options>key] = generator;
+      compiled.set(<keyof Options>key, generator);
     });
-    return compiled as OptionsCompiledDefinition<Options>;
+    return compiled;
   }
 
   clean(options: Options) {
     const cleaned: Partial<Options> = {};
-    Object.entries<OptionValueGenerator<any>>(this.definition).forEach(([key, value]) => {
+    this.definition.forEach((value, key) => {
       cleaned[<keyof Options>key] = value(options[<keyof Options>key]);
     });
     return cleaned as Options;
