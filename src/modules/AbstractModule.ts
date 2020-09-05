@@ -1,3 +1,5 @@
-export default class AbstractModule {
+export default abstract class AbstractModule {
+  initialize?(): Promise<void>;
 
+  postInitialize?(): Promise<void>;
 }
