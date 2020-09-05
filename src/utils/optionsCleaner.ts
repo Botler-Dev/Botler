@@ -1,26 +1,45 @@
-export type OptionValueGenerator<Type> = (rawValue: Type) => Type;
+export type OptionValueGenerator<InputType, OutputType> = (rawValue: InputType) => OutputType;
 
-export type OptionValueDefinition<Type> =
-  Type extends Function ? OptionValueGenerator<Type> :
-  Type extends ErrorConstructor ? OptionValueGenerator<Type> :
-  (OptionValueGenerator<Type> | Type | ErrorConstructor);
+export type OptionValueDefinition<InputType, OutputType> =
+  OptionValueGenerator<InputType, OutputType> |
+  (OutputType extends ErrorConstructor ? never : ErrorConstructor) |
+  (OutputType extends Function ? never :
+    InputType extends OutputType ? OutputType : never);
 
-export type OptionsDefinition<Options extends object> = {
-  [Key in keyof Options]-?: OptionValueDefinition<Options[Key]>;
+export type OptionsDefinition<
+  InputOptions extends object,
+  OutputOptions extends OptionsCleanerOutput<InputOptions>
+  > = {
+    [Key in keyof InputOptions]-?: OptionValueDefinition<InputOptions[Key], OutputOptions[Key]>;
+  };
+
+export type OptionsCompiledDefinition<
+  InputOptions extends object,
+  OutputOptions extends OptionsCleanerOutput<InputOptions>
+  > = Map<
+    keyof InputOptions,
+    OptionValueGenerator<InputOptions[keyof InputOptions], OutputOptions[keyof InputOptions]>
+  >;
+
+export type OptionsCleanerOutput<InputOptions extends object> = {
+  [Key in keyof InputOptions]: any;
 };
 
-export type OptionsCompiledDefinition<Options extends object> =
-  Map<keyof Options, OptionValueGenerator<Options[keyof Options]>>;
+export default class OptionsCleaner<
+  InputOptions extends object,
+  OutputOptions extends OptionsCleanerOutput<InputOptions> = InputOptions
+  > {
+  private definition: OptionsCompiledDefinition<InputOptions, OutputOptions>;
 
-export default class OptionsCleaner<Options extends object> {
-  private definition: OptionsCompiledDefinition<Options>;
-
-  constructor(definition: OptionsDefinition<Options>) {
+  constructor(definition: OptionsDefinition<InputOptions, OutputOptions>) {
     this.definition = OptionsCleaner.compileDefinition(definition);
   }
 
-  private static compileDefinition<Options extends object>(definition: OptionsDefinition<Options>) {
-    const compiled: OptionsCompiledDefinition<Options> = new Map();
+  private static compileDefinition<
+    InputOptions extends object,
+    OutputOptions extends OptionsCleanerOutput<InputOptions> = InputOptions
+  >(definition: OptionsDefinition<InputOptions, OutputOptions>) {
+    const compiled: OptionsCompiledDefinition<InputOptions, OutputOptions> = new Map();
     Object.entries(definition).forEach(([key, value]) => {
       let generator: any = value;
       if (value === Error) {
@@ -31,16 +50,16 @@ export default class OptionsCleaner<Options extends object> {
       } else if (typeof value !== 'function') {
         generator = (r: any) => r ?? value;
       }
-      compiled.set(<keyof Options>key, generator);
+      compiled.set(<keyof InputOptions>key, generator);
     });
     return compiled;
   }
 
-  clean(options: Options) {
-    const cleaned: Partial<Options> = {};
+  clean(options: InputOptions) {
+    const cleaned: Partial<OutputOptions> = {};
     this.definition.forEach((value, key) => {
-      cleaned[<keyof Options>key] = value(options[<keyof Options>key]);
+      cleaned[<keyof OutputOptions>key] = value(options[<keyof InputOptions>key]);
     });
-    return cleaned as Options;
+    return cleaned as OutputOptions;
   }
 }
