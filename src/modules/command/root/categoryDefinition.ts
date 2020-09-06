@@ -1,8 +1,9 @@
 import { CommandCategoryDefinition } from '../CommandCategory';
+import TestCommand from './TestCommand';
 
 const categoryDefinition: CommandCategoryDefinition = {
   name: '~',
-  commands: [],
+  commands: [TestCommand],
 };
 
 export default categoryDefinition;

@@ -1,14 +1,14 @@
 import { Collection } from 'discord.js';
 
 import OptionsCleaner from '../../utils/optionsCleaner';
-import AbstractCommand, { ConcreteCommandConstructor } from './AbstractCommand';
+import AbstractCommand from './AbstractCommand';
 import CommandCollection from './CommandCollection';
 
 export type CommandCategoryDefinition = {
   name: string,
   description?: string,
   hidden?: boolean,
-  commands: ConcreteCommandConstructor[],
+  commands: Constructor<AbstractCommand>[],
   subcategories?: CommandCategoryDefinition[]
 };
 
@@ -33,7 +33,7 @@ export default class CommandCategory {
       name: Error,
       description: '',
       hidden: false,
-      commands: (commands: ConcreteCommandConstructor[]) => {
+      commands: (commands: Constructor<AbstractCommand>[]) => {
         if (commands == null || commands.length === 0) {
           throw new Error('Command categories must have at least have one command in them.');
         }

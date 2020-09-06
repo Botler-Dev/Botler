@@ -1,7 +1,5 @@
 export type CommandName = string;
 
-export type ConcreteCommandConstructor = { new(): AbstractCommand };
-
 export default abstract class AbstractCommand {
   abstract readonly name: CommandName;
 

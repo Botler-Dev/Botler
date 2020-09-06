@@ -5,7 +5,7 @@ import AbstractCommand from './AbstractCommand';
 export default class CommandCollection extends Collection<string, AbstractCommand> {
   constructor(commands?: AbstractCommand[]) {
     super();
-    commands?.forEach(this.addCommand);
+    commands?.forEach((command) => this.addCommand(command));
   }
 
   addCommand(command: AbstractCommand) {
