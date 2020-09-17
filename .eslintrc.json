@@ -3,23 +3,17 @@
     "browser": true,
     "es2020": true
   },
-  "extends": [
-    "airbnb-base"
-  ],
+  "extends": ["airbnb-base", "prettier", "prettier/@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 11,
     "sourceType": "module"
   },
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [
-          ".ts"
-        ]
+        "extensions": [".ts"]
       }
     }
   },
