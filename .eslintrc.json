@@ -24,14 +24,14 @@
     }
   },
   "rules": {
-    "import/no-extraneous-dependencies": 0,
-    "no-unused-vars": "warn",
+    "import/no-extraneous-dependencies": "off",
     "import/extensions": [
       "error",
       "ignorePackages",
       {
         "ts": "never"
       }
-    ]
+    ],
+    "no-unused-vars": "warn"
   }
 }
