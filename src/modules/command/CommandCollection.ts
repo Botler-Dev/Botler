@@ -1,14 +1,14 @@
 import { Collection } from 'discord.js';
 
-import AbstractCommand from './AbstractCommand';
+import Command from './Command';
 
-export default class CommandCollection extends Collection<string, AbstractCommand> {
-  constructor(commands?: AbstractCommand[]) {
+export default class CommandCollection extends Collection<string, Command> {
+  constructor(commands?: Command[]) {
     super();
     commands?.forEach((command) => this.addCommand(command));
   }
 
-  addCommand(command: AbstractCommand) {
+  addCommand(command: Command) {
     this.set(command.name, command);
     command.aliases?.forEach((alias) => this.set(alias, command));
   }

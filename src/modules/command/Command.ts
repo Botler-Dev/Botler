@@ -1,6 +1,6 @@
 export type CommandName = string;
 
-export default abstract class AbstractCommand {
+export default abstract class Command {
   abstract readonly name: CommandName;
 
   readonly aliases?: CommandName[];

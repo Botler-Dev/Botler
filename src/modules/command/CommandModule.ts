@@ -1,13 +1,13 @@
 import {Client} from 'discord.js';
 import {singleton} from 'tsyringe';
 
-import AbstractModule from '../AbstractModule';
+import Module from '../Module';
 import CommandCategory from './CommandCategory';
 import CommandCollection from './CommandCollection';
 import categoryDefinition from './root/categoryDefinition';
 
 @singleton()
-export default class CommandModule extends AbstractModule {
+export default class CommandModule extends Module {
   tree!: CommandCategory;
 
   commands!: CommandCollection;

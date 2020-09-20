@@ -4,7 +4,7 @@ import {ConnectionOptions} from 'typeorm';
 
 import MasterLogger, {MasterLoggerConfig} from './logger/MasterLogger';
 import ScopedLogger from './logger/ScopedLogger';
-import AbstractModule from './modules/AbstractModule';
+import Module from './modules/Module';
 import CommandModule from './modules/command/CommandModule';
 import OptionsCleaner from './utils/optionsCleaner';
 
@@ -14,7 +14,7 @@ export interface BotConfig {
 }
 
 export default class Bot {
-  public static readonly MODULES: ReadonlyArray<Constructor<AbstractModule>> = [CommandModule];
+  public static readonly MODULES: ReadonlyArray<Constructor<Module>> = [CommandModule];
 
   private masterLogger!: MasterLogger;
 
@@ -22,7 +22,7 @@ export default class Bot {
 
   private client!: Client;
 
-  private modules!: AbstractModule[];
+  private modules!: Module[];
 
   private readonly botConfig: BotConfig;
 

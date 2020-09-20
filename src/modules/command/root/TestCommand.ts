@@ -1,6 +1,6 @@
-import AbstractCommand from '../AbstractCommand';
+import Command from '../Command';
 
-export default class TestCommand extends AbstractCommand {
+export default class TestCommand extends Command {
   name = 'test';
 
   dm = false;

@@ -2,7 +2,7 @@ import {container, DependencyContainer} from 'tsyringe';
 
 import ScopedLogger from '../logger/ScopedLogger';
 
-export default abstract class AbstractModule {
+export default abstract class Module {
   readonly name: string;
 
   protected readonly container: DependencyContainer;

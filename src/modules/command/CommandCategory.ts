@@ -1,14 +1,14 @@
 import { Collection } from 'discord.js';
 
 import OptionsCleaner from '../../utils/optionsCleaner';
-import AbstractCommand from './AbstractCommand';
+import Command from './Command';
 import CommandCollection from './CommandCollection';
 
 export type CommandCategoryDefinition = {
   name: string,
   description?: string,
   hidden?: boolean,
-  commands: Constructor<AbstractCommand>[],
+  commands: Constructor<Command>[],
   subcategories?: CommandCategoryDefinition[]
 };
 
@@ -33,7 +33,7 @@ export default class CommandCategory {
       name: Error,
       description: '',
       hidden: false,
-      commands: (commands: Constructor<AbstractCommand>[]) => {
+      commands: (commands: Constructor<Command>[]) => {
         if (commands == null || commands.length === 0) {
           throw new Error('Command categories must have at least have one command in them.');
         }
@@ -47,7 +47,7 @@ export default class CommandCategory {
     this.name = cleanDefinition.name;
     this.description = cleanDefinition.description;
     this.hidden = cleanDefinition.hidden;
-    this.commands = new CommandCollection(cleanDefinition.commands.map((Command) => new Command()));
+    this.commands = new CommandCollection(cleanDefinition.commands.map((CommandConstructor) => new CommandConstructor()));
     this.subcategories = CommandCategory.createSubcategories(cleanDefinition.subcategories);
   }
 
