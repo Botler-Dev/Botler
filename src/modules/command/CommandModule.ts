@@ -1,16 +1,24 @@
-import {Client} from 'discord.js';
+import {Client, Collection} from 'discord.js';
 import {singleton} from 'tsyringe';
 
 import Module from '../Module';
+import Command, {CommandName} from './Command';
 import CommandCategory from './CommandCategory';
-import CommandCollection from './CommandCollection';
 import categoryDefinition from './root/categoryDefinition';
 
 @singleton()
 export default class CommandModule extends Module {
   tree!: CommandCategory;
 
-  commands!: CommandCollection;
+  /**
+   * All commands mapped with only their `name` properties.
+   */
+  commandInstances!: Collection<CommandName, Command>;
+
+  /**
+   * All command names and aliases mapped to the commands
+   */
+  commandAliases!: Collection<string, Command>;
 
   readonly client: Client;
 
@@ -21,6 +29,10 @@ export default class CommandModule extends Module {
 
   async initialize() {
     this.tree = new CommandCategory(categoryDefinition);
-    this.commands = this.tree.getAllCommands();
+    this.commandInstances = this.tree.getAllCommands();
+    this.commandAliases = this.commandInstances.flatMap(
+      command =>
+        new Collection([command.name].concat(command.aliases ?? []).map(name => [name, command]))
+    );
   }
 }

@@ -1,8 +1,7 @@
 import {Collection} from 'discord.js';
 
 import OptionsCleaner from '../../utils/optionsCleaner';
-import Command from './Command';
-import CommandCollection from './CommandCollection';
+import Command, {CommandName} from './Command';
 
 export type CommandCategoryDefinition = {
   name: string;
@@ -24,7 +23,10 @@ export default class CommandCategory {
 
   readonly hidden: boolean;
 
-  readonly commands: CommandCollection;
+  /**
+   * All commands in this category level. Only mapped with the `name` property.
+   */
+  readonly commands: Collection<CommandName, Command>;
 
   readonly subcategories?: Collection<string, CommandCategory>;
 
@@ -49,8 +51,10 @@ export default class CommandCategory {
     this.name = cleanDefinition.name;
     this.description = cleanDefinition.description;
     this.hidden = cleanDefinition.hidden;
-    this.commands = new CommandCollection(
-      cleanDefinition.commands.map(CommandConstructor => new CommandConstructor())
+    this.commands = new Collection(
+      cleanDefinition.commands
+        .map(CommandConstructor => new CommandConstructor())
+        .map(command => [command.name, command])
     );
     this.subcategories = CommandCategory.createSubcategories(cleanDefinition.subcategories);
   }
@@ -63,7 +67,7 @@ export default class CommandCategory {
     return new Collection(categories);
   }
 
-  getAllCommands(): CommandCollection {
+  getAllCommands(): Collection<CommandName, Command> {
     if (this.subcategories == null) return this.commands.clone();
     return this.commands.concat(...this.subcategories.map(category => category.getAllCommands()));
   }
