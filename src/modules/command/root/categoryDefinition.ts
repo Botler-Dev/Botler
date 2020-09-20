@@ -1,4 +1,4 @@
-import { CommandCategoryDefinition } from '../CommandCategory';
+import {CommandCategoryDefinition} from '../CommandCategory';
 import TestCommand from './TestCommand';
 
 const categoryDefinition: CommandCategoryDefinition = {

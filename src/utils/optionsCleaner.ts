@@ -1,25 +1,24 @@
 export type OptionValueGenerator<InputType, OutputType> = (rawValue: InputType) => OutputType;
 
 export type OptionValueDefinition<InputType, OutputType> =
-  OptionValueGenerator<InputType, OutputType> |
-  (OutputType extends ErrorConstructor ? never : ErrorConstructor) |
-  (OutputType extends Function ? never :
-    InputType extends OutputType ? OutputType : never);
+  | OptionValueGenerator<InputType, OutputType>
+  | (OutputType extends ErrorConstructor ? never : ErrorConstructor)
+  | (OutputType extends Function ? never : InputType extends OutputType ? OutputType : never);
 
 export type OptionsDefinition<
   InputOptions extends object,
   OutputOptions extends OptionsCleanerOutput<InputOptions>
-  > = {
-    [Key in keyof InputOptions]-?: OptionValueDefinition<InputOptions[Key], OutputOptions[Key]>;
-  };
+> = {
+  [Key in keyof InputOptions]-?: OptionValueDefinition<InputOptions[Key], OutputOptions[Key]>;
+};
 
 export type OptionsCompiledDefinition<
   InputOptions extends object,
   OutputOptions extends OptionsCleanerOutput<InputOptions>
-  > = Map<
-    keyof InputOptions,
-    OptionValueGenerator<InputOptions[keyof InputOptions], OutputOptions[keyof InputOptions]>
-  >;
+> = Map<
+  keyof InputOptions,
+  OptionValueGenerator<InputOptions[keyof InputOptions], OutputOptions[keyof InputOptions]>
+>;
 
 export type OptionsCleanerOutput<InputOptions extends object> = {
   [Key in keyof InputOptions]: any;
@@ -28,7 +27,7 @@ export type OptionsCleanerOutput<InputOptions extends object> = {
 export default class OptionsCleaner<
   InputOptions extends object,
   OutputOptions extends OptionsCleanerOutput<InputOptions> = InputOptions
-  > {
+> {
   private definition: OptionsCompiledDefinition<InputOptions, OutputOptions>;
 
   constructor(definition: OptionsDefinition<InputOptions, OutputOptions>) {
