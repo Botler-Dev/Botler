@@ -1,5 +1,5 @@
-import { Client } from 'discord.js';
-import { singleton } from 'tsyringe';
+import {Client} from 'discord.js';
+import {singleton} from 'tsyringe';
 
 import AbstractModule from '../AbstractModule';
 import CommandCategory from './CommandCategory';
@@ -15,7 +15,7 @@ export default class CommandModule extends AbstractModule {
   readonly client: Client;
 
   constructor(client: Client) {
-    super();
+    super('Command');
     this.client = client;
   }
 

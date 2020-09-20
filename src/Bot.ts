@@ -3,6 +3,7 @@ import {container} from 'tsyringe';
 import {ConnectionOptions} from 'typeorm';
 
 import MasterLogger, {MasterLoggerConfig} from './logger/MasterLogger';
+import ScopedLogger from './logger/ScopedLogger';
 import AbstractModule from './modules/AbstractModule';
 import CommandModule from './modules/command/CommandModule';
 import OptionsCleaner from './utils/optionsCleaner';
@@ -16,6 +17,8 @@ export default class Bot {
   public static readonly MODULES: ReadonlyArray<Constructor<AbstractModule>> = [CommandModule];
 
   private masterLogger!: MasterLogger;
+
+  private globalLogger!: ScopedLogger;
 
   private client!: Client;
 
@@ -35,6 +38,9 @@ export default class Bot {
   public async initializeBot() {
     this.masterLogger = new MasterLogger(this.botConfig.logger);
     container.register(MasterLogger, {useValue: this.masterLogger});
+
+    this.globalLogger = new ScopedLogger('global');
+    container.register(ScopedLogger, {useValue: this.globalLogger});
 
     this.client = new Client({
       disableMentions: 'everyone',
