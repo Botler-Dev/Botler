@@ -4,11 +4,12 @@
   "description": "Exon multipurpose discord bot",
   "main": "main.js",
   "scripts": {
-    "lint": "eslint . --ext .ts || exit 0",
-    "fix": "eslint . --ext .ts --fix || exit 0",
-    "build": "tsc || exit 0",
-    "watch": "tsc --watch || exit 0",
-    "bot": "node ./dist/main.js || exit 0",
+    "lint": "eslint . --ext .ts",
+    "fix": "eslint . --ext .ts --fix",
+    "build:prod": "tsc",
+    "build:dev": "tsc --sourceMap",
+    "build:watch": "tsc --watch --sourceMap",
+    "bot": "node ./dist/main.js",
     "format": "cd src && npx prettier --write \"**/*.ts\""
   },
   "repository": {
