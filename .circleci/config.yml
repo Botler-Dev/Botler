@@ -26,6 +26,7 @@ jobs:
   eslint:
     executor: node-executor
     steps:
+      - checkout
       - run:
           name: Run linter
           command: |
@@ -33,5 +34,5 @@ jobs:
 workflows:
   default:
     jobs:
-      - eslint
       - build
+      - eslint
