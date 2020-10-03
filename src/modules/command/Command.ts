@@ -14,5 +14,5 @@ export default abstract class Command {
 
   readonly globalCooldown?: number;
 
-  readonly ExecutionSubject: Subject
+  // readonly ExecutionSubject: Subject
 }

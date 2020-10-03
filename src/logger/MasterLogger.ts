@@ -64,7 +64,7 @@ export default class MasterLogger implements Logger {
     return output;
   }
 
-  advancedLog(metadata: LogMetadata, ...objs: any[]) {
+  advancedLog(metadata: LogMetadata, ...objs: any[]): void {
     let metaString = '';
     if (this.config.stampLabel) {
       metaString += this.finalizeLabel(
@@ -82,19 +82,19 @@ export default class MasterLogger implements Logger {
     console[logLevel](metaString, ...objs);
   }
 
-  log(metadata: LogLevelMetadata, ...objs: any[]) {
+  log(metadata: LogLevelMetadata, ...objs: any[]): void {
     this.advancedLog({level: LogLevel.Log, ...metadata}, ...objs);
   }
 
-  info(metadata: LogLevelMetadata, ...objs: any[]) {
+  info(metadata: LogLevelMetadata, ...objs: any[]): void {
     this.advancedLog({level: LogLevel.Info, ...metadata}, ...objs);
   }
 
-  warn(metadata: LogLevelMetadata, ...objs: any[]) {
+  warn(metadata: LogLevelMetadata, ...objs: any[]): void {
     this.advancedLog({level: LogLevel.Warn, ...metadata}, ...objs);
   }
 
-  error(metadata: LogLevelMetadata, ...objs: any[]) {
+  error(metadata: LogLevelMetadata, ...objs: any[]): void {
     this.advancedLog({level: LogLevel.Error, ...metadata}, ...objs);
   }
 }

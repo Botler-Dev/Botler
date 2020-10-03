@@ -27,7 +27,7 @@ export default class CommandModule extends Module {
     this.client = client;
   }
 
-  async initialize() {
+  async initialize(): Promise<void> {
     this.tree = new CommandCategory(categoryDefinition);
     this.commandInstances = this.tree.getAllCommands();
     this.commandAliases = this.commandInstances.flatMap(

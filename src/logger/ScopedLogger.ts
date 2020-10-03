@@ -13,19 +13,19 @@ export default class ScopedLogger implements Logger {
     this.masterLogger = container.resolve(MasterLogger);
   }
 
-  log(...objs: any[]) {
+  log(...objs: any[]): void {
     this.masterLogger.log({scope: this.scope}, ...objs);
   }
 
-  info(...objs: any[]) {
+  info(...objs: any[]): void {
     this.masterLogger.log({scope: this.scope}, ...objs);
   }
 
-  warn(...objs: any[]) {
+  warn(...objs: any[]): void {
     this.masterLogger.log({scope: this.scope}, ...objs);
   }
 
-  error(...objs: any[]) {
+  error(...objs: any[]): void {
     this.masterLogger.log({scope: this.scope}, ...objs);
   }
 }

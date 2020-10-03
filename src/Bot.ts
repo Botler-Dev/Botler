@@ -35,7 +35,7 @@ export default class Bot {
     this.botConfig = Bot.botConfigCleaner.clean(botConfig);
   }
 
-  public async initializeBot() {
+  public async initializeBot(): Promise<void> {
     this.masterLogger = new MasterLogger(this.botConfig.logger);
     container.register(MasterLogger, {useValue: this.masterLogger});
 
