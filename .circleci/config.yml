@@ -3,22 +3,22 @@ jobs:
   build:
     docker:
       - image: node:14-alpine
-      auth:
-        username: mydockerhub-user
-        password: $DOCKERHUB_PASSWORD
-  steps:
-    - checkout
-    - run:
-        name: Build Bot
-        command: |
-          npm ci
-          npm run build:prod
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+    steps:
+      - checkout
+      - run:
+          name: Build Bot
+          command: |
+            npm ci
+            npm run build:prod
   eslint:
     docker:
       - image: node:14-alpine
-      auth:
-        username: mydockerhub-user
-        password: $DOCKERHUB_PASSWORD
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
     steps:
       - run:
           name: Run linter
