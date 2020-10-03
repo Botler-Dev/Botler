@@ -33,7 +33,8 @@ jobs:
             npm run lint
 workflow:
   default:
-    - build
-    - eslint:
-        requires:
-          - build
+    jobs:
+      - build
+      - eslint:
+          requires:
+            - build
