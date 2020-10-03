@@ -8,7 +8,7 @@ executors:
           password: $DOCKERHUB_PASSWORD
 jobs:
   build:
-    executors: node-executor
+    executor: node-executor
     steps:
       - checkout
       - run:
@@ -24,7 +24,7 @@ jobs:
           command: |
             npm run build:prod
   eslint:
-    executors: node-executor
+    executor: node-executor
     steps:
       - run:
           name: Run linter
