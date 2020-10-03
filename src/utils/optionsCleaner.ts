@@ -56,7 +56,8 @@ export default class OptionsCleaner<
   ) {
     if (definition === Error)
       return (raw: Input) => {
-        if (raw == null) throw new Error(`Options is missing required argument "${name}"`);
+        if (raw === undefined || raw === null)
+          throw new Error(`Options is missing required argument "${name}"`);
         return raw as Output;
       };
     if (typeof definition !== 'function') return (raw: Input) => (raw as Output) ?? definition;

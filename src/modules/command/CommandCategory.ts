@@ -38,7 +38,7 @@ export default class CommandCategory {
     description: '',
     hidden: false,
     commands: (commands: Constructor<Command>[]) => {
-      if (commands == null || commands.length === 0) {
+      if (commands.length === 0) {
         throw new Error('Command categories must have at least have one command in them.');
       }
       return commands;
@@ -60,7 +60,7 @@ export default class CommandCategory {
   }
 
   private static createSubcategories(subcategories?: CommandCategoryDefinition[]) {
-    if (subcategories == null) return undefined;
+    if (subcategories === undefined) return undefined;
     const categories = subcategories
       .map(category => new CommandCategory(category))
       .map(category => [category.name, category] as [string, CommandCategory]);
@@ -68,7 +68,7 @@ export default class CommandCategory {
   }
 
   getAllCommands(): Collection<CommandName, Command> {
-    if (this.subcategories == null) return this.commands.clone();
+    if (this.subcategories === undefined) return this.commands.clone();
     return this.commands.concat(...this.subcategories.map(category => category.getAllCommands()));
   }
 }
