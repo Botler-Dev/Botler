@@ -9,9 +9,16 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build Bot
+          name: Add Bot Config
+          command: |
+            echo "{\"ormconfig\": {}}" > src/botconfig.json
+      - run:
+          name: Install Dependencies
           command: |
             npm ci
+      - run:
+          name: Build Bot
+          command: |
             npm run build:prod
   eslint:
     docker:
