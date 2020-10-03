@@ -33,5 +33,5 @@ jobs:
 workflow:
   default:
     jobs:
-      - build
       - eslint
+      - build
