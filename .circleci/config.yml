@@ -7,18 +7,21 @@ executors:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
 jobs:
-  build:
+  setup:
     executor: node-executor
     steps:
       - checkout
       - run:
-          name: Add Bot Config
-          command: |
-            echo "{\"ormconfig\": {}}" > src/botconfig.json
-      - run:
           name: Install Dependencies
           command: |
             npm ci
+      - run:
+          name: Add Bot Config
+          command: |
+            echo "{\"ormconfig\": {}}" > src/botconfig.json
+  build:
+    executor: node-executor
+    steps:
       - run:
           name: Build Bot
           command: |
@@ -26,7 +29,6 @@ jobs:
   eslint:
     executor: node-executor
     steps:
-      - checkout
       - run:
           name: Run linter
           command: |
@@ -34,5 +36,10 @@ jobs:
 workflows:
   default:
     jobs:
-      - build
-      - eslint
+      - setup
+      - build:
+          requires:
+            - setup
+      - eslint:
+          requires:
+            - setup
