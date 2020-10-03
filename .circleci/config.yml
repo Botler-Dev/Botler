@@ -1,11 +1,14 @@
 version: 2.1
-jobs:
-  build:
+executors:
+  node-executor:
     docker:
       - image: node:14-alpine
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
+jobs:
+  build:
+    executors: node-executor
     steps:
       - checkout
       - run:
@@ -21,11 +24,7 @@ jobs:
           command: |
             npm run build:prod
   eslint:
-    docker:
-      - image: node:14-alpine
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD
+    executors: node-executor
     steps:
       - run:
           name: Run linter
@@ -35,6 +34,4 @@ workflow:
   default:
     jobs:
       - build
-      - eslint:
-          requires:
-            - build
+      - eslint
