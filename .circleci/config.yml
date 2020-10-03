@@ -30,7 +30,7 @@ jobs:
           name: Run linter
           command: |
             npm run lint
-workflow:
+workflows:
   default:
     jobs:
       - eslint
