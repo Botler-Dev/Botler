@@ -6,7 +6,7 @@ import MasterLogger, {MasterLoggerConfig} from './logger/MasterLogger';
 import ScopedLogger from './logger/ScopedLogger';
 import Module from './modules/Module';
 import CommandModule from './modules/command/CommandModule';
-import OptionsCleaner from './utils/optionsCleaner';
+import OptionsCleaner from './utils/OptionsCleaner';
 
 export interface BotConfig {
   ormconfig: ConnectionOptions;

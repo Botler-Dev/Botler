@@ -1,6 +1,6 @@
 import {Collection} from 'discord.js';
 
-import OptionsCleaner from '../../utils/optionsCleaner';
+import OptionsCleaner from '../../utils/OptionsCleaner';
 import Command, {CommandName} from './Command';
 
 export type CommandCategoryDefinition = {

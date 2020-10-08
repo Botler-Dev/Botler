@@ -2,7 +2,7 @@
 import chalk, {Chalk} from 'chalk';
 import dayjs from 'dayjs';
 
-import OptionsCleaner from '../utils/optionsCleaner';
+import OptionsCleaner from '../utils/OptionsCleaner';
 import Logger, {LOG_LEVEL_STRINGS, LogLevel} from './Logger';
 
 export type ConsoleColor = Parameters<Chalk['keyword']>[0] | Parameters<Chalk['rgb']>;
