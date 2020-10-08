@@ -9,7 +9,8 @@
     "build:prod": "tsc",
     "build:dev": "tsc --sourceMap",
     "build:watch": "tsc --watch --sourceMap",
-    "bot": "node ./dist/main.js",
+    "start:prod": "node ./dist/main.js",
+    "start:dev": "node -r dotenv/config ./dist/main.js",
     "format": "cd src && npx prettier --write \"**/*.ts\""
   },
   "repository": {
@@ -39,6 +40,7 @@
     "@types/ws": "^7.2.6",
     "@typescript-eslint/eslint-plugin": "^3.6.1",
     "@typescript-eslint/parser": "^3.9.1",
+    "dotenv": "^8.2.0",
     "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-airbnb-typescript": "^9.0.0",

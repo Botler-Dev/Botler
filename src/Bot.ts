@@ -1,17 +1,10 @@
 import {Client} from 'discord.js';
 import {container} from 'tsyringe';
-import {ConnectionOptions} from 'typeorm';
 
-import MasterLogger, {MasterLoggerConfig} from './logger/MasterLogger';
+import MasterLogger from './logger/MasterLogger';
 import ScopedLogger from './logger/ScopedLogger';
-import Module from './modules/Module';
 import CommandModule from './modules/command/CommandModule';
-import OptionsCleaner from './utils/OptionsCleaner';
-
-export interface BotConfig {
-  ormconfig: ConnectionOptions;
-  logger?: MasterLoggerConfig;
-}
+import Module from './modules/Module';
 
 export default class Bot {
   public static readonly MODULES: ReadonlyArray<Constructor<Module>> = [CommandModule];
@@ -24,19 +17,8 @@ export default class Bot {
 
   private modules!: Module[];
 
-  private readonly botConfig: BotConfig;
-
-  private static readonly botConfigCleaner = new OptionsCleaner<BotConfig>({
-    ormconfig: Error,
-    logger: (raw?: MasterLoggerConfig) => raw,
-  });
-
-  constructor(botConfig: BotConfig) {
-    this.botConfig = Bot.botConfigCleaner.clean(botConfig);
-  }
-
   public async initializeBot(): Promise<void> {
-    this.masterLogger = new MasterLogger(this.botConfig.logger);
+    this.masterLogger = new MasterLogger();
     container.register(MasterLogger, {useValue: this.masterLogger});
 
     this.globalLogger = new ScopedLogger('global');

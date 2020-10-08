@@ -8,4 +8,4 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build:prod && (rm -r src & rm -r node_modules && npm ci --production)
 
-CMD npm run bot
+CMD npm run start:prod
