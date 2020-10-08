@@ -15,10 +15,6 @@ commands:
           name: Install Dependencies
           command: |
             npm ci
-      - run:
-          name: Add Bot Config
-          command: |
-            echo "{\"ormconfig\": {}}" > src/botconfig.json
 jobs:
   build:
     executor: node-executor
