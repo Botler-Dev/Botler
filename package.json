@@ -10,7 +10,7 @@
     "build:dev": "tsc --sourceMap",
     "build:watch": "tsc --watch --sourceMap",
     "start:prod": "node ./dist/main.js",
-    "start:dev": "node -r dotenv/config ./dist/main.js",
+    "start:dev": "node -r dotenv/config --nolazy ./dist/main.js",
     "format": "cd src && npx prettier --write \"**/*.ts\""
   },
   "repository": {
