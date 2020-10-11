@@ -2,8 +2,8 @@
 import chalk from 'chalk';
 import dayjs from 'dayjs';
 
-import {stringToBooleanCleaner, stringToNumberCleaner} from '../utils/cleaners';
-import OptionsCleaner from '../utils/OptionsCleaner';
+import {optional, optionalStringToBoolean, optionalToNumber} from '../utils/optionCleaners';
+import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
 import Logger, {LOG_LEVEL_STRINGS, LogLevel} from './Logger';
 
 export type MasterLoggerConfig = {
@@ -38,25 +38,25 @@ export type LogLevelMetadata = Omit<LogMetadata, 'level'>;
 export default class MasterLogger implements Logger {
   private config: MasterLoggerConfig;
 
-  private static readonly configCleaner = new OptionsCleaner<
+  private static readonly configCleanerDefinition: OptionsCleanerDefinition<
     RawMasterLoggerConfig,
     MasterLoggerConfig
-  >({
-    stampLabel: stringToBooleanCleaner(true),
-    scopeLabel: stringToBooleanCleaner(true),
-    levelLabel: stringToBooleanCleaner(true),
-    stampColor: 'gray',
-    scopeColor: 'yellow',
-    levelColor: 'cyan',
-    labelPrefix: '[',
-    labelSuffix: ']',
-    stampPad: stringToNumberCleaner(0),
-    scopePad: stringToNumberCleaner(10),
-    stampPattern: 'YYYY/MM/DD HH:mm:ss.sss',
-  });
+  > = {
+    stampLabel: optionalStringToBoolean(true),
+    scopeLabel: optionalStringToBoolean(true),
+    levelLabel: optionalStringToBoolean(true),
+    stampColor: optional('gray'),
+    scopeColor: optional('yellow'),
+    levelColor: optional('cyan'),
+    labelPrefix: optional('['),
+    labelSuffix: optional(']'),
+    stampPad: optionalToNumber(0),
+    scopePad: optionalToNumber(10),
+    stampPattern: optional('YYYY/MM/DD HH:mm:ss.sss'),
+  };
 
   constructor() {
-    this.config = MasterLogger.configCleaner.clean({
+    this.config = cleanOptions(MasterLogger.configCleanerDefinition, {
       stampLabel: process.env.LOGGER_STAMP_LABEL,
       scopeLabel: process.env.LOGGER_SCOPE_LABEL,
       levelLabel: process.env.LOGGER_LEVEL_LABEL,
