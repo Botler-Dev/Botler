@@ -74,11 +74,7 @@ export default class MasterLogger implements Logger {
   private finalizeLabel(value: string, color: string, minLength?: number) {
     let output = this.config.labelPrefix + value + this.config.labelSuffix;
     output = output.padEnd(minLength ?? 0, ' ');
-    if (color.startsWith('#')) {
-      output = chalk.hex(color)(output);
-    } else {
-      output = chalk.keyword(color)(output);
-    }
+    output = (color.startsWith('#') ? chalk.hex(color) : chalk.keyword(color))(output);
     return output;
   }
 
