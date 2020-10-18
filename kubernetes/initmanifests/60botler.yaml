@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: botler-config
+  labels:
+    app: botler
+  namespace: botler
+data:
+  TYPEORM_CONNECTION: postgres
+  TYPEORM_DATABASE: BotlerDB
+  TYPEORM_USERNAME: postgres
+  TYPEORM_PASSWORD: root
+  TYPEORM_HOST: botler-postgresql-headless
+  TYPEORM_PORT: "5432"
+  TYPEORM_ENTITIES: dist/entities/persistent/*.js
+  TYPEORM_MIGRATIONS: dist/entities/persistent
+  TYPEORM_MIGRATIONS_DIR: dist/migration

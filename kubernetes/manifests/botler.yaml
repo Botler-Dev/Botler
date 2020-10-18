@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: botler-deployment
+  labels:
+    app: botler
+  namespace: botler
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: botler
+
+  template:
+    metadata:
+      name: botler
+      labels:
+        app: botler
+
+    spec:
+      nodeName: intel01
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+
+      containers:
+        - image: botler:latest
+          imagePullPolicy: IfNotPresent
+          name: botler
+          resources:
+            requests:
+              memory: 300M
+              cpu: 300m
+            limits:
+              memory: 500M
+              cpu: 500m
+          envFrom:
+            - configMapRef:
+                name: botler-config
