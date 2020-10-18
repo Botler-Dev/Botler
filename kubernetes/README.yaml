@@ -1,5 +1,5 @@
 note: this kubernetes solution is only designed for a single node cluster
-dev-note: any mentions of 'intel01' or 'node-role.kubernetes.io/master' are for my machine. you can delete everything but the nodeaffinity part of initmanifests/50postgres.yaml
+dev-note: any mentions of 'intel01' or 'node-role.kubernetes.io/master' are for my machine. you can delete everything but you have to change the nodeaffinity part of initmanifests/50postgres.yaml
 
 how to use:
   - run "./build-docker.sh" in the root directory
