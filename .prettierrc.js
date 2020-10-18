@@ -1,3 +1,3 @@
 module.exports = {
-  ...require('prettier-airbnb-config')
+  ...require('prettier-airbnb-config'),
 };
