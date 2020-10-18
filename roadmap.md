@@ -21,4 +21,3 @@ will be implemented in what version.
 | VERSION 1.0                      |
 | **Birthday Role Assignment**     | Automatically assign a role on a members birthday             |
 | **Leveling**                     | Voice and text based leveling with rank roles                 |
-| **UwU Features**                 | Will have to look with @Montori what this is                  |
