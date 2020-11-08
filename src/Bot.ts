@@ -1,6 +1,6 @@
 import {Client} from 'discord.js';
 import {container} from 'tsyringe';
-import { Connection, createConnection } from 'typeorm';
+import {Connection, createConnection} from 'typeorm';
 
 import MasterLogger from './logger/MasterLogger';
 import ScopedLogger from './logger/ScopedLogger';
@@ -16,6 +16,8 @@ export default class Bot {
 
   private client!: Client;
 
+  private connection!: Connection;
+
   private modules!: Module[];
 
   public async initializeBot(): Promise<void> {
@@ -29,11 +31,11 @@ export default class Bot {
       disableMentions: 'everyone',
       partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
     });
-
     container.register(Client, {useValue: this.client});
 
-    const connection: Connection = await createConnection();
-    connection.runMigrations();
+    this.connection = await createConnection();
+    container.register(Connection, {useValue: this.connection});
+    await this.connection.runMigrations({transaction: 'all'});
 
     this.modules = Bot.MODULES.map(constructor => container.resolve(constructor));
     Promise.all(this.modules.map(module => module.initialize?.()));

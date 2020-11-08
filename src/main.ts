@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 import Bot from './Bot';
+import {preprocessEnvironmentVariables} from './utils/enviroment';
 
 function exitWithError() {
   console.info('Exiting with code 1.');
@@ -21,6 +22,8 @@ process.on('uncaughtException', error => {
 });
 
 dayjs.extend(utc);
+
+preprocessEnvironmentVariables();
 
 const bot = new Bot();
 bot.initializeBot().catch(error => {
