@@ -12,5 +12,5 @@
     "removeComments": true,
     "strict": true
   },
-  "include": ["src/**/*.ts", "src/botconfig.json", ".eslintrc.js"]
+  "include": ["src/**/*.ts", ".eslintrc.js"]
 }
