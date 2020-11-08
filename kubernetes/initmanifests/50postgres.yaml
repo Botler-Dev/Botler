@@ -4,7 +4,7 @@ metadata:
   name: postgres-storageclass
   namespace: botler
 provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: Immediate
+volumeBindingMode: WaitForFirstConsumer
 
 ---
 apiVersion: v1
@@ -14,7 +14,7 @@ metadata:
   namespace: botler
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   storageClassName: postgres-storageclass
   capacity:
     storage: 100Mi
@@ -39,7 +39,7 @@ metadata:
   namespace: botler
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   storageClassName: postgres-storageclass
   capacity:
     storage: 100Mi
