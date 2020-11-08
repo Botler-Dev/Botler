@@ -11,18 +11,12 @@ replication:
   enabled: yes
   slaveReplicas: 1
 
-service:
-  type: NodePort
-  nodePort: 30432
-
 persistence:
   storageClass: postgres-storageclass
-  accessModes: [ ReadWriteMany ]
+  accessModes: [ ReadWriteOnce ]
   size: 100Mi
 
 master:
-  service:
-    nodePort: 30432
   nodeSelector:
     kubernetes.io/hostname: intel01
   tolerations:
@@ -30,8 +24,6 @@ master:
       operator: Exists
 
 slave:
-  service:
-    nodePort: 30433
   nodeSelector:
     kubernetes.io/hostname: intel01
   tolerations:
