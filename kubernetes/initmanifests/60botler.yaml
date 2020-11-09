@@ -10,7 +10,7 @@ data:
   TYPEORM_DATABASE: postgres
   TYPEORM_USERNAME: postgres
   TYPEORM_PASSWORD: root
-  TYPEORM_HOST: botler-postgresql-postgresql-ha-postgresql-headless
+  TYPEORM_HOST: botler-postgresql-postgresql-ha-pgpool
   TYPEORM_PORT: "5432"
   TYPEORM_ENTITIES: dist/entities/persistent/*.js
   TYPEORM_MIGRATIONS: dist/entities/persistent
