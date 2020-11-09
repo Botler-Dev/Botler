@@ -10,7 +10,7 @@ volumeBindingMode: WaitForFirstConsumer
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-volume-master
+  name: postgres-volume-0
   namespace: botler
 spec:
   accessModes:
@@ -20,9 +20,9 @@ spec:
     storage: 100Mi
   claimRef:
     namespace: botler
-    name: data-botler-postgresql-postgresql-master-0
+    name: data-botler-postgresql-postgresql-ha-postgresql-0
   local:
-    path: /data/postgres_volume_master
+    path: /data/postgres_volume_0
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -35,7 +35,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-volume-slave
+  name: postgres-volume-1
   namespace: botler
 spec:
   accessModes:
@@ -45,9 +45,9 @@ spec:
     storage: 100Mi
   claimRef:
     namespace: botler
-    name: data-botler-postgresql-slave-0
+    name: data-botler-postgresql-postgresql-ha-postgresql-1
   local:
-    path: /data/postgres_volume_slave
+    path: /data/postgres_volume_1
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -55,3 +55,4 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values: [ intel01 ]
+

@@ -1,31 +1,24 @@
 global:
   postgresql:
-    postgresqlDatabase: BotlerDB
-    postgresqlUsername: postgres
-    postgresqlPassword: root
-    servicePort: "5432"
-    replicationPassword: password
-  storageClass: postgres-storageclass
+    database: postgres
+    username: postgres
+    password: root
+  storageClass: postgress-storageclass
 
-replication:
-  enabled: yes
-  slaveReplicas: 1
+postgresql:
+  nodeSelector:
+    kubernetes.io/hostname: intel01
+  tolerations:
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+
+pgpool:
+  nodeSelector:
+    kubernetes.io/hostname: intel01
+  tolerations:
+    - key: node-role.kubernetes.io/master
+      operator: Exists
 
 persistence:
-  storageClass: postgres-storageclass
   accessModes: [ ReadWriteOnce ]
   size: 100Mi
-
-master:
-  nodeSelector:
-    kubernetes.io/hostname: intel01
-  tolerations:
-    - key: node-role.kubernetes.io/master
-      operator: Exists
-
-slave:
-  nodeSelector:
-    kubernetes.io/hostname: intel01
-  tolerations:
-    - key: node-role.kubernetes.io/master
-      operator: Exists
