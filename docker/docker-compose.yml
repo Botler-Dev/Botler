@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  bot:
+    image: botler:dev
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.dev
+    environment:
+      TYPEORM_HOST: postgres
+      TYPEORM_USERNAME: postgres
+      TYPEORM_PASSWORD: ${POSTGRES_PASSWORD}

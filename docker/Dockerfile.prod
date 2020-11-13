@@ -1,0 +1,21 @@
+FROM node:14-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build:prod
+
+RUN npm prune --production
+
+FROM mhart/alpine-node:slim-14
+
+WORKDIR /app
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+
+# Do not use NPM here because the slim version does not have it
+CMD ["node","./dist/main.js"]

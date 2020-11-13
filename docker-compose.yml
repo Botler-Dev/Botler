@@ -1,6 +1,0 @@
-version: '3'
-
-services:
-  bot:
-    image: botler
-    container_name: bot
