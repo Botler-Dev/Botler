@@ -16,7 +16,9 @@ export function preprocessEnvironmentVariables(): void {
 
   process.env.TYPEORM_DATABASE = process.env.TYPEORM_DATABASE || 'postgres';
   process.env.TYPEORM_PORT = process.env.TYPEORM_PORT || '5432';
-  process.env.TYPEORM_SYNCHRONIZE = runningInProduction ? 'false' : 'true';
+  process.env.TYPEORM_SYNCHRONIZE = runningInProduction
+    ? 'false'
+    : process.env.TYPEORM_SYNCHRONIZE ?? 'true';
 
   if (runningInProduction) return;
   if (!process.env.TYPEORM_USERNAME) {
@@ -24,7 +26,7 @@ export function preprocessEnvironmentVariables(): void {
     warnDevelopmentDefault('TYPEORM_USERNAME', process.env.TYPEORM_USERNAME);
   }
   if (!process.env.TYPEORM_PASSWORD) {
-    process.env.TYPEORM_PASSWORD = 'password';
+    process.env.TYPEORM_PASSWORD = 'botler';
     warnDevelopmentDefault('TYPEORM_PASSWORD', process.env.TYPEORM_PASSWORD);
   }
 }

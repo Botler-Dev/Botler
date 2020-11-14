@@ -3,7 +3,7 @@
   "database": "postgres",
   "port": "5432",
   "username": "postgres",
-  "password": "password",
+  "password": "botler",
   "entities": ["src/entities/**/*.ts"],
   "migrations": ["src/migrations/**/*.ts"],
   "cli": {
