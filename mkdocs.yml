@@ -51,5 +51,7 @@ nav:
       - Introduction: index.md
       - License: License.md
   - Development:
+      - Run Botler: Development/Run-Botler.md
+      - Configuration: Development/Configuration.md
       - Database Schema: Development/Database-Schema.md
       - Documentation: Development/Documentation.md
