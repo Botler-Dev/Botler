@@ -1,0 +1,11 @@
+name: botler-mkdocs
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+      - mkdocs-material==6.1.4
+      - mkdocs==1.1.2
+      - mkdocs-minify-plugin==0.3.0
+      - mkdocs-git-revision-date-localized-plugin==0.7.3

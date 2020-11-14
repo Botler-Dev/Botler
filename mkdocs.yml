@@ -4,14 +4,11 @@ repo_url: https://github.com/Botler-Dev/Botler
 
 theme:
   name: material
-  custom_dir: docs/overrides
   palette:
-    scheme: slate
-    primary: blue
-    accent: blue
+    scheme: default
   features:
-    - instant
-    - tabs
+    - navigation.tabs
+    - navigation.instant
   icon:
     repo: fontawesome/brands/github
 
@@ -24,40 +21,34 @@ plugins:
 
 extra:
   social:
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/AQBYTSxg4C
     - icon: fontawesome/brands/github
       link: https://github.com/Botler-Dev/Botler
 
 markdown_extensions:
-  - codehilite:
-      guess_lang: false
-  - toc:
-      permalink: true
+  - abbr
+  - admonition
+  - attr_list
+  - meta
+  - footnotes
+  - pymdownx.snippets
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.tabbed
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.betterem:
       smart_enable: all
-  - admonition
-  - meta
-  - footnotes
-  - pymdownx.details
-  - pymdownx.inlinehilite
-  - pymdownx.superfences
-  - pymdownx.tabbed
-  - pymdownx.tilde
+  - toc:
+      permalink: true
 
 nav:
   - Home:
       - Introduction: index.md
-      - Commands List: Commands.md
       - License: License.md
-  - Setup Guides:
-      - Production:
-          - Linux: Setup-Guides/Production/Linux-Prod-Setup-Guide.md
-      - Development:
-          - Linux: Setup-Guides/Development/Linux-Dev-Setup-Guide.md
-      - Helpful Guides:
-          - Create A Bot: Helpful-Guides/Creating-&-Inviting-A-Bot.md
-          - Invite A Bot: Helpful-Guides/Creating-&-Inviting-A-Bot.md
-          - Bot Token: Helpful-Guides/Bot-Token.md
   - Development:
       - Database Schema: Development/Database-Schema.md
