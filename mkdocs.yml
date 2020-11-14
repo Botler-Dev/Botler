@@ -52,3 +52,4 @@ nav:
       - License: License.md
   - Development:
       - Database Schema: Development/Database-Schema.md
+      - Documentation: Development/Documentation.md
