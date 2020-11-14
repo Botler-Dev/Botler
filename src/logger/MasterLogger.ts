@@ -21,7 +21,7 @@ export type MasterLoggerConfig = {
   stampPad: number;
   scopePad: number;
 
-  stampPattern: string;
+  stampFormat: string;
 };
 
 export type RawMasterLoggerConfig = {
@@ -52,7 +52,7 @@ export default class MasterLogger implements Logger {
     labelSuffix: optional(']'),
     stampPad: optionalToNumber(0),
     scopePad: optionalToNumber(10),
-    stampPattern: optional('YYYY/MM/DD HH:mm:ss.sss'),
+    stampFormat: optional('YYYY/MM/DD HH:mm:ss.sss'),
   };
 
   constructor() {
@@ -67,7 +67,7 @@ export default class MasterLogger implements Logger {
       labelSuffix: process.env.LOGGER_LABEL_SUFFIX,
       stampPad: process.env.LOGGER_STAMP_PAD,
       scopePad: process.env.LOGGER_SCOPE_PAD,
-      stampPattern: process.env.LOGGER_STAMP_PATTERN,
+      stampFormat: process.env.LOGGER_STAMP_FORMAT,
     });
   }
 
@@ -82,7 +82,7 @@ export default class MasterLogger implements Logger {
     let metaString = '';
     if (this.config.stampLabel) {
       metaString += this.finalizeLabel(
-        dayjs().utc().format(this.config.stampPattern),
+        dayjs().utc().format(this.config.stampFormat),
         this.config.stampColor,
         this.config.stampPad
       );

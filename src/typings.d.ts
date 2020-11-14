@@ -16,6 +16,6 @@ declare namespace NodeJS {
     LOGGER_STAMP_PAD?: string;
     LOGGER_SCOPE_PAD?: string;
 
-    LOGGER_STAMP_PATTERN?: string;
+    LOGGER_STAMP_FORMAT?: string;
   }
 }

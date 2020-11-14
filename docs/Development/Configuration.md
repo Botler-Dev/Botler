@@ -23,7 +23,7 @@ Botler can be configured via the environment variables below.
 | `LOGGER_LABEL_SUFFIX`  |            `]`            |     same     | Suffix of metadata label                                                                                                      |
 |   `LOGGER_STAMP_PAD`   |            `0`            |     same     | Minimum length of characters for timestamp label. Will be padded with spaces.                                                 |
 |   `LOGGER_SCOPE_PAD`   |           `10`            |     same     | Minimum length of characters for the scope label. Will be padded with spaces.                                                 |
-| `LOGGER_STAMP_PATTERN` | `YYYY/MM/DD HH:mm:ss.sss` |     same     | Pattern of timestamp label. See the [Day.js documentation](https://day.js.org/docs/en/display/format) for more information.   |
+| `LOGGER_STAMP_FORMAT`  | `YYYY/MM/DD HH:mm:ss.sss` |     same     | Format of timestamp label. See the [Day.js documentation](https://day.js.org/docs/en/display/format) for more information.    |
 
 !!! tip "Additional Database Connection Options"
     The variables with a `TYPEORM` prefix are for the database connection but not all possible options are listed.
