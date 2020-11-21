@@ -4,7 +4,7 @@
   "description": "Exon multipurpose discord bot",
   "main": "dist/main.js",
   "scripts": {
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint .",
     "lint:fix": "yarn lint --fix",
     "build:prod": "tsc",
     "build:dev": "tsc --sourceMap",
