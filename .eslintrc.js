@@ -34,6 +34,7 @@ module.exports = {
         ts: 'never',
       },
     ],
+    'prettier/prettier': 'error',
     // Types are often not the default export
     'unicorn/import-style': 'off',
     // Conflict with "consistent-return"
