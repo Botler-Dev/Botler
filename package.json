@@ -1,22 +1,22 @@
 {
-  "name": "exon",
+  "name": "botler",
   "version": "0.0.1",
   "description": "Exon multipurpose discord bot",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "fix": "eslint . --ext .ts --fix",
+    "lint:fix": "yarn lint --fix",
     "build:prod": "tsc",
     "build:dev": "tsc --sourceMap",
-    "build:watch": "tsc --watch --sourceMap",
+    "build:watch": "yarn build:dev --sourceMap",
     "start:prod": "node ./dist/main.js",
-    "start:dev": "node -r dotenv/config --nolazy ./dist/main.js",
+    "start:dev": "node --require dotenv/config --nolazy ./dist/main.js",
     "format": "npx prettier --write .",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Exon-Development/Exon.git"
+    "url": "git+https://github.com/Botler-Dev/Botler.git"
   },
   "keywords": [
     "bot",
@@ -25,9 +25,12 @@
   "author": "Codec, Montori",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Exon-Development/Exon/issues"
+    "url": "https://github.com/Botler-Dev/Botler/issues"
   },
-  "homepage": "https://github.com/Exon-Development/Exon#readme",
+  "homepage": "https://github.com/Botler-Dev/Botler#readme",
+  "engines": {
+    "node": ">=15"
+  },
   "dependencies": {
     "chalk": "^4.1.0",
     "dayjs": "^1.9.3",

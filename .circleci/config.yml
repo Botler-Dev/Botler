@@ -2,7 +2,7 @@ version: 2.1
 executors:
   node-executor:
     docker:
-      - image: node:14-alpine
+      - image: node:15-alpine
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
