@@ -1,21 +1,21 @@
 FROM node:14-alpine AS builder
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+COPY package.json ./
+COPY yarn.lock ./
+RUN yarn install --frozen-lockfile
 
 COPY tsconfig.json ./
 COPY src ./src
-RUN npm run build:prod
+RUN yarn build:prod
 
-RUN npm prune --production
+RUN yarn install --production
 
 FROM mhart/alpine-node:slim-14
 
 WORKDIR /app
-COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
-# Do not use NPM here because the slim version does not have it
+# Do not use Yarn here because the slim version does not have it installed
 CMD ["node","./dist/main.js"]

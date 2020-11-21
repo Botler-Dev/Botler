@@ -10,7 +10,7 @@
     "build:dev": "tsc --sourceMap",
     "build:watch": "tsc --watch --sourceMap",
     "start:prod": "node ./dist/main.js",
-    "start:dev": "node -r dotenv/config --nolazy ./dist/main.js || exit 0",
+    "start:dev": "node -r dotenv/config --nolazy ./dist/main.js",
     "format": "npx prettier --write .",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js"
   },

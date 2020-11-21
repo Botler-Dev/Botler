@@ -14,7 +14,7 @@ commands:
       - run:
           name: Install Dependencies
           command: |
-            npm ci
+            yarn install --frozen-lockfile
 jobs:
   build:
     executor: node-executor
@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Build Bot
           command: |
-            npm run build:prod
+            yarn build:prod
   eslint:
     executor: node-executor
     steps:
@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Run linter
           command: |
-            npm run lint
+            yarn lint
 workflows:
   default:
     jobs:
