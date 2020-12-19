@@ -8,7 +8,7 @@
     "lint:fix": "yarn lint --fix",
     "build:prod": "tsc",
     "build:dev": "tsc --sourceMap",
-    "build:watch": "yarn build:dev --sourceMap",
+    "build:watch": "yarn build:dev --watch",
     "start:prod": "node ./dist/main.js",
     "start:dev": "node --require dotenv/config --nolazy ./dist/main.js",
     "format": "npx prettier --write .",
