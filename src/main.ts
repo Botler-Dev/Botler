@@ -6,19 +6,13 @@ import utc from 'dayjs/plugin/utc';
 
 import Bot from './Bot';
 import {preprocessEnvironmentVariables} from './utils/enviroment';
-
-function exitWithError() {
-  console.info('Exiting with code 1.');
-  // eslint-disable-next-line unicorn/no-process-exit
-  process.exit(1);
-}
+import {ExitCode, exitWithError} from './utils/process';
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection from Promise:', reason, promise);
 });
 process.on('uncaughtException', error => {
-  console.error('Uncaught Exception thrown:', error);
-  exitWithError();
+  exitWithError(ExitCode.UnexpectedError, 'Uncaught Exception thrown:', error);
 });
 
 dayjs.extend(utc);
@@ -27,6 +21,9 @@ preprocessEnvironmentVariables();
 
 const bot = new Bot();
 bot.initializeBot().catch(error => {
-  console.error('Uncaught Exception thrown while initializing bot:', error);
-  exitWithError();
+  exitWithError(
+    ExitCode.UnexpectedError,
+    'Uncaught Exception thrown while initializing bot:',
+    error
+  );
 });

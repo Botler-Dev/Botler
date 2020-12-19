@@ -4,10 +4,10 @@
   "port": "5432",
   "username": "postgres",
   "password": "botler",
-  "entities": ["src/entities/**/*.ts"],
-  "migrations": ["src/migrations/**/*.ts"],
+  "entities": ["src/database/entities/**/*.ts"],
+  "migrations": ["src/database/migrations/**/*.ts"],
   "cli": {
-    "entitiesDir": "src/entities",
-    "migrationsDir": "src/migrations"
+    "entitiesDir": "src/database/entities",
+    "migrationsDir": "src/database/migrations"
   }
 }

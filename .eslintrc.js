@@ -9,6 +9,7 @@ module.exports = {
   extends: [
     'airbnb-typescript/base',
     'plugin:@typescript-eslint/recommended',
+    'plugin:import/typescript',
     'plugin:unicorn/recommended',
     'prettier',
     'prettier/@typescript-eslint',
@@ -34,6 +35,12 @@ module.exports = {
         ts: 'never',
       },
     ],
+    // We do not use Flow and already use 'import/extensions'
+    // See: https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-duplicates.md#when-not-to-use-it
+    'import/no-duplicates': 'off',
+    // In TypeScript getter and setter internal values should be stored in properties with an underscore prefix
+    'no-underscore-dangle': ['error', {allowAfterThis: true}],
+    // TODO: remove prettier plugin and make it a separate CI check
     'prettier/prettier': 'error',
     // Types are often not the default export
     'unicorn/import-style': 'off',

@@ -1,5 +1,5 @@
 node_modules/
 dist/
-src/migrations/
+src/database/migrations/
 docs/
 *.md

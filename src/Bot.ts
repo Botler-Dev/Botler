@@ -1,6 +1,8 @@
 import {Client} from 'discord.js';
 import {container} from 'tsyringe';
 import {Connection, createConnection} from 'typeorm';
+import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
+import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
 
 import MasterLogger from './logger/MasterLogger';
 import ScopedLogger from './logger/ScopedLogger';
@@ -14,9 +16,11 @@ export default class Bot {
 
   private globalLogger!: ScopedLogger;
 
-  private client!: Client;
-
   private connection!: Connection;
+
+  private globalSettingsManager!: GlobalSettingsManager;
+
+  private client!: Client;
 
   private modules!: Module[];
 
@@ -27,15 +31,18 @@ export default class Bot {
     this.globalLogger = new ScopedLogger('global');
     container.register(ScopedLogger, {useValue: this.globalLogger});
 
+    this.connection = await createConnection();
+    container.register(Connection, {useValue: this.connection});
+    await this.connection.runMigrations({transaction: 'all'});
+
+    this.globalSettingsManager = new GlobalSettingsManager();
+    container.register(GlobalSettingsWrapper, {useValue: await this.globalSettingsManager.fetch()});
+
     this.client = new Client({
       disableMentions: 'everyone',
       partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
     });
     container.register(Client, {useValue: this.client});
-
-    this.connection = await createConnection();
-    container.register(Connection, {useValue: this.connection});
-    await this.connection.runMigrations({transaction: 'all'});
 
     this.modules = Bot.MODULES.map(constructor => container.resolve(constructor));
     Promise.all(this.modules.map(module => module.initialize?.()));

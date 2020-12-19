@@ -1,3 +1,4 @@
+// TODO: rename to isRunningInProduction
 export const runningInProduction = process.env.NODE_ENV === 'production';
 
 function warnDevelopmentDefault(envName: string, defaultValue: string) {
@@ -9,10 +10,10 @@ function warnDevelopmentDefault(envName: string, defaultValue: string) {
 
 export function preprocessEnvironmentVariables(): void {
   process.env.TYPEORM_CONNECTION = 'postgres';
-  process.env.TYPEORM_ENTITIES = 'dist/entities/*.js';
-  process.env.TYPEORM_MIGRATIONS = 'dist/migration/*.js';
-  process.env.TYPEORM_ENTITIES_DIR = 'dist/entities';
-  process.env.TYPEORM_MIGRATIONS_DIR = 'dist/migration';
+  process.env.TYPEORM_ENTITIES = 'dist/database/entities/*.js';
+  process.env.TYPEORM_MIGRATIONS = 'dist/database/migration/*.js';
+  process.env.TYPEORM_ENTITIES_DIR = 'dist/database/entities';
+  process.env.TYPEORM_MIGRATIONS_DIR = 'dist/database/migration';
 
   process.env.TYPEORM_DATABASE = process.env.TYPEORM_DATABASE || 'postgres';
   process.env.TYPEORM_PORT = process.env.TYPEORM_PORT || '5432';
