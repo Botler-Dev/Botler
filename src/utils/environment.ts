@@ -15,6 +15,7 @@ export function preprocessEnvironmentVariables(): void {
   process.env.TYPEORM_ENTITIES_DIR = 'dist/database/entities';
   process.env.TYPEORM_MIGRATIONS_DIR = 'dist/database/migration';
 
+  process.env.TYPEORM_HOST = process.env.TYPEORM_HOST || 'localhost';
   process.env.TYPEORM_DATABASE = process.env.TYPEORM_DATABASE || 'postgres';
   process.env.TYPEORM_PORT = process.env.TYPEORM_PORT || '5432';
   process.env.TYPEORM_SYNCHRONIZE = runningInProduction

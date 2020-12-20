@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 import Bot from './Bot';
-import {preprocessEnvironmentVariables} from './utils/enviroment';
+import {preprocessEnvironmentVariables} from './utils/environment';
 import {ExitCode, exitWithError} from './utils/process';
 
 process.on('unhandledRejection', (reason, promise) => {

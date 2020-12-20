@@ -4,10 +4,10 @@ export function notCleaned<Raw>() {
   return (raw: Raw): Raw => raw;
 }
 
-export function required<Raw>(name: string) {
-  return (raw: Raw): Raw | never => {
+export function required<Raw>() {
+  return (raw: Raw, key: string): Raw | never => {
     if (raw === undefined || raw === null)
-      throw new Error(`Options is missing required option "${name}"`);
+      throw new Error(`Options is missing required option "${key}"`);
     return raw;
   };
 }
@@ -39,9 +39,12 @@ export function stringToBoolean() {
 export function stack<Input, Output>(
   ...cleaners: OptionValueCleaner<any, any>[]
 ): OptionValueCleaner<Input, Output> {
-  return (raw: Input) =>
+  return (raw: Input, key: string) =>
     // eslint-disable-next-line unicorn/no-reduce
-    cleaners.reduce((accumulated: unknown, nextCleaner) => nextCleaner(accumulated), raw) as Output;
+    cleaners.reduce(
+      (accumulated: unknown, nextCleaner) => nextCleaner(accumulated, key),
+      raw
+    ) as Output;
 }
 
 export function optionalStringToBoolean(
@@ -52,4 +55,8 @@ export function optionalStringToBoolean(
 
 export function optionalToNumber<Raw>(defaultValue: number): OptionValueCleaner<Raw, number> {
   return stack<Raw, number>(toNumber<Raw>(), optional(defaultValue));
+}
+
+export function requiredToNumber<Raw>(): OptionValueCleaner<Raw, number> {
+  return stack<Raw, number>(toNumber<Raw>(), required());
 }

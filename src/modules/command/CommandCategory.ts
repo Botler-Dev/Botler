@@ -35,7 +35,7 @@ export default class CommandCategory {
     CommandCategoryDefinition,
     CleanedCommandCategoryDefinition
   > = {
-    name: required('name'),
+    name: required(),
     description: optional(''),
     hidden: optional(false),
     commands: (commands: Constructor<Command>[]) => {

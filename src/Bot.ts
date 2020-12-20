@@ -2,6 +2,7 @@ import {Client} from 'discord.js';
 import {container} from 'tsyringe';
 import {Connection, createConnection} from 'typeorm';
 import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
+import DatabaseEventHub from './database/synchronizer/DatabaseEventHub';
 import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
 
 import MasterLogger from './logger/MasterLogger';
@@ -16,7 +17,10 @@ export default class Bot {
 
   private globalLogger!: ScopedLogger;
 
+  // TODO: create a database class which takes care of database system management
   private connection!: Connection;
+
+  private eventHub!: DatabaseEventHub;
 
   private globalSettingsManager!: GlobalSettingsManager;
 
@@ -34,6 +38,10 @@ export default class Bot {
     this.connection = await createConnection();
     container.register(Connection, {useValue: this.connection});
     await this.connection.runMigrations({transaction: 'all'});
+
+    this.eventHub = new DatabaseEventHub();
+    container.register(DatabaseEventHub, {useValue: this.eventHub});
+    await this.eventHub.initialize();
 
     this.globalSettingsManager = new GlobalSettingsManager();
     container.register(GlobalSettingsWrapper, {useValue: await this.globalSettingsManager.fetch()});
