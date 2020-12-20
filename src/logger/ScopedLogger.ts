@@ -18,14 +18,14 @@ export default class ScopedLogger implements Logger {
   }
 
   info(...objs: any[]): void {
-    this.masterLogger.log({scope: this.scope}, ...objs);
+    this.masterLogger.info({scope: this.scope}, ...objs);
   }
 
   warn(...objs: any[]): void {
-    this.masterLogger.log({scope: this.scope}, ...objs);
+    this.masterLogger.warn({scope: this.scope}, ...objs);
   }
 
   error(...objs: any[]): void {
-    this.masterLogger.log({scope: this.scope}, ...objs);
+    this.masterLogger.error({scope: this.scope}, ...objs);
   }
 }
