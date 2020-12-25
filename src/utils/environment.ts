@@ -1,5 +1,4 @@
-// TODO: rename to isRunningInProduction
-export const runningInProduction = process.env.NODE_ENV === 'production';
+export const isRunningInProduction = process.env.NODE_ENV === 'production';
 
 function warnDevelopmentDefault(envName: string, defaultValue: string) {
   // eslint-disable-next-line no-console
@@ -18,11 +17,11 @@ export function preprocessEnvironmentVariables(): void {
   process.env.TYPEORM_HOST = process.env.TYPEORM_HOST || 'localhost';
   process.env.TYPEORM_DATABASE = process.env.TYPEORM_DATABASE || 'postgres';
   process.env.TYPEORM_PORT = process.env.TYPEORM_PORT || '5432';
-  process.env.TYPEORM_SYNCHRONIZE = runningInProduction
+  process.env.TYPEORM_SYNCHRONIZE = isRunningInProduction
     ? 'false'
     : process.env.TYPEORM_SYNCHRONIZE ?? 'true';
 
-  if (runningInProduction) return;
+  if (isRunningInProduction) return;
   if (!process.env.TYPEORM_USERNAME) {
     process.env.TYPEORM_USERNAME = 'postgres';
     warnDevelopmentDefault('TYPEORM_USERNAME', process.env.TYPEORM_USERNAME);
