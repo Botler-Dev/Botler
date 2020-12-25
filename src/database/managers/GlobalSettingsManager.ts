@@ -16,8 +16,7 @@ export default class GlobalSettingsManager extends CacheManager<
   GlobalSettingsManager
 > {
   constructor(connection?: Connection) {
-    // TODO: potentially make tableName dynamic
-    super(GlobalSettingsEntity, new GlobalSettingsSynchronizer('GlobalSettings'), connection);
+    super(GlobalSettingsEntity, tableName => new GlobalSettingsSynchronizer(tableName), connection);
   }
 
   async fetch(): Promise<GlobalSettingsWrapper> {

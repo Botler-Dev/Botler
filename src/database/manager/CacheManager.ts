@@ -28,17 +28,18 @@ export default abstract class CacheManager<
     any
   >
 > extends WrapperManager<TEntity, TWrapper> {
+  // TODO: remove set and unset methods from public API
   cache = new Collection<TCacheKey, TWrapper>();
 
   private synchronizer: TSynchronizer;
 
   constructor(
     entityTarget: EntityTarget<TEntity>,
-    synchronizer: TSynchronizer,
+    synchronizerGenerator: (tableName: string) => TSynchronizer,
     connection = container.resolve(Connection)
   ) {
     super(entityTarget, connection);
-    this.synchronizer = synchronizer;
+    this.synchronizer = synchronizerGenerator(this.repo.metadata.tableName);
   }
 
   async initialize(): Promise<void> {

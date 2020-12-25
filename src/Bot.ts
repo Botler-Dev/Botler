@@ -34,6 +34,7 @@ export default class Bot {
 
     this.globalLogger = new ScopedLogger('global');
     container.register(ScopedLogger, {useValue: this.globalLogger});
+    // TODO: overwrite native console with proxy to global logger
 
     this.connection = await createConnection();
     container.register(Connection, {useValue: this.connection});
