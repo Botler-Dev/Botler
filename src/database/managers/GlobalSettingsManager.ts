@@ -2,43 +2,43 @@ import {Connection} from 'typeorm';
 import {ExitCode, exitWithError} from '../../utils/process';
 import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
 import CacheManager from '../manager/CacheManager';
+import GlobalSettingsSynchronizer from '../synchronizers/GlobalSettingsSynchronizer';
 import GlobalSettingsWrapper from '../wrappers/GlobalSettingsWrapper';
 
-const GlobalSettingsCacheKey: Readonly<0> = 0;
+// TODO: Make GlobalSettingsManager use the entry with the highest version number
+export const GlobalSettingsCacheKey = 0 as const;
 
 export default class GlobalSettingsManager extends CacheManager<
   GlobalSettingsEntity,
   GlobalSettingsWrapper,
   typeof GlobalSettingsCacheKey,
-  []
+  GlobalSettingsSynchronizer,
+  GlobalSettingsManager
 > {
   constructor(connection?: Connection) {
-    super(GlobalSettingsEntity, connection);
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  getCacheKey(): typeof GlobalSettingsCacheKey {
-    return GlobalSettingsCacheKey;
+    // TODO: potentially make tableName dynamic
+    super(GlobalSettingsEntity, new GlobalSettingsSynchronizer('GlobalSettings'), connection);
   }
 
   async fetch(): Promise<GlobalSettingsWrapper> {
-    // TODO: refactor generic wrapping and registering part into CacheManager
-    let wrapper = this.cache.get(this.getCacheKey());
+    let wrapper = this.getUnchecked();
     if (wrapper) return wrapper;
     const entity = await this.repo.findOne();
     if (!entity)
       exitWithError(ExitCode.InvalidConfiguration, 'Could not find a GlobalSettings entry.');
-    wrapper = this.wrapEntity(entity);
-    this.cache.set(this.getCacheKey(), wrapper);
+    wrapper = this.registerWrapper(
+      GlobalSettingsCacheKey,
+      stream => new GlobalSettingsWrapper(this, stream, entity)
+    );
     return wrapper;
   }
 
-  protected wrapEntity(entity: GlobalSettingsEntity): GlobalSettingsWrapper {
-    return new GlobalSettingsWrapper(this, this.createSyncStream(this.getCacheKey()), entity);
+  getUnchecked(): GlobalSettingsWrapper | undefined {
+    return this.cache.get(GlobalSettingsCacheKey);
   }
 
   get(): GlobalSettingsWrapper {
-    const wrapper = this.cache.get(this.getCacheKey());
+    const wrapper = this.getUnchecked();
     if (!wrapper)
       throw new Error(
         'GlobalSettings could not be retrieved synchronously. No cache entry was found.'

@@ -45,6 +45,7 @@ export default class Bot {
 
     this.globalSettingsManager = new GlobalSettingsManager();
     container.register(GlobalSettingsWrapper, {useValue: await this.globalSettingsManager.fetch()});
+    await this.globalSettingsManager.initialize();
 
     this.client = new Client({
       disableMentions: 'everyone',

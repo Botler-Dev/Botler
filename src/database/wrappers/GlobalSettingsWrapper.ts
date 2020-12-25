@@ -1,8 +1,8 @@
-import {map, switchMap, tap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {ExitCode, exitWithError} from '../../utils/process';
 import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
-import {SyncStream} from '../manager/CacheManager';
 import type GlobalSettingsManager from '../managers/GlobalSettingsManager';
+import {SyncStream} from '../synchronizer/CacheSynchronizer';
 import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
 
 export default class GlobalSettingsWrapper

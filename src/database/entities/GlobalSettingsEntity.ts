@@ -4,7 +4,7 @@ import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
   name: 'GlobalSettings',
 })
 export default class GlobalSettingsEntity {
-  @PrimaryGeneratedColumn('increment', {type: 'int8'})
+  @PrimaryGeneratedColumn('increment', {type: 'smallint'})
   version!: number;
 
   @Column({type: 'text', nullable: false})
