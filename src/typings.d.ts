@@ -15,6 +15,10 @@ type ImmutableMap<K, V> = ReadonlyMap<Immutable<K>, Immutable<V>>;
 type ImmutableSet<T> = ReadonlySet<Immutable<T>>;
 type ImmutableObject<T> = {readonly [K in keyof T]: Immutable<T[K]>};
 
+declare module 'discord.js' {
+  type ReadonlyCollection<K, V> = Omit<Collection<K, V>, 'set' | 'delete' | 'clear' | 'sweep'>;
+}
+
 declare namespace NodeJS {
   interface ProcessEnv {
     LOGGER_STAMP_LABEL?: string;

@@ -1,4 +1,4 @@
-import {Collection} from 'discord.js';
+import {Collection, ReadonlyCollection} from 'discord.js';
 import {container} from 'tsyringe';
 import {Connection, EntityTarget} from 'typeorm';
 import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
@@ -28,8 +28,11 @@ export default abstract class CacheManager<
     any
   >
 > extends WrapperManager<TEntity, TWrapper> {
-  // TODO: remove set and unset methods from public API
-  cache = new Collection<TCacheKey, TWrapper>();
+  private readonly _cache = new Collection<TCacheKey, TWrapper>();
+
+  get cache(): ReadonlyCollection<TCacheKey, TWrapper> {
+    return this._cache;
+  }
 
   private synchronizer: TSynchronizer;
 
@@ -51,7 +54,9 @@ export default abstract class CacheManager<
     wrapperGenerator: WrapperGenerator<TEntity, TWrapper>
   ): TWrapper {
     const wrapper = wrapperGenerator(this.synchronizer.getSyncStream(key));
-    this.cache.set(key, wrapper);
+    this._cache.set(key, wrapper);
     return wrapper;
   }
+
+  // TODO: implement manual decaching
 }
