@@ -4,8 +4,14 @@ import EntityWrapper from './EntityWrapper';
 
 export default abstract class CacheEntityWrapper<
   TEntity extends Record<string, any>,
-  TManager extends CacheManager<TEntity, CacheEntityWrapper<TEntity, TManager, TEntityState>>,
-  TEntityState extends TEntity | undefined = TEntity
+  TManager extends CacheManager<TEntity, This, any, any, any>,
+  TEntityState extends TEntity | undefined = TEntity,
+  This extends CacheEntityWrapper<TEntity, TManager, TEntityState, This> = CacheEntityWrapper<
+    TEntity,
+    TManager,
+    TEntityState,
+    any
+  >
 > extends EntityWrapper<TEntity, TManager, TEntityState> {
   protected entitySubject: BehaviorSubject<TEntityState>;
 

@@ -11,6 +11,4 @@ export default abstract class WrapperManager<
   constructor(entityTarget: EntityTarget<TEntity>, connection = container.resolve(Connection)) {
     this.repo = connection.getRepository(entityTarget);
   }
-
-  protected abstract wrapEntity(entity: TEntity): TWrapper;
 }

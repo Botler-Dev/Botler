@@ -65,12 +65,12 @@ export default class DatabaseEventHub {
     );
   }
 
-  async listenTo(channel: string): Promise<Observable<unknown>> {
+  async listenTo<TPayload>(channel: string): Promise<Observable<TPayload>> {
     let eventStream = this.channels.get(channel);
-    if (eventStream) return eventStream;
+    if (eventStream) return eventStream as Observable<TPayload>;
     await this.subscriber.listenTo(channel);
     eventStream = fromEvent(this.subscriber.notifications, channel);
     this._channels.set(channel, eventStream);
-    return eventStream;
+    return eventStream as Observable<TPayload>;
   }
 }
