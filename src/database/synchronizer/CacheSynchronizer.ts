@@ -6,6 +6,11 @@ import DatabaseEventHub from './DatabaseEventHub';
 
 export type SyncStream<TEntity> = Subject<TEntity | undefined>;
 
+export interface ExhaustStreamPayload<TEntity extends Record<string, any>, TCacheKey> {
+  key: TCacheKey;
+  entity: TEntity | undefined;
+}
+
 export default abstract class CacheSynchronizer<
   TEntity extends Record<string, any>,
   TCacheKey = unknown,
@@ -19,7 +24,10 @@ export default abstract class CacheSynchronizer<
     this.tableName = tableName;
   }
 
-  // TODO: add exhaust stream (stream that emits all events of which no stream was found)
+  /**
+   * Emits change events for which no syncStream have been found.
+   */
+  protected exhaustStream = new Subject<ExhaustStreamPayload<TEntity, TCacheKey>>();
 
   async initialize(): Promise<void> {
     const eventHub = container.resolve(DatabaseEventHub);
@@ -39,7 +47,10 @@ export default abstract class CacheSynchronizer<
     merge(entityStream, deleteStream).subscribe(({key, entity}) => {
       if (key === undefined) return;
       const stream = this.syncStreams.get(key);
-      if (!stream) return;
+      if (!stream) {
+        this.exhaustStream.next({key, entity});
+        return;
+      }
       stream.next(entity);
     });
   }
