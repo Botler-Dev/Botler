@@ -55,8 +55,16 @@ export default abstract class CacheManager<
   ): TWrapper {
     const wrapper = wrapperGenerator(this.synchronizer.getSyncStream(key));
     this._cache.set(key, wrapper);
+    wrapper.afterCacheStateChange.subscribe(() => {
+      this.synchronizer.removeSyncStream(key);
+      this._cache.delete(key);
+    });
     return wrapper;
   }
 
-  // TODO: implement manual decaching
+  uncache(key: TCacheKey): TWrapper | undefined {
+    const wrapper = this.cache.get(key);
+    wrapper?.uncache();
+    return wrapper;
+  }
 }

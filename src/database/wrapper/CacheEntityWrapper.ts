@@ -19,10 +19,21 @@ export default abstract class CacheEntityWrapper<
     return this.entitySubject.value as Immutable<TEntityState>;
   }
 
+  private isCachedSubject = new BehaviorSubject<boolean>(true);
+
+  get isCached(): boolean {
+    return this.isCachedSubject.value;
+  }
+
+  get afterCacheStateChange(): Observable<boolean> {
+    return this.isCachedSubject;
+  }
+
   constructor(manager: TManager, syncStream: Observable<TEntityState>, entity: TEntityState) {
     super(manager);
     this.entitySubject = new BehaviorSubject(entity);
-    syncStream.subscribe(this.entitySubject);
+    const subscription = syncStream.subscribe(this.entitySubject);
+    this.isCachedSubject.subscribe(() => subscription.unsubscribe());
   }
 
   protected getModifiableEntity(): TEntity {
@@ -31,5 +42,9 @@ export default abstract class CacheEntityWrapper<
 
   protected setEntity(entity: TEntityState): void {
     this.entitySubject.next(entity);
+  }
+
+  uncache(): void {
+    this.isCachedSubject.next(false);
   }
 }
