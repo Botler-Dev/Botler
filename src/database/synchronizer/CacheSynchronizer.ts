@@ -2,17 +2,18 @@ import {Collection, ReadonlyCollection} from 'discord.js';
 import {merge, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {container} from 'tsyringe';
+import {Entity} from '../wrapper/EntityWrapper';
 import DatabaseEventHub from './DatabaseEventHub';
 
 export type SyncStream<TEntity> = Subject<TEntity | undefined>;
 
-export interface ExhaustStreamPayload<TEntity extends Record<string, any>, TCacheKey> {
+export interface ExhaustStreamPayload<TEntity extends Entity, TCacheKey> {
   key: TCacheKey;
   entity: TEntity | undefined;
 }
 
 export default abstract class CacheSynchronizer<
-  TEntity extends Record<string, any>,
+  TEntity extends Entity,
   TCacheKey = unknown,
   TDeleteEventPayload = unknown
 > {

@@ -5,14 +5,15 @@ import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
 import WrapperManager from './WrapperManager';
 import type CacheSynchronizer from '../synchronizer/CacheSynchronizer';
 import type {SyncStream} from '../synchronizer/CacheSynchronizer';
+import {Entity} from '../wrapper/EntityWrapper';
 
 export type WrapperGenerator<
-  TEntity extends Record<string, any>,
+  TEntity extends Entity,
   TWrapper extends CacheEntityWrapper<TEntity, any, any>
 > = (syncStream: SyncStream<TEntity>) => TWrapper;
 
 export default abstract class CacheManager<
-  TEntity extends Record<string, any>,
+  TEntity extends Entity,
   TWrapper extends CacheEntityWrapper<TEntity, This, any>,
   TCacheKey = unknown,
   TSynchronizer extends CacheSynchronizer<TEntity, TCacheKey, unknown> = CacheSynchronizer<

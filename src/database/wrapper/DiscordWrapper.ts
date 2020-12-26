@@ -1,8 +1,8 @@
 import WrapperManager from '../manager/WrapperManager';
-import EntityWrapper from './EntityWrapper';
+import EntityWrapper, {Entity} from './EntityWrapper';
 
 export default interface DiscordWrapper<
-  TEntity,
+  TEntity extends Entity,
   TDiscordObject,
   TManager extends WrapperManager<TEntity, EntityWrapper<TEntity, TManager>>
 > extends EntityWrapper<TEntity, TManager> {

@@ -1,8 +1,8 @@
 import WrapperManager from '../manager/WrapperManager';
-import EntityWrapper from './EntityWrapper';
+import EntityWrapper, {Entity} from './EntityWrapper';
 
 export default abstract class NormalEntityWrapper<
-  TEntity extends Record<string, any>,
+  TEntity extends Entity,
   TManager extends WrapperManager<TEntity, EntityWrapper<TEntity, TManager, TEntityState>>,
   TEntityState extends TEntity | undefined = TEntity
 > extends EntityWrapper<TEntity, TManager, TEntityState> {

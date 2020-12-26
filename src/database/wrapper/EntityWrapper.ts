@@ -1,9 +1,10 @@
 import {FindConditions} from 'typeorm';
 import type WrapperManager from '../manager/WrapperManager';
 
+export type Entity = Record<string, any>;
+
 export default abstract class EntityWrapper<
-  // TODO: define a separate type for the Record type
-  TEntity extends Record<string, any>,
+  TEntity extends Entity,
   TManager extends WrapperManager<TEntity, EntityWrapper<TEntity, TManager, TEntityState>>,
   TEntityState extends TEntity | undefined = TEntity
 > {
