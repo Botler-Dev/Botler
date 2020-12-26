@@ -1,4 +1,4 @@
-import {Collection} from 'discord.js';
+import {Collection, ReadonlyCollection} from 'discord.js';
 import {merge, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {container} from 'tsyringe';
@@ -16,9 +16,13 @@ export default abstract class CacheSynchronizer<
   TCacheKey = unknown,
   TDeleteEventPayload = unknown
 > {
-  private syncStreams = new Collection<TCacheKey, SyncStream<TEntity>>();
+  private _syncStreams = new Collection<TCacheKey, SyncStream<TEntity>>();
 
-  private readonly tableName: string;
+  protected get syncStreams(): ReadonlyCollection<TCacheKey, SyncStream<TEntity>> {
+    return this._syncStreams;
+  }
+
+  readonly tableName: string;
 
   constructor(tableName: string) {
     this.tableName = tableName;
@@ -63,11 +67,11 @@ export default abstract class CacheSynchronizer<
     let stream = this.syncStreams.get(key);
     if (stream) return stream;
     stream = new Subject();
-    this.syncStreams.set(key, stream);
+    this._syncStreams.set(key, stream);
     return stream;
   }
 
   removeSyncStream(key: TCacheKey): void {
-    this.syncStreams.delete(key);
+    this._syncStreams.delete(key);
   }
 }

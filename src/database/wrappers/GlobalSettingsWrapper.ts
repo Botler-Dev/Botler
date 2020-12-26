@@ -1,4 +1,4 @@
-import {map} from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 import {ExitCode, exitWithError} from '../../utils/process';
 import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
 import type GlobalSettingsManager from '../managers/GlobalSettingsManager';
@@ -31,10 +31,10 @@ export default class GlobalSettingsWrapper
       manager,
       syncStream.pipe(
         map(newEntity => {
-          if (!newEntity)
-            exitWithError(ExitCode.InvalidConfiguration, 'GlobalSettings entry was deleted.');
+          if (!newEntity) this.manager.refetch();
           return newEntity;
-        })
+        }),
+        filter((newEntity): newEntity is GlobalSettingsEntity => !!newEntity)
       ),
       entity
     );

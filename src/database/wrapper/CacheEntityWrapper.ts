@@ -1,4 +1,5 @@
 import {BehaviorSubject, Observable} from 'rxjs';
+import {skip} from 'rxjs/operators';
 import type CacheManager from '../manager/CacheManager';
 import EntityWrapper from './EntityWrapper';
 
@@ -26,14 +27,14 @@ export default abstract class CacheEntityWrapper<
   }
 
   get afterCacheStateChange(): Observable<boolean> {
-    return this.isCachedSubject;
+    return this.isCachedSubject.pipe(skip(1));
   }
 
   constructor(manager: TManager, syncStream: Observable<TEntityState>, entity: TEntityState) {
     super(manager);
     this.entitySubject = new BehaviorSubject(entity);
     const subscription = syncStream.subscribe(this.entitySubject);
-    this.isCachedSubject.subscribe(() => subscription.unsubscribe());
+    this.afterCacheStateChange.subscribe(() => subscription.unsubscribe());
   }
 
   protected getModifiableEntity(): TEntity {

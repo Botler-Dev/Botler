@@ -34,7 +34,7 @@ export default abstract class CacheManager<
     return this._cache;
   }
 
-  private synchronizer: TSynchronizer;
+  protected synchronizer: TSynchronizer;
 
   constructor(
     entityTarget: EntityTarget<TEntity>,
