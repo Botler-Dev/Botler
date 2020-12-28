@@ -39,7 +39,7 @@ jobs:
       - run:
           name: Run format checker
           command: |
-            yarn format check
+            yarn format:check
 workflows:
   default:
     jobs:
