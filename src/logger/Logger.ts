@@ -5,12 +5,7 @@ export enum LogLevel {
   Error = 3,
 }
 
-export const LOG_LEVEL_STRINGS: readonly ['log', 'info', 'warn', 'error'] = [
-  'log',
-  'info',
-  'warn',
-  'error',
-];
+export const LOG_LEVEL_STRINGS = ['log', 'info', 'warn', 'error'] as const;
 
 interface Logger {
   log(...args: any[]): void;

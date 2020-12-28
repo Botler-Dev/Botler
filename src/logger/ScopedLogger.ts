@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {container} from 'tsyringe';
 
 import Logger from './Logger';
@@ -28,4 +29,11 @@ export default class ScopedLogger implements Logger {
   error(...objs: any[]): void {
     this.masterLogger.error({scope: this.scope}, ...objs);
   }
+}
+
+export function proxyNativeConsole(logger: ScopedLogger): void {
+  console.log = logger.log.bind(logger);
+  console.info = logger.info.bind(logger);
+  console.warn = logger.warn.bind(logger);
+  console.error = logger.error.bind(logger);
 }

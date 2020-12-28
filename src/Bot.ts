@@ -6,7 +6,7 @@ import DatabaseEventHub from './database/DatabaseEventHub';
 import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
 
 import MasterLogger from './logger/MasterLogger';
-import ScopedLogger from './logger/ScopedLogger';
+import ScopedLogger, {proxyNativeConsole} from './logger/ScopedLogger';
 import CommandModule from './modules/command/CommandModule';
 import Module from './modules/Module';
 
@@ -33,7 +33,7 @@ export default class Bot {
 
     this.globalLogger = new ScopedLogger('global');
     container.register(ScopedLogger, {useValue: this.globalLogger});
-    // TODO: overwrite native console with proxy to global logger
+    proxyNativeConsole(this.globalLogger);
 
     this.connection = await createConnection();
     container.register(Connection, {useValue: this.connection});

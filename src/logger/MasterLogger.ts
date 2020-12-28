@@ -55,6 +55,17 @@ export default class MasterLogger implements Logger {
     stampFormat: optional('YYYY/MM/DD HH:mm:ss.sss'),
   };
 
+  /**
+   * This is required so when the native console is overwritten
+   * with a ScopedLogger there is no infinite recursion
+   */
+  private static originalConsole = {
+    log: console.log,
+    info: console.info,
+    warn: console.warn,
+    error: console.error,
+  };
+
   constructor() {
     this.config = cleanOptions(MasterLogger.configCleanerDefinition, {
       stampLabel: process.env.LOGGER_STAMP_LABEL,
@@ -98,7 +109,7 @@ export default class MasterLogger implements Logger {
     if (this.config.levelLabel) {
       metaString += this.finalizeLabel(logLevel.toUpperCase(), this.config.levelColor, 7);
     }
-    console[logLevel](metaString, ...objs);
+    MasterLogger.originalConsole[logLevel](metaString, ...objs);
   }
 
   log(metadata: LogLevelMetadata, ...objs: any[]): void {
