@@ -5,7 +5,7 @@ module.exports = {
   env: {
     es2020: true,
   },
-  plugins: ['@typescript-eslint', 'unicorn', 'prettier'],
+  plugins: ['@typescript-eslint', 'unicorn'],
   extends: [
     'airbnb-typescript/base',
     'plugin:@typescript-eslint/recommended',
@@ -40,8 +40,6 @@ module.exports = {
     'import/no-duplicates': 'off',
     // In TypeScript getter and setter internal values should be stored in properties with an underscore prefix
     'no-underscore-dangle': ['error', {allowAfterThis: true}],
-    // TODO: remove prettier plugin and make it a separate CI check
-    'prettier/prettier': 'error',
     // Types are often not the default export
     'unicorn/import-style': 'off',
     // Conflict with "consistent-return"
