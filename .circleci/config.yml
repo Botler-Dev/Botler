@@ -8,7 +8,7 @@ executors:
           password: $DOCKERHUB_PASSWORD
 commands:
   setup-project:
-    description: 'Checks out, installs the dependencies and adds a bot config'
+    description: 'Checks out and installs the dependencies'
     steps:
       - checkout
       - run:
@@ -24,16 +24,25 @@ jobs:
           name: Build Bot
           command: |
             yarn build:prod
-  eslint:
+  linting-check:
     executor: node-executor
     steps:
       - setup-project
       - run:
-          name: Run linter
+          name: Run linting checker
           command: |
             yarn lint
+  formatting-check:
+    executor: node-executor
+    steps:
+      - setup-project
+      - run:
+          name: Run format checker
+          command: |
+            yarn format check
 workflows:
   default:
     jobs:
       - build
-      - eslint
+      - linting-check
+      - formatting-check

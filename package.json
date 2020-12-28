@@ -4,14 +4,15 @@
   "description": "Exon multipurpose discord bot",
   "main": "dist/main.js",
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "yarn lint --fix",
     "build:prod": "tsc",
     "build:dev": "tsc --sourceMap",
     "build:watch": "yarn build:dev --watch",
     "start:prod": "node ./dist/main.js",
     "start:dev": "node --require dotenv/config --nolazy ./dist/main.js",
-    "format": "npx prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "yarn lint --fix",
+    "format:check": "yarn prettier --check .",
+    "format": "yarn prettier --write .",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js"
   },
   "repository": {
