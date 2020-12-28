@@ -2,9 +2,9 @@ import {ClientConfig} from 'pg';
 import createPostgresSubscriber, {Subscriber} from 'pg-listen';
 import {fromEvent, Observable} from 'rxjs';
 import {singleton} from 'tsyringe';
-import ScopedLogger from '../../logger/ScopedLogger';
-import {required, requiredToNumber} from '../../utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '../../utils/optionsCleaner';
+import ScopedLogger from '../logger/ScopedLogger';
+import {required, requiredToNumber} from '../utils/optionCleaners';
+import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
 
 export interface RawClientConfig {
   user?: string;

@@ -1,5 +1,4 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
-import {container} from 'tsyringe';
 import {Connection, EntityTarget} from 'typeorm';
 import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
 import WrapperManager from './WrapperManager';
@@ -40,7 +39,7 @@ export default abstract class CacheManager<
   constructor(
     entityTarget: EntityTarget<TEntity>,
     synchronizerGenerator: (tableName: string) => TSynchronizer,
-    connection = container.resolve(Connection)
+    connection?: Connection
   ) {
     super(entityTarget, connection);
     this.synchronizer = synchronizerGenerator(this.repo.metadata.tableName);

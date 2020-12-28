@@ -1,9 +1,9 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {merge, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {container} from 'tsyringe';
+import {container, DependencyContainer} from 'tsyringe';
 import {Entity} from '../wrapper/EntityWrapper';
-import DatabaseEventHub from './DatabaseEventHub';
+import DatabaseEventHub from '../DatabaseEventHub';
 
 export type SyncStream<TEntity> = Subject<TEntity | undefined>;
 
@@ -23,22 +23,24 @@ export default abstract class CacheSynchronizer<
     return this._syncStreams;
   }
 
-  readonly tableName: string;
-
-  constructor(tableName: string) {
-    this.tableName = tableName;
-  }
-
   /**
    * Emits change events for which no syncStream have been found.
    */
   protected exhaustStream = new Subject<ExhaustStreamPayload<TEntity, TCacheKey>>();
 
+  readonly tableName: string;
+
+  protected readonly eventHub: DatabaseEventHub;
+
+  constructor(tableName: string, eventHub = container.resolve(DatabaseEventHub)) {
+    this.tableName = tableName;
+    this.eventHub = eventHub;
+  }
+
   async initialize(): Promise<void> {
-    const eventHub = container.resolve(DatabaseEventHub);
     const entityStream = merge(
-      await eventHub.listenTo<TEntity>(`sync_${this.tableName}_UPDATE`),
-      await eventHub.listenTo<TEntity>(`sync_${this.tableName}_INSERT`)
+      await this.eventHub.listenTo<TEntity>(`sync_${this.tableName}_UPDATE`),
+      await this.eventHub.listenTo<TEntity>(`sync_${this.tableName}_INSERT`)
     ).pipe(
       map(entity => ({
         key: this.getCacheKeyFromEntity(entity),
@@ -46,7 +48,7 @@ export default abstract class CacheSynchronizer<
       }))
     );
     const deleteStream = (
-      await eventHub.listenTo<TDeleteEventPayload>(`sync_${this.tableName}_DELETE`)
+      await this.eventHub.listenTo<TDeleteEventPayload>(`sync_${this.tableName}_DELETE`)
     ).pipe(map(payload => ({key: this.getCacheKeyFromDelete(payload), entity: undefined})));
 
     merge(entityStream, deleteStream).subscribe(({key, entity}) => {
