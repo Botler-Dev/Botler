@@ -44,6 +44,8 @@ module.exports = {
     'unicorn/import-style': 'off',
     // Conflict with "consistent-return"
     'unicorn/no-useless-undefined': 'off',
+    // Database entities have their optional fields set to null
+    'unicorn/no-null': 'warn',
 
     // Copied from https://github.com/airbnb/javascript/issues/1536#issuecomment-547416680
     'unicorn/import-index': 'off',
