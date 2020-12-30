@@ -1,14 +1,17 @@
 import {Client} from 'discord.js';
+import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {container} from 'tsyringe';
 import {Connection, createConnection} from 'typeorm';
-import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
-import DatabaseEventHub from './database/DatabaseEventHub';
-import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
 
+import DatabaseEventHub from './database/DatabaseEventHub';
+import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
+import GuildManager from './database/managers/GuildManager';
+import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
 import MasterLogger from './logger/MasterLogger';
 import ScopedLogger, {proxyNativeConsole} from './logger/ScopedLogger';
 import CommandModule from './modules/command/CommandModule';
 import Module from './modules/Module';
+import {ExitCode, exitWithMessage} from './utils/process';
 
 export default class Bot {
   public static readonly MODULES: ReadonlyArray<Constructor<Module>> = [CommandModule];
@@ -26,6 +29,8 @@ export default class Bot {
   private globalSettings!: GlobalSettingsWrapper;
 
   private client!: Client;
+
+  private guildManager!: GuildManager;
 
   private modules!: Module[];
 
@@ -55,6 +60,10 @@ export default class Bot {
       partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
     });
     container.register(Client, {useValue: this.client});
+
+    this.guildManager = new GuildManager();
+    await this.guildManager.initialize();
+    container.register(GuildManager, {useValue: this.guildManager});
 
     this.modules = Bot.MODULES.map(constructor => container.resolve(constructor));
     Promise.all(this.modules.map(module => module.initialize?.()));
