@@ -2,10 +2,9 @@ import WrapperManager from '../manager/WrapperManager';
 import EntityWrapper, {Entity} from './EntityWrapper';
 
 export default abstract class NormalEntityWrapper<
-  TEntity extends Entity,
-  TManager extends WrapperManager<TEntity, EntityWrapper<TEntity, TManager, TEntityState>>,
-  TEntityState extends TEntity | undefined = TEntity
-> extends EntityWrapper<TEntity, TManager, TEntityState> {
+  TEntityState extends Entity | undefined,
+  TManager extends WrapperManager<Exclude<TEntityState, undefined>>
+> extends EntityWrapper<TEntityState, TManager> {
   private _entity: TEntityState;
 
   get entity(): Immutable<TEntityState> {
@@ -15,10 +14,6 @@ export default abstract class NormalEntityWrapper<
   constructor(manager: TManager, entity: TEntityState) {
     super(manager);
     this._entity = entity;
-  }
-
-  protected getModifiableEntity(): TEntity {
-    return this._entity ?? this.createDefaultEntity();
   }
 
   protected setEntity(entity: TEntityState): void {

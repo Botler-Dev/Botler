@@ -13,7 +13,7 @@ export type WrapperGenerator<
 
 export default abstract class CacheManager<
   TEntity extends Entity,
-  TWrapper extends CacheEntityWrapper<TEntity, This, any>,
+  TWrapper extends CacheEntityWrapper<any, This, any>,
   TCacheKey = unknown,
   TSynchronizer extends CacheSynchronizer<TEntity, TCacheKey, unknown> = CacheSynchronizer<
     TEntity,
@@ -27,7 +27,7 @@ export default abstract class CacheManager<
     TSynchronizer,
     any
   >
-> extends WrapperManager<TEntity, TWrapper> {
+> extends WrapperManager<TEntity> {
   private readonly _cache = new Collection<TCacheKey, TWrapper>();
 
   get cache(): ReadonlyCollection<TCacheKey, TWrapper> {

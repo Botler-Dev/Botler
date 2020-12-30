@@ -1,11 +1,8 @@
 import {container} from 'tsyringe';
 import {Connection, EntityTarget, Repository} from 'typeorm';
-import EntityWrapper from '../wrapper/EntityWrapper';
+import {Entity} from '../wrapper/EntityWrapper';
 
-export default abstract class WrapperManager<
-  TEntity,
-  TWrapper extends EntityWrapper<TEntity, WrapperManager<TEntity, TWrapper>, any>
-> {
+export default abstract class WrapperManager<TEntity extends Entity> {
   readonly repo: Repository<TEntity>;
 
   constructor(entityTarget: EntityTarget<TEntity>, connection = container.resolve(Connection)) {
