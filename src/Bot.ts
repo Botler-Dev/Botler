@@ -23,6 +23,8 @@ export default class Bot {
 
   private globalSettingsManager!: GlobalSettingsManager;
 
+  private globalSettings!: GlobalSettingsWrapper;
+
   private client!: Client;
 
   private modules!: Module[];
@@ -45,7 +47,8 @@ export default class Bot {
 
     this.globalSettingsManager = new GlobalSettingsManager();
     await this.globalSettingsManager.initialize();
-    container.register(GlobalSettingsWrapper, {useValue: this.globalSettingsManager.get()});
+    this.globalSettings = this.globalSettingsManager.get();
+    container.register(GlobalSettingsWrapper, {useValue: this.globalSettings});
 
     this.client = new Client({
       disableMentions: 'everyone',
@@ -57,6 +60,19 @@ export default class Bot {
     Promise.all(this.modules.map(module => module.initialize?.()));
     Promise.all(this.modules.map(module => module.postInitialize?.()));
 
-    // Discord.js client login here
+    await this.login();
+  }
+
+  private async login(): Promise<void> {
+    await this.client.login(this.globalSettings.botToken);
+    this.globalSettings.afterEntityChangeWithInitial
+      .pipe(
+        map(entity => entity.botToken),
+        distinctUntilChanged(),
+        skip(1)
+      )
+      .subscribe(() =>
+        exitWithMessage(ExitCode.BotTokenChanged, 'Bot token changed which requires a restart.')
+      );
   }
 }
