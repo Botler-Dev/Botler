@@ -52,7 +52,7 @@ export default class MasterLogger implements Logger {
     labelSuffix: optional(']'),
     stampPad: optionalToNumber(0),
     scopePad: optionalToNumber(10),
-    stampFormat: optional('YYYY/MM/DD HH:mm:ss.sss'),
+    stampFormat: optional('YYYY/MM/DD HH:mm:ss.SSS'),
   };
 
   /**
