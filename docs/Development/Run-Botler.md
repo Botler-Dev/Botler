@@ -2,20 +2,20 @@
 
 There are several different ways to run Botler. For development only running Postgres in Docker is recommended.
 
-## Using NPM
+## Using YARN
 
 First, install the dependencies:
 
 ```shell
-npm install
+yarn install
 ```
 
-Then because this project is written in TypeScript you will have to first compile the code to JavaScript with the following command:
+Then, because this project is written in TypeScript, you will have to first compile the code to JavaScript with the following command:
 
 ```shell
-npm run build:dev
+yarn run build:dev
 # Or if the compiler should also watch for changes
-npm run build:watch
+yarn run build:watch
 ```
 
 Now there should be a `dist` folder in the root of the compiled code.
@@ -24,7 +24,7 @@ Before running Botler you will need to configure him first. See the [Configurati
 After configuring the bot run the following command to start it:
 
 ```shell
-npm run start:dev
+yarn run start:dev
 ```
 
 !!! note

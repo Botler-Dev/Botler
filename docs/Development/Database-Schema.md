@@ -6,7 +6,7 @@ To view the schema use [dbdiagram.io](https://dbdiagram.io/d).
 Table Guild as G {
   id string [pk]
   prefix string [null]
-  guildLogChannel string [null]
+  systemLogChannel string [null]
   caseLogChannel string [null]
 }
 
