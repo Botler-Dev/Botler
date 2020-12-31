@@ -1,5 +1,6 @@
 import {BehaviorSubject, Observable} from 'rxjs';
-import {skip} from 'rxjs/operators';
+import {filter, skip} from 'rxjs/operators';
+import {isDeepStrictEqual} from 'util';
 import type CacheManager from '../manager/CacheManager';
 import EntityWrapper, {Entity} from './EntityWrapper';
 
@@ -39,8 +40,9 @@ export default abstract class CacheEntityWrapper<
   constructor(manager: TManager, syncStream: Observable<TEntityState>, entity: TEntityState) {
     super(manager);
     this.entitySubject = new BehaviorSubject(entity);
-    // TODO: implement distinctUntilChanged
-    const subscription = syncStream.subscribe(this.entitySubject);
+    const subscription = syncStream
+      .pipe(filter(newEntity => !isDeepStrictEqual(newEntity, this.entity)))
+      .subscribe(this.entitySubject);
     this.afterCacheStateChange.subscribe(() => subscription.unsubscribe());
   }
 
