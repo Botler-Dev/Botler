@@ -10,12 +10,10 @@ import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
 import MasterLogger from './logger/MasterLogger';
 import ScopedLogger, {proxyNativeConsole} from './logger/ScopedLogger';
 import CommandModule from './modules/command/CommandModule';
-import Module from './modules/Module';
+import ModuleLoader from './modules/ModuleLoader';
 import {ExitCode, exitWithMessage} from './utils/process';
 
 export default class Bot {
-  public static readonly MODULES: ReadonlyArray<Constructor<Module>> = [CommandModule];
-
   private masterLogger!: MasterLogger;
 
   private globalLogger!: ScopedLogger;
@@ -32,7 +30,7 @@ export default class Bot {
 
   private guildManager!: GuildManager;
 
-  private modules!: Module[];
+  private moduleLoader!: ModuleLoader;
 
   public async initializeBot(): Promise<void> {
     this.masterLogger = new MasterLogger();
@@ -62,12 +60,12 @@ export default class Bot {
     container.register(Client, {useValue: this.client});
 
     this.guildManager = new GuildManager();
-    await this.guildManager.initialize();
     container.register(GuildManager, {useValue: this.guildManager});
+    await this.guildManager.initialize();
 
-    this.modules = Bot.MODULES.map(constructor => container.resolve(constructor));
-    Promise.all(this.modules.map(module => module.initialize?.()));
-    Promise.all(this.modules.map(module => module.postInitialize?.()));
+    this.moduleLoader = new ModuleLoader([CommandModule]);
+    container.registerInstance(ModuleLoader, this.moduleLoader);
+    await this.moduleLoader.initialize();
 
     await this.login();
   }
