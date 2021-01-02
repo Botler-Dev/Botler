@@ -1,12 +1,12 @@
 import {Client, Collection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
-import StaticImplements from '../../utils/staticImplements';
 
 import Module from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
 import Command, {CommandName} from './Command';
 import CommandCategory from './CommandCategory';
 import categoryDefinition from './root/categoryDefinition';
+import StaticImplements from '../../utils/StaticImplements';
 
 @StaticImplements<ModuleConstructor>()
 export default class CommandModule extends Module {
