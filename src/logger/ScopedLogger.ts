@@ -9,9 +9,9 @@ export default class ScopedLogger implements Logger {
 
   private readonly masterLogger: MasterLogger;
 
-  constructor(scope: string) {
+  constructor(scope: string, masterLogger = container.resolve(MasterLogger)) {
     this.scope = scope;
-    this.masterLogger = container.resolve(MasterLogger);
+    this.masterLogger = masterLogger;
   }
 
   log(...objs: any[]): void {
