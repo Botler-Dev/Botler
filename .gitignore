@@ -3,3 +3,4 @@ dist/
 site/
 .vscode/
 .env
+eslint.xml
