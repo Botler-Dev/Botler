@@ -10,7 +10,7 @@
     "start:prod": "node ./dist/main.js",
     "start:dev": "node --require dotenv/config --nolazy ./dist/main.js",
     "lint": "eslint .",
-    "lint:ci": "eslint . > eslint.xml",
+    "lint:ci": "eslint . > eslint.xml --format checkstyle",
     "lint:fix": "yarn lint --fix",
     "format:check": "yarn prettier --check .",
     "format": "yarn prettier --write .",
