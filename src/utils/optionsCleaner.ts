@@ -1,33 +1,34 @@
-export type OptionValue = any;
+export type OptionValue = unknown;
 
-export type Options = Record<string, OptionValue>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type InputOptions = Record<string, any>;
 
-export type OptionsCleanerOutput<InputOptions extends Options> = {
-  [Key in keyof InputOptions]: OptionValue;
+export type OptionsCleanerOutput<TInputOptions extends InputOptions> = {
+  [Key in keyof TInputOptions]: OptionValue;
 };
 
-export type OptionValueCleaner<Input extends OptionValue, Output extends OptionValue> = (
-  rawValue: Input,
+export type OptionValueCleaner<TInput extends OptionValue, TOutput extends OptionValue> = (
+  rawValue: TInput,
   key: string
-) => Output;
+) => TOutput;
 
 export type OptionsCleanerDefinition<
-  InputOptions extends Options,
-  OutputOptions extends Partial<OptionsCleanerOutput<InputOptions>>
+  TInputOptions extends InputOptions,
+  TOutputOptions extends Partial<OptionsCleanerOutput<TInputOptions>>
 > = {
-  [Key in keyof InputOptions]-?: OptionValueCleaner<InputOptions[Key], OutputOptions[Key]>;
+  [Key in keyof TInputOptions]-?: OptionValueCleaner<TInputOptions[Key], TOutputOptions[Key]>;
 };
 
 export default function cleanOptions<
-  InputOptions extends Options,
-  OutputOptions extends Partial<OptionsCleanerOutput<InputOptions>>
+  TInputOptions extends InputOptions,
+  TOutputOptions extends Partial<OptionsCleanerOutput<TInputOptions>>
 >(
-  definition: OptionsCleanerDefinition<InputOptions, OutputOptions>,
-  raw: InputOptions
-): OutputOptions {
-  const cleaned: Partial<OutputOptions> = {};
+  definition: OptionsCleanerDefinition<TInputOptions, TOutputOptions>,
+  raw: TInputOptions
+): TOutputOptions {
+  const cleaned: Partial<TOutputOptions> = {};
   Object.entries(definition).forEach(([optionName, optionCleaner]) => {
-    cleaned[optionName as keyof OutputOptions] = optionCleaner(raw[optionName], optionName);
+    cleaned[optionName as keyof TOutputOptions] = optionCleaner(raw[optionName], optionName);
   });
-  return cleaned as OutputOptions;
+  return cleaned as TOutputOptions;
 }

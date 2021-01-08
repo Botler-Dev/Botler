@@ -37,6 +37,7 @@ export function stringToBoolean() {
 }
 
 export function stack<Input, Output>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ...cleaners: OptionValueCleaner<any, any>[]
 ): OptionValueCleaner<Input, Output> {
   return (raw: Input, key: string) =>

@@ -8,13 +8,16 @@ import {Entity} from '../wrapper/EntityWrapper';
 
 export type WrapperGenerator<
   TEntity extends Entity,
-  TWrapper extends CacheEntityWrapper<TEntity, any, any>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TWrapper extends CacheEntityWrapper<TEntity, any>
 > = (syncStream: SyncStream<TEntity>) => TWrapper;
 
 export default abstract class CacheManager<
   TEntity extends Entity,
-  TWrapper extends CacheEntityWrapper<any, This, any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TWrapper extends CacheEntityWrapper<any, This>,
   TCacheKey = unknown,
+  // TODO: make synchronizer cache key a separate type
   TSynchronizer extends CacheSynchronizer<TEntity, TCacheKey, unknown> = CacheSynchronizer<
     TEntity,
     TCacheKey,
@@ -25,6 +28,7 @@ export default abstract class CacheManager<
     TWrapper,
     TCacheKey,
     TSynchronizer,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
 > extends WrapperManager<TEntity> {

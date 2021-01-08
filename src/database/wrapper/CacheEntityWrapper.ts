@@ -6,10 +6,12 @@ import EntityWrapper, {Entity} from './EntityWrapper';
 
 export default abstract class CacheEntityWrapper<
   TEntityState extends Entity | undefined,
-  TManager extends CacheManager<Exclude<TEntityState, undefined>, This, any, any, any>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TManager extends CacheManager<Exclude<TEntityState, undefined>, This, any>,
   This extends CacheEntityWrapper<TEntityState, TManager, This> = CacheEntityWrapper<
     TEntityState,
     TManager,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
 > extends EntityWrapper<TEntityState, TManager> {

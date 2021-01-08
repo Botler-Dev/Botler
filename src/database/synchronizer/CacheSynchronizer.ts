@@ -1,7 +1,7 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {merge, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {container, DependencyContainer} from 'tsyringe';
+import {container} from 'tsyringe';
 import {Entity} from '../wrapper/EntityWrapper';
 import DatabaseEventHub from '../DatabaseEventHub';
 

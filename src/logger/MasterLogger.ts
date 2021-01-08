@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 
 import {optional, optionalStringToBoolean, optionalToNumber} from '../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
-import Logger, {LOG_LEVEL_STRINGS, LogLevel} from './Logger';
+import LogLevel, {LOG_LEVEL_STRINGS} from './LogLevel';
 
 export type MasterLoggerConfig = {
   stampLabel: boolean;
@@ -35,7 +35,7 @@ export type LogMetadata = {
 
 export type LogLevelMetadata = Omit<LogMetadata, 'level'>;
 
-export default class MasterLogger implements Logger {
+export default class MasterLogger {
   private config: MasterLoggerConfig;
 
   private static readonly configCleanerDefinition: OptionsCleanerDefinition<
@@ -89,7 +89,7 @@ export default class MasterLogger implements Logger {
     return output;
   }
 
-  advancedLog(metadata: LogMetadata, ...objs: any[]): void {
+  advancedLog(metadata: LogMetadata, ...objs: unknown[]): void {
     let metaString = '';
     if (this.config.stampLabel) {
       metaString += this.finalizeLabel(
@@ -112,19 +112,19 @@ export default class MasterLogger implements Logger {
     MasterLogger.originalConsole[logLevel](metaString, ...objs);
   }
 
-  log(metadata: LogLevelMetadata, ...objs: any[]): void {
+  log(metadata: LogLevelMetadata, ...objs: unknown[]): void {
     this.advancedLog({level: LogLevel.Log, ...metadata}, ...objs);
   }
 
-  info(metadata: LogLevelMetadata, ...objs: any[]): void {
+  info(metadata: LogLevelMetadata, ...objs: unknown[]): void {
     this.advancedLog({level: LogLevel.Info, ...metadata}, ...objs);
   }
 
-  warn(metadata: LogLevelMetadata, ...objs: any[]): void {
+  warn(metadata: LogLevelMetadata, ...objs: unknown[]): void {
     this.advancedLog({level: LogLevel.Warn, ...metadata}, ...objs);
   }
 
-  error(metadata: LogLevelMetadata, ...objs: any[]): void {
+  error(metadata: LogLevelMetadata, ...objs: unknown[]): void {
     this.advancedLog({level: LogLevel.Error, ...metadata}, ...objs);
   }
 }

@@ -13,12 +13,12 @@ export function exit(code: ExitCode): never {
   process.exit(code);
 }
 
-export function exitWithError(code: ExitCode, ...args: any[]): never {
+export function exitWithError(code: ExitCode, ...args: unknown[]): never {
   console.error(...args);
   exit(code);
 }
 
-export function exitWithMessage(code: ExitCode, ...args: any[]): never {
+export function exitWithMessage(code: ExitCode, ...args: unknown[]): never {
   console.info(...args);
   exit(code);
 }

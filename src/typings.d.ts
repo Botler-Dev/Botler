@@ -1,4 +1,6 @@
-type Constructor<Instance> = new (...args: any[]) => Instance;
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+type Constructor<Instance> = new (...args: unknown[]) => Instance;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ImmutablePrimitive = undefined | null | boolean | string | number | Function;

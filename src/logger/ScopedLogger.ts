@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
 import {container} from 'tsyringe';
 
-import Logger from './Logger';
 import MasterLogger from './MasterLogger';
 
-export default class ScopedLogger implements Logger {
+export default class ScopedLogger {
   readonly scope: string;
 
   private readonly masterLogger: MasterLogger;
@@ -14,19 +13,19 @@ export default class ScopedLogger implements Logger {
     this.masterLogger = masterLogger;
   }
 
-  log(...objs: any[]): void {
+  log(...objs: unknown[]): void {
     this.masterLogger.log({scope: this.scope}, ...objs);
   }
 
-  info(...objs: any[]): void {
+  info(...objs: unknown[]): void {
     this.masterLogger.info({scope: this.scope}, ...objs);
   }
 
-  warn(...objs: any[]): void {
+  warn(...objs: unknown[]): void {
     this.masterLogger.warn({scope: this.scope}, ...objs);
   }
 
-  error(...objs: any[]): void {
+  error(...objs: unknown[]): void {
     this.masterLogger.error({scope: this.scope}, ...objs);
   }
 }

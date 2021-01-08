@@ -1,6 +1,7 @@
 import {FindConditions} from 'typeorm';
 import type WrapperManager from '../manager/WrapperManager';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Entity = Record<string, any>;
 
 export default abstract class EntityWrapper<
