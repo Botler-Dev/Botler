@@ -1,12 +1,11 @@
-import {Client, Collection} from 'discord.js';
+import {Client} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 
+import StaticImplements from '../../utils/StaticImplements';
 import Module from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
-import Command, {CommandName} from './Command';
 import CommandCategory from './CommandCategory';
-import categoryDefinition from './root/categoryDefinition';
-import StaticImplements from '../../utils/StaticImplements';
+import CommandManager from './CommandManager';
 
 @StaticImplements<ModuleConstructor>()
 export default class CommandModule extends Module {
@@ -16,31 +15,17 @@ export default class CommandModule extends Module {
 
   static readonly optionalDependencies = [];
 
-  tree!: CommandCategory;
+  readonly commands: CommandManager;
 
-  /**
-   * All commands mapped with only their `name` properties.
-   */
-  commandInstances!: Collection<CommandName, Command>;
+  readonly rootCategory: CommandCategory;
 
-  /**
-   * All command names and aliases mapped to the commands
-   */
-  commandAliases!: Collection<string, Command>;
-
-  readonly client: Client;
+  private readonly client: Client;
 
   constructor(moduleContainer: DependencyContainer, client = moduleContainer.resolve(Client)) {
     super(moduleContainer);
+    this.commands = new CommandManager(this.container);
+    this.container.registerInstance(CommandManager, this.commands);
+    this.rootCategory = new CommandCategory(moduleContainer, undefined, '');
     this.client = client;
-  }
-
-  async initialize(): Promise<void> {
-    this.tree = new CommandCategory(categoryDefinition);
-    this.commandInstances = this.tree.getAllCommands();
-    this.commandAliases = this.commandInstances.flatMap(
-      command =>
-        new Collection([command.name].concat(command.aliases ?? []).map(name => [name, command]))
-    );
   }
 }

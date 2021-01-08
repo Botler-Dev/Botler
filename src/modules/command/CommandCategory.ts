@@ -1,75 +1,83 @@
-import {Collection} from 'discord.js';
+import {Collection, ReadonlyCollection} from 'discord.js';
+import {DependencyContainer} from 'tsyringe';
+import ScopedLogger from '../../logger/ScopedLogger';
+import type Command from './Command';
+import type {CommandName} from './Command';
+import CommandManager from './CommandManager';
 
-import {notCleaned, optional, required} from '../../utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '../../utils/optionsCleaner';
-import Command, {CommandName} from './Command';
+export type CommandCategoryGenerator = (container: DependencyContainer) => CommandCategory;
 
-export type CommandCategoryDefinition = {
-  name: string;
-  description?: string;
-  hidden?: boolean;
-  commands: Constructor<Command>[];
-  subcategories?: CommandCategoryDefinition[];
-};
-
-export type CleanedCommandCategoryDefinition = CommandCategoryDefinition & {
-  description: string;
-  hidden: boolean;
-};
+export type CommandCategoryName = string;
 
 export default class CommandCategory {
-  readonly name: string;
+  readonly parent?: CommandCategory;
 
-  readonly description: string;
+  readonly name: CommandCategoryName;
 
-  readonly hidden: boolean;
+  readonly description?: string;
 
-  /**
-   * All commands in this category level. Only mapped with the `name` property.
-   */
-  readonly commands: Collection<CommandName, Command>;
+  readonly path: string;
 
-  readonly subcategories?: Collection<string, CommandCategory>;
+  private readonly _commands = new Collection<CommandName, Command>();
 
-  private static readonly definitionCleanerDefinition: OptionsCleanerDefinition<
-    CommandCategoryDefinition,
-    CleanedCommandCategoryDefinition
-  > = {
-    name: required(),
-    description: optional(''),
-    hidden: optional(false),
-    commands: (commands: Constructor<Command>[]) => {
-      if (commands.length === 0) {
-        throw new Error('Command categories must have at least have one command in them.');
-      }
-      return commands;
-    },
-    subcategories: notCleaned(),
-  };
+  get commands(): ReadonlyCollection<CommandName, Command> {
+    return this._commands;
+  }
 
-  constructor(definition: CommandCategoryDefinition) {
-    const cleanDefinition = cleanOptions(CommandCategory.definitionCleanerDefinition, definition);
-    this.name = cleanDefinition.name;
-    this.description = cleanDefinition.description;
-    this.hidden = cleanDefinition.hidden;
-    this.commands = new Collection(
-      cleanDefinition.commands
-        .map(CommandConstructor => new CommandConstructor())
-        .map(command => [command.name, command])
+  private readonly _subcategories = new Collection<CommandCategoryName, CommandCategory>();
+
+  get subcategories(): ReadonlyCollection<CommandCategoryName, CommandCategory> {
+    return this._subcategories;
+  }
+
+  private readonly container: DependencyContainer;
+
+  private readonly logger: ScopedLogger;
+
+  private readonly commandManager: CommandManager;
+
+  constructor(
+    container: DependencyContainer,
+    parent: CommandCategory | undefined,
+    name: CommandCategoryName,
+    description?: string
+  ) {
+    this.parent = parent;
+    this.name = name;
+    this.description = description;
+    this.path = `${parent?.path ?? ''}${name}/`;
+    this.container = container;
+    this.logger = container.resolve(ScopedLogger);
+    this.commandManager = container.resolve(CommandManager);
+  }
+
+  createSubcategory(name: CommandCategoryName, description?: string): CommandCategory {
+    let category = this.subcategories.get(name);
+    if (category) return category;
+    category = new CommandCategory(this.container, this, name, description);
+    this._subcategories.set(name, category);
+    this.logger.info(`Created new command category "${category.path}".`);
+    return category;
+  }
+
+  getCategoryAtPath(path: string): CommandCategory | undefined {
+    return (
+      path
+        .split('/')
+        // eslint-disable-next-line unicorn/no-reduce
+        .reduce<CommandCategory | undefined>(
+          (previousCategory, name) => previousCategory?.subcategories.get(name),
+          this
+        )
     );
-    this.subcategories = CommandCategory.createSubcategories(cleanDefinition.subcategories);
   }
 
-  private static createSubcategories(subcategories?: CommandCategoryDefinition[]) {
-    if (subcategories === undefined) return undefined;
-    const categories = subcategories
-      .map(category => new CommandCategory(category))
-      .map(category => [category.name, category] as [string, CommandCategory]);
-    return new Collection(categories);
-  }
-
-  getAllCommands(): Collection<CommandName, Command> {
-    if (this.subcategories === undefined) return this.commands.clone();
-    return this.commands.concat(...this.subcategories.map(category => category.getAllCommands()));
+  registerCommand(command: Command): void {
+    if (command.category !== this)
+      throw new Error(
+        `Tried to register a command with a non-matching "category" property in command category.`
+      );
+    this.commandManager.register(command);
+    this._commands.set(command.name, command);
   }
 }

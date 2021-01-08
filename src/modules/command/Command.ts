@@ -1,3 +1,6 @@
+import {DependencyContainer} from 'tsyringe';
+import type CommandCategory from './CommandCategory';
+
 export type CommandName = string;
 
 export default abstract class Command {
@@ -5,14 +8,20 @@ export default abstract class Command {
 
   readonly aliases?: CommandName[];
 
+  readonly category: CommandCategory;
+
   abstract readonly dm: boolean;
 
-  // TODO: implement permissions levels
-  abstract readonly permLevel: unknown;
+  abstract readonly botMasterOnly: boolean;
 
   readonly localCooldown?: number;
 
   readonly globalCooldown?: number;
 
-  // readonly ExecutionSubject: Subject
+  protected readonly container: DependencyContainer;
+
+  constructor(category: CommandCategory, container: DependencyContainer) {
+    this.category = category;
+    this.container = container;
+  }
 }
