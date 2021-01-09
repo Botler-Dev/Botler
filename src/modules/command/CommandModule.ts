@@ -1,11 +1,15 @@
-import {Client} from 'discord.js';
+import {Client, Message} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
+import GuildManager from '../../database/managers/GuildManager';
+import GlobalSettingsWrapper from '../../database/wrappers/GlobalSettingsWrapper';
 
 import StaticImplements from '../../utils/StaticImplements';
 import Module from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
 import CommandCategory from './CommandCategory';
 import CommandManager from './CommandManager';
+import InitialExecutionContext from './executionContexts/InitialExecutionContext';
+import TestCommand from './TestCommand';
 
 @StaticImplements<ModuleConstructor>()
 export default class CommandModule extends Module {
@@ -21,11 +25,47 @@ export default class CommandModule extends Module {
 
   private readonly client: Client;
 
-  constructor(moduleContainer: DependencyContainer, client = moduleContainer.resolve(Client)) {
+  private readonly guildManager: GuildManager;
+
+  private readonly globalSettings: GlobalSettingsWrapper;
+
+  constructor(
+    moduleContainer: DependencyContainer,
+    client = moduleContainer.resolve(Client),
+    guildManager = moduleContainer.resolve(GuildManager),
+    globalSettings = moduleContainer.resolve(GlobalSettingsWrapper)
+  ) {
     super(moduleContainer);
     this.commands = new CommandManager(this.container);
     this.container.registerInstance(CommandManager, this.commands);
     this.rootCategory = new CommandCategory(moduleContainer, undefined, '');
     this.client = client;
+    this.guildManager = guildManager;
+    this.globalSettings = globalSettings;
+  }
+
+  async initialize(): Promise<void> {
+    this.rootCategory.registerCommand(new TestCommand(this.rootCategory, this.container));
+  }
+
+  async postInitialize(): Promise<void> {
+    this.client.on('message', async (message: Message) => {
+      const guild = message.guild ? await this.guildManager.fetch(message.guild) : undefined;
+      const prefix = guild?.prefix ?? this.globalSettings.prefix;
+      if (message.author.bot || !message.content.startsWith(prefix)) return;
+
+      const commandName = message.content.slice(prefix.length).split(' ', 2)[0].toLowerCase();
+      const command = this.commands.lookup.get(commandName);
+      if (!command) return;
+
+      const context = new InitialExecutionContext(message, guild, prefix, command);
+      try {
+        await command.execute(context);
+      } catch (error) {
+        this.logger.error(`Uncaught error while executing command "${command.name}".`, error);
+        // TODO: add proper error message
+        await message.channel.send('Something went wrong');
+      }
+    });
   }
 }

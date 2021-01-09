@@ -1,5 +1,6 @@
 import {DependencyContainer} from 'tsyringe';
 import type CommandCategory from './CommandCategory';
+import ExecutionContext from './executionContexts/ExecutionContext';
 
 export type CommandName = string;
 
@@ -10,6 +11,7 @@ export default abstract class Command {
 
   readonly category: CommandCategory;
 
+  // TODO: add capability to define DM only, Guild only, or both
   abstract readonly dm: boolean;
 
   abstract readonly botMasterOnly: boolean;
@@ -24,4 +26,6 @@ export default abstract class Command {
     this.category = category;
     this.container = container;
   }
+
+  abstract execute(context: ExecutionContext): Promise<void>;
 }
