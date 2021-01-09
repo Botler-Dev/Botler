@@ -37,7 +37,6 @@ export default class CommandManager {
     if (overlapAlias)
       throw new Error(`Cannot use "${overlapAlias}" as an alias as it is already used.`);
 
-    command.category.registerCommand(command);
     this._instances.set(command.name, command);
     this._lookup.set(command.name, command);
     command.aliases?.forEach(alias => this._lookup.set(alias, command));
