@@ -9,12 +9,22 @@ export type ParseResults<TValues extends ParsedValues = ParsedValues> = {
   [name in keyof TValues]: ParseResult<TValues[name]>;
 };
 
-export default abstract class MessageExecutionContext extends UserExecutionContext {
-  message: Message;
+export default abstract class MessageExecutionContext<
+  TExistingValues extends ParsedValues = Record<string, never>
+> extends UserExecutionContext {
+  readonly message: Message;
 
-  readonly values: ParsedValues = {};
+  private readonly _values = {} as TExistingValues & ParsedValues;
 
-  readonly parseResults: ParseResults = {};
+  get values(): Readonly<TExistingValues & ParsedValues> {
+    return this._values;
+  }
+
+  private readonly _parseResults = {} as ParseResults<TExistingValues & ParsedValues>;
+
+  get parseResults(): Readonly<ParseResults<TExistingValues & ParsedValues>> {
+    return this._parseResults;
+  }
 
   private _parseIndex = 0;
 
@@ -52,9 +62,15 @@ export default abstract class MessageExecutionContext extends UserExecutionConte
     return result.value;
   }
 
+  protected addParseResult<TName extends keyof TExistingValues>(
+    name: TName,
+    result: ParseResult<TExistingValues[TName]>
+  ): void;
   protected addParseResult(name: string, result: ParseResult): void {
-    this.values[name] = result.value;
-    this.parseResults[name] = result;
+    // @ts-expect-error index type is correct
+    this._values[name] = result.value;
+    // @ts-expect-error index type is correct
+    this._parseResults[name] = result;
     this._parseIndex += result.length;
   }
 }
