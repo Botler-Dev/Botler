@@ -14,7 +14,10 @@ export default class TestCommand extends Command {
   // eslint-disable-next-line class-methods-use-this
   async execute(context: ExecutionContext): Promise<void> {
     if (!(context instanceof InitialExecutionContext)) return;
-    const first = await context.parseNext('text', stringParser, {spaceStopper: true});
+    const first = await context.parseNext('text', stringParser, {
+      default: 'the default',
+      whitespaceStopper: true,
+    });
     const rest = await context.parseOptionalNext('text', stringParser);
     context.message.channel.send(
       `Hello ${context.user.username}. First arg: ${first}. Rest: ${rest}`
