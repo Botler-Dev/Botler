@@ -106,4 +106,8 @@ export default class GuildWrapper
     const keyCount = Object.entries(this.entity || {}).filter(([, value]) => !!value).length;
     return keyCount <= 1 || (keyCount === 2 && this.prefix === this.globalSettings.prefix);
   }
+
+  toString(): string {
+    return this.discord.toString();
+  }
 }

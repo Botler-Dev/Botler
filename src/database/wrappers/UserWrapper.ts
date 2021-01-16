@@ -52,4 +52,8 @@ export default class UserWrapper
   isEntityUseless(): boolean {
     return !this.entity || Object.entries(this.entity).filter(([, value]) => !!value).length === 1;
   }
+
+  toString(): string {
+    return this.discord.toString();
+  }
 }
