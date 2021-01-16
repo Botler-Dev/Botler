@@ -1,4 +1,5 @@
-import {User, UserManager} from 'discord.js';
+import UserManager from '../../../database/managers/UserManager';
+import UserWrapper from '../../../database/wrappers/UserWrapper';
 import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
 import {
   generateDefaultOrNothing,
@@ -10,7 +11,7 @@ import {
 import snowflakeParser, {SnowflakeType} from './snowflakeParser';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface UserParseOptions extends ParseOptions<User> {
+export interface UserParseOptions extends ParseOptions<UserWrapper> {
   // TODO: add name search support in guilds
 }
 
@@ -24,9 +25,9 @@ const userParseOptionsDefinition: OptionsCleanerDefinition<
   ...parseOptionsDefinition,
 };
 
-export type UserParseResult = ParseResult<User>;
+export type UserParseResult = ParseResult<UserWrapper>;
 
-export function userParser(userManager: UserManager): Parser<User, UserParseOptions> {
+export function userParser(userManager: UserManager): Parser<UserWrapper, UserParseOptions> {
   return async (raw: string, options?: UserParseOptions): Promise<UserParseResult | undefined> => {
     const cleaned = cleanOptions(userParseOptionsDefinition, options ?? {});
 

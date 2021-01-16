@@ -1,6 +1,7 @@
 import {Client, Message} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 import GuildManager from '../../database/managers/GuildManager';
+import UserManager from '../../database/managers/UserManager';
 import GlobalSettingsWrapper from '../../database/wrappers/GlobalSettingsWrapper';
 
 import StaticImplements from '../../utils/StaticImplements';
@@ -24,6 +25,8 @@ export default class CommandModule extends Module {
 
   private readonly client: Client;
 
+  private readonly userManager: UserManager;
+
   private readonly guildManager: GuildManager;
 
   private readonly globalSettings: GlobalSettingsWrapper;
@@ -31,6 +34,7 @@ export default class CommandModule extends Module {
   constructor(
     moduleContainer: DependencyContainer,
     client = moduleContainer.resolve(Client),
+    userManager = moduleContainer.resolve(UserManager),
     guildManager = moduleContainer.resolve(GuildManager),
     globalSettings = moduleContainer.resolve(GlobalSettingsWrapper)
   ) {
@@ -39,6 +43,7 @@ export default class CommandModule extends Module {
     this.container.registerInstance(CommandManager, this.commands);
     this.rootCategory = new CommandCategory(moduleContainer, undefined, '');
     this.client = client;
+    this.userManager = userManager;
     this.guildManager = guildManager;
     this.globalSettings = globalSettings;
   }
@@ -49,11 +54,13 @@ export default class CommandModule extends Module {
       const prefix = guild?.prefix ?? this.globalSettings.prefix;
       if (message.author.bot || !message.content.startsWith(prefix)) return;
 
+      const user = await this.userManager.fetch(message.author);
+
       const commandName = message.content.slice(prefix.length).split(' ', 1)[0].toLowerCase();
       const command = this.commands.lookup.get(commandName);
       if (!command) return;
 
-      const context = new InitialExecutionContext(message, guild, prefix, command);
+      const context = new InitialExecutionContext(message, user, guild, prefix, command);
       try {
         await command.execute(context);
       } catch (error) {

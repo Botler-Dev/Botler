@@ -1,5 +1,6 @@
 import {Message} from 'discord.js';
 import GuildWrapper from '../../../database/wrappers/GuildWrapper';
+import UserWrapper from '../../../database/wrappers/UserWrapper';
 import {OptionsFromParser, Parser, ParseResult, ValueFromParser} from '../parsers/parser';
 import UserExecutionContext from './UserExecutionContext';
 
@@ -36,8 +37,8 @@ export default abstract class MessageExecutionContext<
     return this.message.content.slice(this.parseIndex);
   }
 
-  constructor(message: Message, guild: GuildWrapper | undefined) {
-    super(message.author, guild);
+  constructor(message: Message, user: UserWrapper, guild: GuildWrapper | undefined) {
+    super(user, guild);
     this.message = message;
   }
 
