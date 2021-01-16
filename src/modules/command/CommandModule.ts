@@ -9,7 +9,6 @@ import {ModuleConstructor} from '../ModuleConstructor';
 import CommandCategory from './CommandCategory';
 import CommandManager from './CommandManager';
 import InitialExecutionContext from './executionContexts/InitialExecutionContext';
-import TestCommand from './TestCommand';
 
 @StaticImplements<ModuleConstructor>()
 export default class CommandModule extends Module {
@@ -42,10 +41,6 @@ export default class CommandModule extends Module {
     this.client = client;
     this.guildManager = guildManager;
     this.globalSettings = globalSettings;
-  }
-
-  async initialize(): Promise<void> {
-    this.rootCategory.registerCommand(new TestCommand(this.rootCategory, this.container));
   }
 
   async postInitialize(): Promise<void> {
