@@ -24,13 +24,13 @@ export interface SnowflakeParseOptions extends ParseOptions<Snowflake> {
   types?: SnowflakeType[];
 }
 
-interface CleanedSnowflakeParseOptions extends SnowflakeParseOptions {
+interface CleanSnowflakeParseOptions extends SnowflakeParseOptions {
   types: SnowflakeType[];
 }
 
 const snowflakeParseOptionsDefinition: OptionsCleanerDefinition<
   SnowflakeParseOptions,
-  CleanedSnowflakeParseOptions
+  CleanSnowflakeParseOptions
 > = {
   ...parseOptionsDefinition,
   types: stack(

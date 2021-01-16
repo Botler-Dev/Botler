@@ -22,7 +22,7 @@ export interface StringParseOptions extends ParseOptions<string> {
   disallowEmpty?: boolean;
 }
 
-interface CleanedStringParseOptions extends StringParseOptions {
+interface CleanStringParseOptions extends StringParseOptions {
   whitespaceStopper: boolean;
   quotesAsLimiters: boolean;
   disallowEmpty: boolean;
@@ -30,7 +30,7 @@ interface CleanedStringParseOptions extends StringParseOptions {
 
 const stringParseOptionsDefinition: OptionsCleanerDefinition<
   StringParseOptions,
-  CleanedStringParseOptions
+  CleanStringParseOptions
 > = {
   ...parseOptionsDefinition,
   whitespaceStopper: optional(false),
@@ -40,7 +40,7 @@ const stringParseOptionsDefinition: OptionsCleanerDefinition<
 
 export type StringParseResult = ParseResult<string>;
 
-function innerParser(raw: string, options: CleanedStringParseOptions): StringParseResult {
+function innerParser(raw: string, options: CleanStringParseOptions): StringParseResult {
   if (!options.quotesAsLimiters) {
     const result = raw.match(/^"(.*?[^\\])"(?:\s+|$)/);
     if (result)
