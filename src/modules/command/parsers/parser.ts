@@ -36,6 +36,14 @@ export type Parser<TValue = any, TOptions extends ParseOptions<TValue> = ParseOp
   options?: TOptions
 ) => Promise<ParseResult<TValue> | undefined>;
 
+export function parseTrimStart(raw: string): ParseResult<string> {
+  const trimmed = raw.trimStart();
+  return {
+    value: trimmed,
+    length: raw.length - trimmed.length,
+  };
+}
+
 export function generateDefaultOrNothing<TValue>(
   options: ParseOptions<TValue>
 ): ParseResult<TValue> | undefined {

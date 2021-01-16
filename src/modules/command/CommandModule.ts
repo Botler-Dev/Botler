@@ -54,7 +54,7 @@ export default class CommandModule extends Module {
       const prefix = guild?.prefix ?? this.globalSettings.prefix;
       if (message.author.bot || !message.content.startsWith(prefix)) return;
 
-      const commandName = message.content.slice(prefix.length).split(' ', 2)[0].toLowerCase();
+      const commandName = message.content.slice(prefix.length).split(' ', 1)[0].toLowerCase();
       const command = this.commands.lookup.get(commandName);
       if (!command) return;
 

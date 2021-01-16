@@ -1,6 +1,6 @@
 import {optional} from '../../../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
-import {ParseOptions, parseOptionsDefinition, Parser, ParseResult} from './parser';
+import {ParseOptions, parseOptionsDefinition, Parser, ParseResult, parseTrimStart} from './parser';
 
 export interface StringParseOptions extends ParseOptions<string> {
   /**
@@ -22,13 +22,13 @@ export interface StringParseOptions extends ParseOptions<string> {
   disallowEmpty?: boolean;
 }
 
-export interface CleanedStringParseOptions extends ParseOptions<string> {
+interface CleanedStringParseOptions extends StringParseOptions {
   whitespaceStopper: boolean;
   quotesAsLimiters: boolean;
   disallowEmpty: boolean;
 }
 
-export const stringParseOptionsDefinition: OptionsCleanerDefinition<
+const stringParseOptionsDefinition: OptionsCleanerDefinition<
   StringParseOptions,
   CleanedStringParseOptions
 > = {
@@ -42,7 +42,7 @@ export type StringParseResult = ParseResult<string>;
 
 function innerParser(raw: string, options: CleanedStringParseOptions): StringParseResult {
   if (!options.quotesAsLimiters) {
-    const result = raw.match(/^"(.*?[^\\])"(?:\s|$)/);
+    const result = raw.match(/^"(.*?[^\\])"(?:\s+|$)/);
     if (result)
       return {
         value: result[1],
@@ -50,7 +50,7 @@ function innerParser(raw: string, options: CleanedStringParseOptions): StringPar
       };
   }
   if (options.whitespaceStopper) {
-    const [value, rest] = raw.split(/\s+/, 2) as [string, string | undefined];
+    const [value, rest] = raw.split(/\s+(.*)/) as [string, string | undefined];
     return {
       value,
       length: raw.length - (rest?.length ?? 0),
@@ -67,14 +67,13 @@ const stringParser: Parser<string, StringParseOptions> = async (
   options?: StringParseOptions
 ): Promise<StringParseResult | undefined> => {
   const cleaned = cleanOptions(stringParseOptionsDefinition, options ?? {});
-  const trimmed = raw.trimStart();
-  const trimmedLength = raw.length - trimmed.length;
-  const {value, length} = innerParser(trimmed, cleaned);
+  const trimmed = parseTrimStart(raw);
+  const {value, length} = innerParser(trimmed.value, cleaned);
   if (cleaned.disallowEmpty && value.length === 0 && cleaned.default === undefined)
     return undefined;
   return {
     value: (value || cleaned?.default) ?? '',
-    length: trimmedLength + length,
+    length: trimmed.length + length,
   };
 };
 

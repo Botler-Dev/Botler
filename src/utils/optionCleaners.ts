@@ -19,6 +19,13 @@ export function optional<Input, Output = Exclude<Input, undefined | null>>(defau
   };
 }
 
+export function notEmpty<Raw extends {length: number}>() {
+  return (raw: Raw, key: string): Raw => {
+    if (raw.length === 0) throw new Error(`Option "${key}" cannot be empty.`);
+    return raw;
+  };
+}
+
 export function toNumber<Raw>() {
   return (raw: Raw): number | undefined => {
     if (raw === null) return undefined;
