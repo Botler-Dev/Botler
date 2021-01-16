@@ -36,6 +36,7 @@ export default class GuildManager extends CacheManager<
   async hasDatabaseEntry(guild: GuildWrapperResolvable): Promise<boolean> {
     if (guild instanceof GuildWrapper) return !!guild.entity;
     const id = this.discordGuilds.resolveID(guild);
+    if (!id) throw new Error('GuildResolvable could not be resolved to an id.');
     return !!(await this.repo.createQueryBuilder().select('1').where({id}).getCount());
   }
 

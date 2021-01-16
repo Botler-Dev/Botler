@@ -6,6 +6,7 @@ import {Connection, createConnection} from 'typeorm';
 import DatabaseEventHub from './database/DatabaseEventHub';
 import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
 import GuildManager from './database/managers/GuildManager';
+import UserManager from './database/managers/UserManager';
 import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
 import MasterLogger from './logger/MasterLogger';
 import ScopedLogger, {proxyNativeConsole} from './logger/ScopedLogger';
@@ -27,6 +28,8 @@ export default class Bot {
   private globalSettings!: GlobalSettingsWrapper;
 
   private client!: Client;
+
+  private userManager!: UserManager;
 
   private guildManager!: GuildManager;
 
@@ -58,6 +61,10 @@ export default class Bot {
       partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
     });
     container.register(Client, {useValue: this.client});
+
+    this.userManager = new UserManager();
+    container.registerInstance(UserManager, this.userManager);
+    await this.userManager.initialize();
 
     this.guildManager = new GuildManager();
     container.register(GuildManager, {useValue: this.guildManager});
