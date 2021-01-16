@@ -4,3 +4,4 @@ site/
 .vscode/
 .env
 eslint.xml
+coverage/
