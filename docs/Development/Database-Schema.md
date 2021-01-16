@@ -64,7 +64,7 @@ Table GuildMember as GM {
 
 Table User as U {
   id [pk]
-  birthday date
+  birthDate date
 }
 
 Table CommandLastUsed {
