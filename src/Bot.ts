@@ -7,6 +7,7 @@ import DatabaseEventHub from './database/DatabaseEventHub';
 import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
 import GuildManager from './database/managers/GuildManager';
 import UserManager from './database/managers/UserManager';
+import GuildMemberSynchronizer from './database/synchronizers/GuildMemberSynchronizer';
 import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
 import MasterLogger from './logger/MasterLogger';
 import ScopedLogger, {proxyNativeConsole} from './logger/ScopedLogger';
@@ -30,6 +31,8 @@ export default class Bot {
   private client!: Client;
 
   private userManager!: UserManager;
+
+  private guildMemberSynchronizer!: GuildMemberSynchronizer;
 
   private guildManager!: GuildManager;
 
@@ -65,6 +68,10 @@ export default class Bot {
     this.userManager = new UserManager();
     container.registerInstance(UserManager, this.userManager);
     await this.userManager.initialize();
+
+    this.guildMemberSynchronizer = new GuildMemberSynchronizer();
+    container.registerInstance(GuildMemberSynchronizer, this.guildMemberSynchronizer);
+    await this.guildMemberSynchronizer.initialize();
 
     this.guildManager = new GuildManager();
     container.register(GuildManager, {useValue: this.guildManager});

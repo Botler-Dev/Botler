@@ -4,6 +4,7 @@ import {container} from 'tsyringe';
 import {FindConditions} from 'typeorm';
 import GuildEntity from '../entities/GuildEntity';
 import type GuildManager from '../managers/GuildManager';
+import GuildMemberManager from '../managers/GuildMemberManager';
 import {SyncStream} from '../synchronizer/CacheSynchronizer';
 import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
 import DiscordWrapper from '../wrapper/DiscordWrapper';
@@ -74,6 +75,8 @@ export default class GuildWrapper
       caseLogChannel: value?.id,
     });
   }
+
+  readonly members = new GuildMemberManager(this);
 
   protected readonly uniqueConditions: FindConditions<GuildEntity>;
 
