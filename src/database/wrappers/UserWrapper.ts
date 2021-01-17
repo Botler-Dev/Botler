@@ -6,8 +6,9 @@ import type UserManager from '../managers/UserManager';
 import {SyncStream} from '../synchronizer/CacheSynchronizer';
 import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
 import DiscordWrapper from '../wrapper/DiscordWrapper';
+import type GuildMemberWrapper from './GuildMemberWrapper';
 
-export type UserWrapperResolvable = UserWrapper | UserResolvable;
+export type UserWrapperResolvable = UserWrapper | GuildMemberWrapper | UserResolvable;
 
 export default class UserWrapper
   extends CacheEntityWrapper<UserEntity | undefined, UserManager, UserWrapper>

@@ -1,33 +1,17 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
-import {Connection, EntityTarget} from 'typeorm';
 import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
 import WrapperManager from './WrapperManager';
-import type CacheSynchronizer from '../synchronizer/CacheSynchronizer';
-import type {SyncStream} from '../synchronizer/CacheSynchronizer';
 import {Entity} from '../wrapper/EntityWrapper';
-
-export type WrapperGenerator<
-  TEntity extends Entity,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TWrapper extends CacheEntityWrapper<TEntity, any>
-> = (syncStream: SyncStream<TEntity>) => TWrapper;
 
 export default abstract class CacheManager<
   TEntity extends Entity,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TWrapper extends CacheEntityWrapper<any, This>,
   TCacheKey = unknown,
-  // TODO: make synchronizer cache key a separate type
-  TSynchronizer extends CacheSynchronizer<TEntity, TCacheKey, unknown> = CacheSynchronizer<
-    TEntity,
-    TCacheKey,
-    unknown
-  >,
-  This extends CacheManager<TEntity, TWrapper, TCacheKey, TSynchronizer> = CacheManager<
+  This extends CacheManager<TEntity, TWrapper, TCacheKey> = CacheManager<
     TEntity,
     TWrapper,
     TCacheKey,
-    TSynchronizer,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any
   >
@@ -38,32 +22,9 @@ export default abstract class CacheManager<
     return this._cache;
   }
 
-  protected synchronizer: TSynchronizer;
-
-  constructor(
-    entityTarget: EntityTarget<TEntity>,
-    synchronizerGenerator: (tableName: string) => TSynchronizer,
-    connection?: Connection
-  ) {
-    super(entityTarget, connection);
-    this.synchronizer = synchronizerGenerator(this.repo.metadata.tableName);
-  }
-
-  async initialize(): Promise<void> {
-    this.synchronizer.initialize();
-  }
-
-  protected registerWrapper(
-    key: TCacheKey,
-    wrapperGenerator: WrapperGenerator<TEntity, TWrapper>
-  ): TWrapper {
-    const wrapper = wrapperGenerator(this.synchronizer.getSyncStream(key));
+  protected cacheWrapper(key: TCacheKey, wrapper: TWrapper): void {
     this._cache.set(key, wrapper);
-    wrapper.afterCacheStateChange.subscribe(() => {
-      this.synchronizer.removeSyncStream(key);
-      this._cache.delete(key);
-    });
-    return wrapper;
+    wrapper.afterCacheStateChange.subscribe(() => this._cache.delete(key));
   }
 
   uncache(key: TCacheKey): TWrapper | undefined {

@@ -12,16 +12,25 @@ export interface ExhaustStreamPayload<TEntity extends Entity, TCacheKey> {
   entity: TEntity | undefined;
 }
 
-export default abstract class CacheSynchronizer<
+export type CacheKeyResolver<TMinimalPayload, TCacheKey = unknown> = (
+  payload: TMinimalPayload
+) => TCacheKey | undefined;
+
+export default class CacheSynchronizer<
   TEntity extends Entity,
-  TCacheKey = unknown,
-  TDeleteEventPayload = unknown
+  TMinimalPayloadKeys extends keyof TEntity = keyof TEntity,
+  TCacheKey = unknown
 > {
   private _syncStreams = new Collection<TCacheKey, SyncStream<TEntity>>();
 
   protected get syncStreams(): ReadonlyCollection<TCacheKey, SyncStream<TEntity>> {
     return this._syncStreams;
   }
+
+  protected readonly cacheKeyResolver: CacheKeyResolver<
+    Pick<TEntity, TMinimalPayloadKeys>,
+    TCacheKey
+  >;
 
   /**
    * Emits change events for which no syncStream have been found.
@@ -32,8 +41,13 @@ export default abstract class CacheSynchronizer<
 
   protected readonly eventHub: DatabaseEventHub;
 
-  constructor(tableName: string, eventHub = container.resolve(DatabaseEventHub)) {
+  constructor(
+    tableName: string,
+    cacheKeyResolver: CacheKeyResolver<Pick<TEntity, TMinimalPayloadKeys>, TCacheKey>,
+    eventHub = container.resolve(DatabaseEventHub)
+  ) {
     this.tableName = tableName;
+    this.cacheKeyResolver = cacheKeyResolver;
     this.eventHub = eventHub;
   }
 
@@ -43,13 +57,15 @@ export default abstract class CacheSynchronizer<
       await this.eventHub.listenTo<TEntity>(`sync_${this.tableName}_INSERT`)
     ).pipe(
       map(entity => ({
-        key: this.getCacheKeyFromEntity(entity),
+        key: this.cacheKeyResolver(entity),
         entity,
       }))
     );
     const deleteStream = (
-      await this.eventHub.listenTo<TDeleteEventPayload>(`sync_${this.tableName}_DELETE`)
-    ).pipe(map(payload => ({key: this.getCacheKeyFromDelete(payload), entity: undefined})));
+      await this.eventHub.listenTo<Pick<TEntity, TMinimalPayloadKeys>>(
+        `sync_${this.tableName}_DELETE`
+      )
+    ).pipe(map(payload => ({key: this.cacheKeyResolver(payload), entity: undefined})));
 
     merge(entityStream, deleteStream).subscribe(({key, entity}) => {
       if (key === undefined) return;
@@ -61,10 +77,6 @@ export default abstract class CacheSynchronizer<
       stream.next(entity);
     });
   }
-
-  protected abstract getCacheKeyFromEntity(entity: TEntity): TCacheKey | undefined;
-
-  protected abstract getCacheKeyFromDelete(payload: TDeleteEventPayload): TCacheKey | undefined;
 
   getSyncStream(key: TCacheKey): SyncStream<TEntity> {
     let stream = this.syncStreams.get(key);

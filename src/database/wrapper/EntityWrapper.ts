@@ -1,13 +1,16 @@
 import {FindConditions} from 'typeorm';
 import type WrapperManager from '../manager/WrapperManager';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Entity = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Entity {}
 
 export default abstract class EntityWrapper<
   TEntityState extends Entity | undefined,
   TManager extends WrapperManager<Exclude<TEntityState, undefined>>
 > {
+  /**
+   * Unmodified raw entity. Can be cast to mutable types if necessary but should never be mutated.
+   */
   abstract entity: Immutable<TEntityState>;
 
   protected abstract uniqueConditions: FindConditions<Exclude<TEntityState, undefined>>;

@@ -11,20 +11,21 @@ export default class GlobalSettingsManager extends CacheManager<
   GlobalSettingsEntity,
   GlobalSettingsWrapper,
   typeof GlobalSettingsCacheKey,
-  GlobalSettingsSynchronizer,
   GlobalSettingsManager
 > {
+  private readonly synchronizer: GlobalSettingsSynchronizer;
+
   constructor(connection?: Connection) {
-    super(GlobalSettingsEntity, tableName => new GlobalSettingsSynchronizer(tableName), connection);
+    super(GlobalSettingsEntity, connection);
+    this.synchronizer = new GlobalSettingsSynchronizer(this.repo.metadata.tableName);
   }
 
   async initialize(): Promise<void> {
-    await super.initialize();
+    await this.synchronizer.initialize();
     const entity = await this.fetchEntity();
-    const wrapper = this.registerWrapper(
-      GlobalSettingsCacheKey,
-      stream => new GlobalSettingsWrapper(this, stream, entity)
-    );
+    const syncStream = this.synchronizer.getSyncStream(GlobalSettingsCacheKey);
+    const wrapper = new GlobalSettingsWrapper(this, syncStream, entity);
+    this.cacheWrapper(GlobalSettingsCacheKey, wrapper);
     this.synchronizer.registerGlobalSettings(wrapper);
   }
 
