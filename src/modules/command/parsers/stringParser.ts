@@ -22,13 +22,13 @@ export interface StringParseOptions extends ParseOptions<string> {
   disallowEmpty?: boolean;
 }
 
-interface CleanStringParseOptions extends StringParseOptions {
+export interface CleanStringParseOptions extends StringParseOptions {
   whitespaceStopper: boolean;
   quotesAsLimiters: boolean;
   disallowEmpty: boolean;
 }
 
-const stringParseOptionsDefinition: OptionsCleanerDefinition<
+export const stringParseOptionsDefinition: OptionsCleanerDefinition<
   StringParseOptions,
   CleanStringParseOptions
 > = {
