@@ -1,4 +1,4 @@
-import {notCleaned} from '../../../utils/optionCleaners';
+import {unchecked} from '../../../utils/optionCleaners';
 import {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
 
 export interface ParseOptions<TValue = unknown> {
@@ -11,7 +11,7 @@ export const parseOptionsDefinition: OptionsCleanerDefinition<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ParseOptions<any>
 > = {
-  default: notCleaned(),
+  default: unchecked(),
 };
 
 export interface ParseResult<TValue = unknown> {

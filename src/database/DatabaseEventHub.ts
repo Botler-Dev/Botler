@@ -3,7 +3,7 @@ import createPostgresSubscriber, {Subscriber} from 'pg-listen';
 import {fromEvent, Observable} from 'rxjs';
 import {singleton} from 'tsyringe';
 import ScopedLogger from '../logger/ScopedLogger';
-import {required, requiredToNumber} from '../utils/optionCleaners';
+import {required, stack, toNumber} from '../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
 
 export interface RawClientConfig {
@@ -34,7 +34,7 @@ export default class DatabaseEventHub {
     user: required(),
     database: required(),
     password: required(),
-    port: requiredToNumber(),
+    port: stack(toNumber(), required()),
     host: required(),
   };
 

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+type Key = string | number | symbol;
+
 type Constructor<Instance> = new (...args: unknown[]) => Instance;
 
 // eslint-disable-next-line @typescript-eslint/ban-types

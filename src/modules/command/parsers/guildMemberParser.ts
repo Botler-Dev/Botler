@@ -41,9 +41,16 @@ export interface GuildMemberParserOptions extends ParseOptions<GuildMemberWrappe
   similarityThreshold?: number;
 }
 
-export type CleanGuildMemberParserOptions = Required<GuildMemberParserOptions>;
+interface CleanGuildMemberParserOptions extends GuildMemberParserOptions {
+  searchId: boolean;
+  searchUsername: boolean;
+  searchNickname: boolean;
+  nameParseOptions: StringParseOptions;
+  allowSimilar: boolean;
+  similarityThreshold: number;
+}
 
-export const guildMemberParseOptionsDefinition: OptionsCleanerDefinition<
+const guildMemberParseOptionsDefinition: OptionsCleanerDefinition<
   GuildMemberParserOptions,
   CleanGuildMemberParserOptions
 > = {

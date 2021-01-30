@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import dayjs from 'dayjs';
 
-import {optional, optionalStringToBoolean, optionalToNumber} from '../utils/optionCleaners';
+import {optional, stack, stringToBoolean, toNumber} from '../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
 import LogLevel, {LOG_LEVEL_STRINGS} from './LogLevel';
 
@@ -42,16 +42,16 @@ export default class MasterLogger {
     RawMasterLoggerConfig,
     MasterLoggerConfig
   > = {
-    stampLabel: optionalStringToBoolean(true),
-    scopeLabel: optionalStringToBoolean(true),
-    levelLabel: optionalStringToBoolean(true),
+    stampLabel: stack(stringToBoolean(), optional(true)),
+    scopeLabel: stack(stringToBoolean(), optional(true)),
+    levelLabel: stack(stringToBoolean(), optional(true)),
     stampColor: optional('gray'),
     scopeColor: optional('yellow'),
     levelColor: optional('cyan'),
     labelPrefix: optional('['),
     labelSuffix: optional(']'),
-    stampPad: optionalToNumber(0),
-    scopePad: optionalToNumber(10),
+    stampPad: stack(toNumber(), optional(0)),
+    scopePad: stack(toNumber(), optional(10)),
     stampFormat: optional('YYYY/MM/DD HH:mm:ss.SSS'),
   };
 
