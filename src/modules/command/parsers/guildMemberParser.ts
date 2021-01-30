@@ -70,18 +70,15 @@ const DISCORD_NAME_MAX_LENGTH = 32;
  *  4. Most similar user- or nickname (case-insensitive)
  */
 export function guildMemberParser(
-  guildMemberManager: GuildMemberManager
-): Parser<GuildMemberWrapper, GuildMemberParserOptions> {
-  return async (
-    raw: string,
-    options?: GuildMemberParserOptions
-  ): Promise<GuildMemberParseResult | undefined> => {
-    const cleaned = cleanOptions(guildMemberParseOptionsDefinition, options ?? {});
-
+  guildMemberManager: GuildMemberManager,
+  options?: GuildMemberParserOptions
+): Parser<GuildMemberWrapper> {
+  const cleaned = cleanOptions(guildMemberParseOptionsDefinition, options ?? {});
+  return async (raw: string): Promise<GuildMemberParseResult | undefined> => {
     if (cleaned.searchId) {
-      const snowflakeResult = await snowflakeParser(raw, {
+      const snowflakeResult = await snowflakeParser({
         types: [SnowflakeType.Plain, SnowflakeType.User],
-      });
+      })(raw);
       if (snowflakeResult)
         try {
           const member = await guildMemberManager.fetch(snowflakeResult.value);
@@ -93,7 +90,7 @@ export function guildMemberParser(
     if (!cleaned.searchUsername && !cleaned.searchNickname)
       return generateDefaultOrNothing(cleaned);
 
-    const nameResult = await stringParser(raw, cleaned.nameParseOptions);
+    const nameResult = await stringParser(cleaned.nameParseOptions)(raw);
     if (!nameResult) return generateDefaultOrNothing(cleaned);
     const generateNameSearchResult = async (member: GuildMember) => ({
       value: await guildMemberManager.fetch(member),

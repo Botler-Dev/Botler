@@ -27,13 +27,15 @@ const userParseOptionsDefinition: OptionsCleanerDefinition<
 
 export type UserParseResult = ParseResult<UserWrapper>;
 
-export function userParser(userManager: UserManager): Parser<UserWrapper, UserParseOptions> {
-  return async (raw: string, options?: UserParseOptions): Promise<UserParseResult | undefined> => {
-    const cleaned = cleanOptions(userParseOptionsDefinition, options ?? {});
-
-    const snowflakeResult = await snowflakeParser(raw, {
+export function userParser(
+  userManager: UserManager,
+  options?: UserParseOptions
+): Parser<UserWrapper> {
+  const cleaned = cleanOptions(userParseOptionsDefinition, options ?? {});
+  return async (raw: string): Promise<UserParseResult | undefined> => {
+    const snowflakeResult = await snowflakeParser({
       types: [SnowflakeType.Plain, SnowflakeType.User],
-    });
+    })(raw);
     if (!snowflakeResult) return generateDefaultOrNothing(cleaned);
     try {
       const user = await userManager.fetch(snowflakeResult.value);

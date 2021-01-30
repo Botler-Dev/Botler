@@ -22,13 +22,13 @@ export interface StringParseOptions extends ParseOptions<string> {
   disallowEmpty?: boolean;
 }
 
-export interface CleanStringParseOptions extends StringParseOptions {
+interface CleanStringParseOptions extends StringParseOptions {
   whitespaceStopper: boolean;
   quotesAsLimiters: boolean;
   disallowEmpty: boolean;
 }
 
-export const stringParseOptionsDefinition: OptionsCleanerDefinition<
+const stringParseOptionsDefinition: OptionsCleanerDefinition<
   StringParseOptions,
   CleanStringParseOptions
 > = {
@@ -62,19 +62,16 @@ function innerParser(raw: string, options: CleanStringParseOptions): StringParse
   };
 }
 
-const stringParser: Parser<string, StringParseOptions> = async (
-  raw: string,
-  options?: StringParseOptions
-): Promise<StringParseResult | undefined> => {
+export default function stringParser(options?: StringParseOptions): Parser<string> {
   const cleaned = cleanOptions(stringParseOptionsDefinition, options ?? {});
-  const trimmed = parseTrimStart(raw);
-  const {value, length} = innerParser(trimmed.value, cleaned);
-  if (cleaned.disallowEmpty && value.length === 0 && cleaned.default === undefined)
-    return undefined;
-  return {
-    value: (value || cleaned?.default) ?? '',
-    length: trimmed.length + length,
+  return async (raw: string): Promise<StringParseResult | undefined> => {
+    const trimmed = parseTrimStart(raw);
+    const {value, length} = innerParser(trimmed.value, cleaned);
+    if (cleaned.disallowEmpty && value.length === 0 && cleaned.default === undefined)
+      return undefined;
+    return {
+      value: (value || cleaned?.default) ?? '',
+      length: trimmed.length + length,
+    };
   };
-};
-
-export default stringParser;
+}

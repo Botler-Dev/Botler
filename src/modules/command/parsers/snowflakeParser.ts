@@ -48,26 +48,23 @@ const REGEXP_PATTERNS = {
   [SnowflakeType.Role]: /^<@&(\d{17,19})>(?:\s+|$)/,
 } as const;
 
-const snowflakeParser: Parser<Snowflake, SnowflakeParseOptions> = async (
-  raw: string,
-  options?: SnowflakeParseOptions
-): Promise<SnowflakeParseResult | undefined> => {
+export default function snowflakeParser(options?: SnowflakeParseOptions): Parser<Snowflake> {
   const cleaned = cleanOptions(snowflakeParseOptionsDefinition, options ?? {});
-  const trimmed = parseTrimStart(raw);
+  return async (raw: string): Promise<SnowflakeParseResult | undefined> => {
+    const trimmed = parseTrimStart(raw);
 
-  let result: ParseResult<string> | undefined;
-  cleaned.types.some(type => {
-    const match = trimmed.value.match(REGEXP_PATTERNS[type]);
-    if (!match) return false;
-    result = {
-      value: match[1],
-      length: trimmed.length + match[0].length,
-    };
-    return true;
-  });
+    let result: ParseResult<string> | undefined;
+    cleaned.types.some(type => {
+      const match = trimmed.value.match(REGEXP_PATTERNS[type]);
+      if (!match) return false;
+      result = {
+        value: match[1],
+        length: trimmed.length + match[0].length,
+      };
+      return true;
+    });
 
-  if (result) return result;
-  return generateDefaultOrNothing(cleaned);
-};
-
-export default snowflakeParser;
+    if (result) return result;
+    return generateDefaultOrNothing(cleaned);
+  };
+}

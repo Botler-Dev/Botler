@@ -1,7 +1,7 @@
 import {Message} from 'discord.js';
 import GuildWrapper from '../../../database/wrappers/GuildWrapper';
 import UserWrapper from '../../../database/wrappers/UserWrapper';
-import {OptionsFromParser, Parser, ParseResult, ValueFromParser} from '../parsers/parser';
+import {Parser, ParseResult} from '../parsers/parser';
 import UserExecutionContext from './UserExecutionContext';
 
 export type ParsedValues = Record<string, unknown>;
@@ -42,36 +42,33 @@ export default abstract class MessageExecutionContext<
     this.message = message;
   }
 
-  async parseNext<TParser extends Parser>(
-    name: string,
-    parser: TParser,
-    options?: OptionsFromParser<TParser>
-  ): Promise<ValueFromParser<TParser>> {
-    const result = await parser(this.remainingContent, options);
-    if (!result) throw new Error(`Failed to parse value called "${name}".`);
+  async parseNext<TValue>(parser: Parser<TValue>, name?: string): Promise<TValue> {
+    const result = await parser(this.remainingContent);
+    if (result === undefined) throw new Error(`Failed to parse value called "${name}".`);
     this.addParseResult(name, result);
     return result.value;
   }
 
-  async parseOptionalNext<TParser extends Parser>(
-    name: string,
-    parser: TParser,
-    options?: OptionsFromParser<TParser>
-  ): Promise<ValueFromParser<TParser> | undefined> {
-    const result = (await parser(this.remainingContent, options)) ?? {value: undefined, length: 0};
+  async parseOptionalNext<TValue>(
+    parser: Parser<TValue>,
+    name?: string
+  ): Promise<TValue | undefined> {
+    const result = (await parser(this.remainingContent)) ?? {value: undefined, length: 0};
     this.addParseResult(name, result);
     return result.value;
   }
 
   protected addParseResult<TName extends keyof TExistingValues>(
-    name: TName,
+    name: string | undefined,
     result: ParseResult<TExistingValues[TName]>
   ): void;
-  protected addParseResult(name: string, result: ParseResult): void {
+  protected addParseResult(name: string | undefined, result: ParseResult): void;
+  protected addParseResult(name: string | undefined, result: ParseResult): void {
+    this._parseIndex += result.length;
+    if (!name) return;
     // @ts-expect-error index type is correct
     this._values[name] = result.value;
     // @ts-expect-error index type is correct
     this._parseResults[name] = result;
-    this._parseIndex += result.length;
   }
 }
