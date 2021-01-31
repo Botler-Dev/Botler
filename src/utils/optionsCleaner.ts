@@ -31,13 +31,13 @@ export default function cleanOptions<
   raw: TInputOptions
 ): TOutputOptions {
   const cleaned: Partial<TOutputOptions> = {};
-  Object.entries(
-    definition
-  ).map(
+  Object.entries(definition).forEach(
     <TKey extends keyof TOutputOptions>([optionName, optionCleaner]: [
       TKey,
       OptionValueCleaner<TInputOptions, TOutputOptions, TKey>
-    ]) => [optionName, optionCleaner(raw[optionName], optionName, raw)]
+    ]) => {
+      cleaned[optionName] = optionCleaner(raw[optionName], optionName, raw);
+    }
   );
   return cleaned as TOutputOptions;
 }
