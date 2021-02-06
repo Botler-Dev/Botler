@@ -1,10 +1,10 @@
-import {Message, MessageEmbed, TextBasedChannels} from 'discord.js';
+import {Message, MessageEmbed, TextBasedChannel} from 'discord.js';
 import {container} from 'tsyringe';
 import GlobalSettingsWrapper, {ColorType} from '../../../database/wrappers/GlobalSettingsWrapper';
 import CommandError from './CommandError';
 
 export default class ResponseError extends CommandError {
-  readonly channel: TextBasedChannels;
+  readonly channel: TextBasedChannel;
 
   readonly publicMessage: string;
 
@@ -13,7 +13,7 @@ export default class ResponseError extends CommandError {
   protected readonly globalSettings: GlobalSettingsWrapper;
 
   constructor(
-    channel: TextBasedChannels,
+    channel: TextBasedChannel,
     publicMessage: string,
     publicDescription?: string,
     globalSettings = container.resolve(GlobalSettingsWrapper)
