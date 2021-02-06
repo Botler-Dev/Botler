@@ -1,12 +1,12 @@
-import GuildWrapper from '../../../database/wrappers/GuildWrapper';
+import GuildContext from './guild/GuildContext';
 
 export default abstract class BaseExecutionContext {
-  readonly guild?: GuildWrapper;
+  readonly guild?: GuildContext;
 
   // TODO: implement command cache
   readonly cache?: unknown;
 
-  constructor(guild?: GuildWrapper) {
+  constructor(guild: GuildContext | undefined) {
     this.guild = guild;
   }
 }

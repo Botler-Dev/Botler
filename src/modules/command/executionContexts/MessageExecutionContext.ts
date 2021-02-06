@@ -1,7 +1,7 @@
 import {Message} from 'discord.js';
-import GuildWrapper from '../../../database/wrappers/GuildWrapper';
 import UserWrapper from '../../../database/wrappers/UserWrapper';
 import {Parser, ParseResult} from '../parsers/parser';
+import GuildMemberContext from './guild/GuildMemberContext';
 import UserExecutionContext from './UserExecutionContext';
 
 export type ParsedValues = Record<string, unknown>;
@@ -37,7 +37,7 @@ export default abstract class MessageExecutionContext<
     return this.message.content.slice(this.parseIndex);
   }
 
-  constructor(message: Message, user: UserWrapper, guild: GuildWrapper | undefined) {
+  constructor(message: Message, user: UserWrapper, guild: GuildMemberContext | undefined) {
     super(user, guild);
     this.message = message;
   }

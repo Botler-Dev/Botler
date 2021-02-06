@@ -1,7 +1,7 @@
 import {Message} from 'discord.js';
-import GuildWrapper from '../../../database/wrappers/GuildWrapper';
 import UserWrapper from '../../../database/wrappers/UserWrapper';
-import type Command from '../Command';
+import type Command from '../command/Command';
+import GuildMemberContext from './guild/GuildMemberContext';
 import MessageExecutionContext, {ParsedValues} from './MessageExecutionContext';
 
 export type InitialParsedValues = {
@@ -15,7 +15,7 @@ export default class InitialExecutionContext<
   constructor(
     message: Message,
     user: UserWrapper,
-    guild: GuildWrapper | undefined,
+    guild: GuildMemberContext | undefined,
     prefix: string,
     command: Command
   ) {
