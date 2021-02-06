@@ -6,8 +6,8 @@ export default class WrongScopeError extends ResponseError {
   constructor(channel: TextBasedChannels, globalSettings?: GlobalSettingsWrapper) {
     super(
       channel,
-      `Wrong Execution Scope`,
-      `This command can only be used in ${channel instanceof DMChannel ? 'servers' : 'DMs'}.`,
+      `This command can only be used in ${channel instanceof DMChannel ? 'servers' : 'DMs'}`,
+      undefined,
       globalSettings
     );
   }

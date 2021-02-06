@@ -55,7 +55,7 @@ export default abstract class Command {
       context instanceof InitialExecutionContext &&
       ((context.guild && !this.isGuildCapable) || (!context.guild && !this.isDmCapable))
     )
-      throw new WrongScopeError(context.message.channel);
+      throw new WrongScopeError(context.message.channel, this.globalSettings);
   }
 
   abstract execute(context: ExecutionContext): Promise<void>;

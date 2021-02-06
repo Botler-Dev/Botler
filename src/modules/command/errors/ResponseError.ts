@@ -6,30 +6,32 @@ import CommandError from './CommandError';
 export default class ResponseError extends CommandError {
   readonly channel: TextBasedChannels;
 
-  readonly title: string;
+  readonly publicMessage: string;
 
-  readonly message: string;
+  readonly publicDescription?: string;
 
   protected readonly globalSettings: GlobalSettingsWrapper;
 
   constructor(
     channel: TextBasedChannels,
-    title: string,
-    message: string,
+    publicMessage: string,
+    publicDescription?: string,
     globalSettings = container.resolve(GlobalSettingsWrapper)
   ) {
-    super(`Command error with message response: Title: "${title}" Message: "${message}".`);
+    super(
+      `Command error with public message response "${publicMessage}" and description "${publicDescription}".`
+    );
     this.channel = channel;
-    this.title = title;
-    this.message = message;
+    this.publicMessage = publicMessage;
+    this.publicDescription = publicDescription;
     this.globalSettings = globalSettings;
   }
 
   async send(): Promise<Message> {
     const embed = new MessageEmbed()
-      .setTitle(`❌ ${this.title}`)
-      .setDescription(this.message)
+      .setTitle(`❌ ${this.publicMessage}`)
       .setColor(this.globalSettings.getColor(ColorType.Bad));
+    if (this.publicDescription) embed.setDescription(this.publicDescription);
     return this.channel.send(embed);
   }
 }
