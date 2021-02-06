@@ -28,10 +28,13 @@ export default class ResponseError extends CommandError {
   }
 
   async send(): Promise<Message> {
-    const embed = new MessageEmbed()
-      .setTitle(`❌ ${this.publicMessage}`)
-      .setColor(this.globalSettings.getColor(ColorType.Bad));
-    if (this.publicDescription) embed.setDescription(this.publicDescription);
+    const embed = new MessageEmbed().setColor(this.globalSettings.getColor(ColorType.Bad));
+    const message = `❌ ${this.publicMessage}`;
+    if (this.publicDescription) {
+      embed.setTitle(message).setDescription(this.publicDescription);
+    } else {
+      embed.setDescription(message);
+    }
     return this.channel.send(embed);
   }
 }

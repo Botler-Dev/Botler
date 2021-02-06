@@ -1,5 +1,6 @@
 import {Message} from 'discord.js';
 import UserWrapper from '../../../database/wrappers/UserWrapper';
+import MissingParameterError from '../errors/MissingParameterError';
 import {Parser, ParseResult} from '../parsers/parser';
 import GuildMemberContext from './guild/GuildMemberContext';
 import UserExecutionContext from './UserExecutionContext';
@@ -44,7 +45,7 @@ export default abstract class MessageExecutionContext<
 
   async parseNext<TValue>(parser: Parser<TValue>, name?: string): Promise<TValue> {
     const result = await parser(this.remainingContent);
-    if (result === undefined) throw new Error(`Failed to parse value called "${name}".`);
+    if (result === undefined) throw new MissingParameterError(this.message.channel, name);
     this.addParseResult(name, result);
     return result.value;
   }
