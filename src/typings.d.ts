@@ -20,7 +20,11 @@ type ImmutableSet<T> = ReadonlySet<Immutable<T>>;
 type ImmutableObject<T> = {readonly [K in keyof T]: Immutable<T[K]>};
 
 declare module 'discord.js' {
+  import {DMChannel, NewsChannel, TextChannel} from 'discord.js';
+
   type ReadonlyCollection<K, V> = Omit<Collection<K, V>, 'set' | 'delete' | 'clear' | 'sweep'>;
+
+  type TextBasedChannels = TextChannel | DMChannel | NewsChannel;
 }
 
 declare namespace NodeJS {
