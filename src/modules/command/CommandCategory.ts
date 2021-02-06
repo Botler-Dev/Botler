@@ -1,8 +1,8 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 import ScopedLogger from '../../logger/ScopedLogger';
-import type Command from './Command';
-import type {CommandName} from './Command';
+import type Command from './command/Command';
+import type {CommandName} from './command/Command';
 import CommandManager from './CommandManager';
 
 export type CommandCategoryGenerator = (container: DependencyContainer) => CommandCategory;
@@ -73,10 +73,7 @@ export default class CommandCategory {
   }
 
   registerCommand(command: Command): void {
-    if (command.category !== this)
-      throw new Error(
-        `Tried to register a command with a non-matching "category" property in command category.`
-      );
+    command.registerCategory(this);
     this.commandManager.register(command);
     this._commands.set(command.name, command);
   }

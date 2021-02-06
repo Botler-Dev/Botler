@@ -1,14 +1,17 @@
 import {Client, Message} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
+
 import GuildManager from '../../database/managers/GuildManager';
 import UserManager from '../../database/managers/UserManager';
 import GlobalSettingsWrapper from '../../database/wrappers/GlobalSettingsWrapper';
-
 import StaticImplements from '../../utils/StaticImplements';
 import Module from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
 import CommandCategory from './CommandCategory';
 import CommandManager from './CommandManager';
+import CommandError from './errors/CommandError';
+import UnexpectedError from './errors/UnexpectedError';
+import GuildMemberContext from './executionContexts/guild/GuildMemberContext';
 import InitialExecutionContext from './executionContexts/InitialExecutionContext';
 
 @StaticImplements<ModuleConstructor>()
@@ -55,18 +58,30 @@ export default class CommandModule extends Module {
       if (message.author.bot || !message.content.startsWith(prefix)) return;
 
       const user = await this.userManager.fetch(message.author);
+      const member = await guild?.members.fetch(user);
 
       const commandName = message.content.slice(prefix.length).split(' ', 1)[0].toLowerCase();
       const command = this.commands.lookup.get(commandName);
       if (!command) return;
 
-      const context = new InitialExecutionContext(message, user, guild, prefix, command);
+      const context = new InitialExecutionContext(
+        message,
+        user,
+        member ? new GuildMemberContext(member) : undefined,
+        prefix,
+        command
+      );
       try {
         await command.execute(context);
       } catch (error) {
-        this.logger.error(`Uncaught error while executing command "${command.name}".`, error);
-        // TODO: add proper error message
-        await message.channel.send('Something went wrong');
+        let commandError: CommandError;
+        if (error instanceof CommandError) {
+          commandError = error;
+        } else {
+          this.logger.error(`Uncaught error while executing command "${command.name}".`, error);
+          commandError = new UnexpectedError(message.channel);
+        }
+        await commandError.send?.();
       }
     });
   }

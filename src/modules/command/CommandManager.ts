@@ -1,7 +1,7 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 import ScopedLogger from '../../logger/ScopedLogger';
-import Command, {CommandName} from './Command';
+import Command, {CommandName} from './command/Command';
 
 export default class CommandManager {
   /**
