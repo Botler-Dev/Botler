@@ -25,6 +25,8 @@ declare module 'discord.js' {
   type ReadonlyCollection<K, V> = Omit<Collection<K, V>, 'set' | 'delete' | 'clear' | 'sweep'>;
 
   type TextBasedChannel = TextChannel | DMChannel | NewsChannel;
+
+  type TextBasedChannelResolvable = Snowflake | TextBasedChannel;
 }
 
 declare namespace NodeJS {
