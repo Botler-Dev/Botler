@@ -9,7 +9,7 @@ function warnDevelopmentDefault(envName: string, defaultValue: string) {
 
 export function preprocessEnvironmentVariables(): void {
   process.env.TYPEORM_CONNECTION = 'postgres';
-  process.env.TYPEORM_ENTITIES = 'dist/database/entities/*.js';
+  process.env.TYPEORM_ENTITIES = 'dist/database/entities/**/*.js';
   process.env.TYPEORM_MIGRATIONS = 'dist/database/migration/*.js';
   process.env.TYPEORM_ENTITIES_DIR = 'dist/database/entities';
   process.env.TYPEORM_MIGRATIONS_DIR = 'dist/database/migration';
