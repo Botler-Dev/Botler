@@ -21,7 +21,7 @@ export default abstract class EntityWrapper<
     this.manager = manager;
   }
 
-  protected abstract createDefaultEntity?(): Exclude<TEntityState, undefined>;
+  protected createDefaultEntity?(): Exclude<TEntityState, undefined>;
 
   protected getModifiableEntity(): Exclude<TEntityState, undefined> {
     if (this.entity !== undefined) return this.entity as Exclude<TEntityState, undefined>;

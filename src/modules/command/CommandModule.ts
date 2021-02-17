@@ -9,10 +9,19 @@ import Module from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
 import CommandCategory from './CommandCategory';
 import CommandManager from './CommandManager';
+import CommandCacheManager from '../../database/managers/command/CommandCacheManager';
 import CommandError from './errors/CommandError';
 import UnexpectedError from './errors/UnexpectedError';
 import GuildMemberContext from './executionContexts/guild/GuildMemberContext';
 import InitialExecutionContext from './executionContexts/InitialExecutionContext';
+import ReactionListenerManager from '../../database/managers/command/ReactionListenerManager';
+import ResponseListenerManager from '../../database/managers/command/ResponseListenerManager';
+import Command from './command/Command';
+import {ConcreteCommandCacheWrapper} from '../../database/wrappers/command/CommandCacheWrapper';
+import MessageExecutionContext, {ParsedValues} from './executionContexts/MessageExecutionContext';
+import ExecutionContext from './executionContexts/ExecutionContext';
+import ResponseExecutionContext from './executionContexts/ResponseExecutionContext';
+import ReactionExecutionContext from './executionContexts/ReactionExecutionContext';
 
 @StaticImplements<ModuleConstructor>()
 export default class CommandModule extends Module {
@@ -25,6 +34,12 @@ export default class CommandModule extends Module {
   readonly commands: CommandManager;
 
   readonly rootCategory: CommandCategory;
+
+  private readonly responseListeners: ResponseListenerManager;
+
+  private readonly reactionListeners: ReactionListenerManager;
+
+  private readonly commandCaches: CommandCacheManager;
 
   private readonly client: Client;
 
@@ -42,9 +57,18 @@ export default class CommandModule extends Module {
     globalSettings = moduleContainer.resolve(GlobalSettingsWrapper)
   ) {
     super(moduleContainer);
+
     this.commands = new CommandManager(this.container);
     this.container.registerInstance(CommandManager, this.commands);
-    this.rootCategory = new CommandCategory(moduleContainer, undefined, '');
+    this.rootCategory = new CommandCategory(this.container, undefined, '');
+
+    this.container.registerSingleton(ResponseListenerManager);
+    this.container.registerSingleton(ReactionListenerManager);
+    this.container.registerSingleton(CommandCacheManager);
+    this.responseListeners = this.container.resolve(ResponseListenerManager);
+    this.reactionListeners = this.container.resolve(ReactionListenerManager);
+    this.commandCaches = this.container.resolve(CommandCacheManager);
+
     this.client = client;
     this.userManager = userManager;
     this.guildManager = guildManager;
@@ -53,9 +77,11 @@ export default class CommandModule extends Module {
 
   async postInitialize(): Promise<void> {
     this.client.on('message', async (message: Message) => {
+      if (message.author.bot) return;
+
       const guild = message.guild ? await this.guildManager.fetch(message.guild) : undefined;
       const prefix = guild?.prefix ?? this.globalSettings.prefix;
-      if (message.author.bot || !message.content.startsWith(prefix)) return;
+      if (!message.content.startsWith(prefix)) return;
 
       const user = await this.userManager.fetch(message.author);
       const member = await guild?.members.fetch(user);
@@ -65,24 +91,85 @@ export default class CommandModule extends Module {
       if (!command) return;
 
       const context = new InitialExecutionContext(
+        command,
+        this.commandCaches,
         message,
         user,
         member ? new GuildMemberContext(member) : undefined,
-        prefix,
-        command
+        prefix
       );
-      try {
-        await command.execute(context);
-      } catch (error) {
-        let commandError: CommandError;
-        if (error instanceof CommandError) {
-          commandError = error;
-        } else {
-          this.logger.error(`Uncaught error while executing command "${command.name}".`, error);
-          commandError = new UnexpectedError(message.channel);
-        }
-        await commandError.send?.();
-      }
+      await this.executeCommand(command, context);
     });
+
+    this.client.on('message', async (message: Message) => {
+      if (message.author.bot) return;
+
+      const cacheIds = await this.responseListeners.findCacheIds(message);
+      if (cacheIds.length === 0) return;
+      const caches = await this.commandCaches.fetchCaches(cacheIds);
+
+      const user = await this.userManager.fetch(message.author);
+      const guild = message.guild ? await this.guildManager.fetch(message.guild) : undefined;
+      const member = await guild?.members.fetch(user);
+      const guildContext = member ? new GuildMemberContext(member) : undefined;
+
+      await Promise.all(
+        caches.map(cache =>
+          this.executeCommand(
+            cache.command,
+            new ResponseExecutionContext(cache.command, cache, message, user, guildContext)
+          )
+        )
+      );
+    });
+
+    this.client.on('messageReactionAdd', async (reaction, user) => {
+      if (user.bot) return;
+      if (reaction.partial) await reaction.fetch();
+      // eslint-disable-next-line no-param-reassign
+      if (user.partial) user = await user.fetch();
+
+      const cacheIds = await this.reactionListeners.findCacheIds(reaction, user);
+      if (cacheIds.length === 0) return;
+      const caches = await this.commandCaches.fetchCaches(cacheIds);
+
+      const userWrapper = await this.userManager.fetch(user);
+
+      if (reaction.message.partial) await reaction.message.fetch();
+      const guild = reaction.message.guild
+        ? await this.guildManager.fetch(reaction.message.guild)
+        : undefined;
+      const member = await guild?.members.fetch(user);
+      const guildContext = member ? new GuildMemberContext(member) : undefined;
+
+      await Promise.all(
+        caches.map(cache =>
+          this.executeCommand(
+            cache.command,
+            new ReactionExecutionContext(cache.command, cache, reaction, userWrapper, guildContext)
+          )
+        )
+      );
+    });
+  }
+
+  private async executeCommand<
+    TCache extends ConcreteCommandCacheWrapper,
+    TParsedValues extends ParsedValues,
+    TCommand extends Command<TCache, ParsedValues>
+  >(command: TCommand, context: ExecutionContext<TCache, TParsedValues, TCommand>): Promise<void> {
+    try {
+      await command.execute(context);
+    } catch (error) {
+      let commandError: CommandError | undefined;
+      if (error instanceof CommandError) {
+        commandError = error;
+      } else {
+        this.logger.error(`Uncaught error while executing command "${command.name}".`, error);
+        if (context instanceof MessageExecutionContext)
+          commandError = new UnexpectedError(context.message.channel);
+      }
+      await commandError?.send?.();
+    }
   }
 }

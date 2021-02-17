@@ -1,15 +1,27 @@
 import {DependencyContainer} from 'tsyringe';
+import CommandCacheEntity from '../../../database/entities/command/CommandCacheEntity';
+import type CommandCacheManager from '../../../database/managers/command/CommandCacheManager';
+import ReactionListenerManager from '../../../database/managers/command/ReactionListenerManager';
+import ResponseListenerManager from '../../../database/managers/command/ResponseListenerManager';
+import {
+  CacheFromCommandCacheWrapper,
+  ConcreteCommandCacheWrapper,
+} from '../../../database/wrappers/command/CommandCacheWrapper';
 import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import type CommandCategory from '../CommandCategory';
 import SilentError from '../errors/SilentError';
 import WrongScopeError from '../errors/WrongScopeError';
-import ExecutionContext from '../executionContexts/ExecutionContext';
+import type ExecutionContext from '../executionContexts/ExecutionContext';
 import InitialExecutionContext from '../executionContexts/InitialExecutionContext';
+import {ParsedValues} from '../executionContexts/MessageExecutionContext';
 import UserExecutionContext from '../executionContexts/UserExecutionContext';
 
 export type CommandName = string;
 
-export default abstract class Command {
+export default abstract class Command<
+  TCache extends ConcreteCommandCacheWrapper = ConcreteCommandCacheWrapper,
+  TParsedValues extends ParsedValues = Record<string, never>
+> {
   abstract readonly name: CommandName;
 
   readonly aliases?: CommandName[];
@@ -44,7 +56,16 @@ export default abstract class Command {
     this._category = category;
   }
 
-  protected async checkContextValidity(context: ExecutionContext): Promise<void> {
+  async wrapCacheEntity?(
+    manager: CommandCacheManager,
+    entity: CommandCacheEntity<CacheFromCommandCacheWrapper<TCache>>,
+    responseListenerManager: ResponseListenerManager,
+    reactionListenerManager: ReactionListenerManager
+  ): Promise<TCache>;
+
+  protected async checkContextValidity(
+    context: ExecutionContext<TCache, TParsedValues, this>
+  ): Promise<void> {
     if (
       context instanceof UserExecutionContext &&
       this.isBotMasterOnly &&
@@ -58,5 +79,5 @@ export default abstract class Command {
       throw new WrongScopeError(context.message.channel, this.globalSettings);
   }
 
-  abstract execute(context: ExecutionContext): Promise<void>;
+  abstract execute(context: ExecutionContext<TCache, TParsedValues, this>): Promise<void>;
 }

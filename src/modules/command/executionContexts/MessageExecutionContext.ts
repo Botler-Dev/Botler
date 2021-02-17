@@ -1,5 +1,7 @@
 import {Message} from 'discord.js';
+import {ConcreteCommandCacheWrapper} from '../../../database/wrappers/command/CommandCacheWrapper';
 import UserWrapper from '../../../database/wrappers/UserWrapper';
+import type Command from '../command/Command';
 import MissingParameterError from '../errors/MissingParameterError';
 import {Parser, ParseResult} from '../parsers/parser';
 import GuildMemberContext from './guild/GuildMemberContext';
@@ -12,19 +14,21 @@ export type ParseResults<TValues extends ParsedValues = ParsedValues> = {
 };
 
 export default abstract class MessageExecutionContext<
-  TExistingValues extends ParsedValues = Record<string, never>
-> extends UserExecutionContext {
+  TCommand extends Command<ConcreteCommandCacheWrapper, ParsedValues>,
+  TCacheState extends ConcreteCommandCacheWrapper | undefined,
+  TParsedValues extends ParsedValues
+> extends UserExecutionContext<TCommand, TCacheState> {
   readonly message: Message;
 
-  private readonly _values = {} as TExistingValues & ParsedValues;
+  private readonly _values = {} as TParsedValues & ParsedValues;
 
-  get values(): Readonly<TExistingValues & ParsedValues> {
+  get values(): Readonly<TParsedValues & ParsedValues> {
     return this._values;
   }
 
-  private readonly _parseResults = {} as ParseResults<TExistingValues & ParsedValues>;
+  private readonly _parseResults = {} as ParseResults<TParsedValues & ParsedValues>;
 
-  get parseResults(): Readonly<ParseResults<TExistingValues & ParsedValues>> {
+  get parseResults(): Readonly<ParseResults<TParsedValues & ParsedValues>> {
     return this._parseResults;
   }
 
@@ -38,8 +42,14 @@ export default abstract class MessageExecutionContext<
     return this.message.content.slice(this.parseIndex);
   }
 
-  constructor(message: Message, user: UserWrapper, guild: GuildMemberContext | undefined) {
-    super(user, guild);
+  constructor(
+    command: TCommand,
+    cache: TCacheState,
+    message: Message,
+    user: UserWrapper,
+    guild: GuildMemberContext | undefined
+  ) {
+    super(command, cache, user, guild);
     this.message = message;
   }
 
@@ -59,9 +69,9 @@ export default abstract class MessageExecutionContext<
     return result.value;
   }
 
-  protected addParseResult<TName extends keyof TExistingValues>(
+  protected addParseResult<TName extends keyof TParsedValues>(
     name: string | undefined,
-    result: ParseResult<TExistingValues[TName]>
+    result: ParseResult<TParsedValues[TName]>
   ): void;
   protected addParseResult(name: string | undefined, result: ParseResult): void;
   protected addParseResult(name: string | undefined, result: ParseResult): void {
