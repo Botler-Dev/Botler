@@ -1,6 +1,6 @@
 import {Connection} from 'typeorm';
 import {injectable} from 'tsyringe';
-import {Dayjs} from 'dayjs';
+import dayjs, {Dayjs} from 'dayjs';
 import CacheManager from '../../manager/CacheManager';
 import CommandCacheEntity from '../../entities/command/CommandCacheEntity';
 import CommandCacheWrapper, {
@@ -19,6 +19,7 @@ export default class CommandCacheManager extends CacheManager<
   CommandCacheEntity<any>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   CommandCacheWrapper<any>,
+  number,
   CommandCacheManager
 > {
   private readonly logger: ScopedLogger;
@@ -54,12 +55,14 @@ export default class CommandCacheManager extends CacheManager<
       return undefined;
     }
     try {
-      return command.wrapCacheEntity(
+      const wrapper = await command.wrapCacheEntity(
         this,
         entity,
         this.responseListenerManager,
         this.reactionListenerManager
       );
+      this.cacheWrapper(wrapper.id, wrapper);
+      return wrapper;
     } catch (error) {
       this.logger.error(
         `Encountered error when generating cache from entity for command "${command.name}".`,
@@ -83,25 +86,32 @@ export default class CommandCacheManager extends CacheManager<
     return wrapper;
   }
 
-  // TODO: implement exclusion of expired caches
-  async fetchCaches(ids: number[]): Promise<CommandCacheWrapper<unknown>[]> {
-    const entities = await this.repo.find({
-      where: ids.map(id => ({id})),
-    });
-    if (entities.length !== ids.length)
-      this.logger.warn(
-        `Could not find all requested caches. ${ids.length - entities.length} missing.`
+  async fetchCaches(ids: number[], now = dayjs()): Promise<CommandCacheWrapper<unknown>[]> {
+    const cachedWrappers = ids.map(id => this.cache.get(id));
+    const wrappers = cachedWrappers.filter(wrapper => !wrapper?.isExpired(now));
+    const uncachedIds = ids.filter((_, index) => !cachedWrappers[index]);
+
+    if (uncachedIds.length > 0) {
+      const entities = await this.repo
+        .createQueryBuilder('cache')
+        .select()
+        .where('cache.id IN (:...ids)', {ids: uncachedIds})
+        .andWhere('cache.expirationDateTime >= :now', {now: now.toISOString()})
+        .getMany();
+      wrappers.concat(
+        await Promise.all(
+          entities.map(entity => {
+            const command = this.commandManager.instances.get(entity.command);
+            if (!command) {
+              this.logger.warn(`Could not find command "${entity.command}" specified in cache.`);
+              return undefined;
+            }
+            return this.wrapEntity(command, entity);
+          })
+        )
       );
-    const wrappers = await Promise.all(
-      entities.map(entity => {
-        const command = this.commandManager.instances.get(entity.command);
-        if (!command) {
-          this.logger.warn(`Could not find command "${entity.command}" specified in cache.`);
-          return undefined;
-        }
-        return this.wrapEntity(command, entity);
-      })
-    );
-    return wrappers.filter((cache): cache is CommandCacheWrapper => !!cache);
+    }
+
+    return wrappers.filter((wrapper): wrapper is Exclude<typeof wrapper, undefined> => !!wrapper);
   }
 }

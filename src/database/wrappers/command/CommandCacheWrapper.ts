@@ -91,7 +91,12 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
     this.reactionListenerManager.removeListener(this.id, message, user, emoji);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   isEntityUseless(): boolean {
-    return dayjs().isAfter(this.expirationDateTime);
+    return false;
+  }
+
+  isExpired(now = dayjs()): boolean {
+    return now.isAfter(this.expirationDateTime);
   }
 }
