@@ -10,7 +10,6 @@ will be implemented in what version.
 | **Basic Command Implementation** | Just command execution with input parsing and simple response | Done   |
 | **Command Response Listener**    | Command can listen for a message response of the user         | WIP    |
 | **Command Reaction Listener**    | Command can listen for reactions on messages                  | WIP    |
-| **PAction Implementation**       | Execute task at a later date                                  |
 | **Cache**                        | Cache often used database objects                             | Done   |
 | **Active Cache**                 | Actively sync the cache with the database                     | Done   |
 
