@@ -16,11 +16,17 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/* eslint-disable no-console */
+/* eslint-disable no-console, import/first */
 import 'reflect-metadata';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import duration from 'dayjs/plugin/duration';
+
+// Needs to be done before the rest is imported to be able
+// to use those features in static properties and global variables
+dayjs.extend(utc);
+dayjs.extend(duration);
 
 import Bot from './Bot';
 import {preprocessEnvironmentVariables} from './utils/environment';
@@ -32,8 +38,6 @@ process.on('unhandledRejection', (reason, promise) => {
 process.on('uncaughtException', error => {
   exitWithError(ExitCode.UnexpectedError, 'Uncaught Exception thrown:', error);
 });
-
-dayjs.extend(utc);
 
 preprocessEnvironmentVariables();
 

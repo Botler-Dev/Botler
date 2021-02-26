@@ -77,7 +77,7 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
   private setTimeout() {
     this.deleteTimeout = setTimeout(
       () => this.delete(),
-      dayjs().add(CommandCacheEntity.DELETE_DELAY).diff(this.expirationDateTime)
+      this.expirationDateTime.add(CommandCacheEntity.DELETE_DELAY).diff(dayjs())
     );
   }
 

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity({
@@ -8,7 +9,7 @@ export default class CommandCacheEntity<TCache = unknown> {
    * Delay in milliseconds after expiration before a cache can get deleted.
    * This prevents a cache from being deleted while still being processed.
    */
-  static readonly DELETE_DELAY = 30000;
+  static readonly DELETE_DELAY = dayjs.duration(5, 'minutes');
 
   @PrimaryGeneratedColumn('increment')
   id!: number;
