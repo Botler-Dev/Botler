@@ -2,12 +2,12 @@ import {EmojiResolvable, Message, MessageReaction, MessageResolvable, User} from
 import {injectable} from 'tsyringe';
 import {Connection, FindConditions} from 'typeorm';
 import ReactionListenerEntity from '../../entities/command/ReactionListenerEntity';
-import WrapperManager from '../../manager/EntityManager';
+import EntityManager from '../../manager/EntityManager';
 import {UserWrapperResolvable} from '../../wrappers/UserWrapper';
 import UserManager from '../UserManager';
 
 @injectable()
-export default class ReactionListenerManager extends WrapperManager<ReactionListenerEntity> {
+export default class ReactionListenerManager extends EntityManager<ReactionListenerEntity> {
   private readonly userManager: UserManager;
 
   constructor(connection: Connection, userManager: UserManager) {

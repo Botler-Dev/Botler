@@ -3,7 +3,7 @@ import {filter, first, map, skip} from 'rxjs/operators';
 import type CacheManager from '../manager/CacheManager';
 import EntityWrapper, {Entity} from './EntityWrapper';
 
-export default abstract class CacheEntityWrapper<
+export default abstract class CachedEntityWrapper<
   TEntityState extends Entity | undefined = Entity | undefined,
   TManager extends CacheManager<Exclude<TEntityState, undefined>> = CacheManager<
     Exclude<TEntityState, undefined>

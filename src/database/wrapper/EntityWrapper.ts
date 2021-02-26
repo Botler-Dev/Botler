@@ -1,12 +1,12 @@
 import {FindConditions} from 'typeorm';
-import type WrapperManager from '../manager/EntityManager';
+import type EntityManager from '../manager/EntityManager';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Entity {}
 
 export default abstract class EntityWrapper<
   TEntityState extends Entity | undefined,
-  TManager extends WrapperManager<Exclude<TEntityState, undefined>>
+  TManager extends EntityManager<Exclude<TEntityState, undefined>>
 > {
   abstract entity: TEntityState | Immutable<TEntityState>;
 

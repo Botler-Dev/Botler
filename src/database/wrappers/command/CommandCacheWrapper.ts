@@ -1,7 +1,7 @@
 import dayjs, {Dayjs} from 'dayjs';
 import {FindConditions} from 'typeorm';
 import {EmojiResolvable, MessageResolvable, TextBasedChannelResolvable} from 'discord.js';
-import CacheEntityWrapper from '../../wrapper/CachedEntityWrapper';
+import CachedEntityWrapper from '../../wrapper/CachedEntityWrapper';
 import CommandCacheEntity from '../../entities/command/CommandCacheEntity';
 import type CommandCacheManager from '../../managers/command/CommandCacheManager';
 import {UserWrapperResolvable} from '../UserWrapper';
@@ -16,7 +16,7 @@ export type CacheFromCommandCacheWrapper<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ConcreteCommandCacheWrapper = CommandCacheWrapper<any>;
 
-export default abstract class CommandCacheWrapper<TCache = unknown> extends CacheEntityWrapper<
+export default abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntityWrapper<
   CommandCacheEntity<TCache>,
   CommandCacheManager
 > {

@@ -3,12 +3,12 @@ import {injectable} from 'tsyringe';
 import {Connection, FindConditions} from 'typeorm';
 import resolveTextBasedChannelId from '../../../utils/resolveTextBasedChannelId';
 import ResponseListenerEntity from '../../entities/command/ResponseListenerEntity';
-import WrapperManager from '../../manager/EntityManager';
+import EntityManager from '../../manager/EntityManager';
 import {UserWrapperResolvable} from '../../wrappers/UserWrapper';
 import UserManager from '../UserManager';
 
 @injectable()
-export default class ResponseListenerManager extends WrapperManager<ResponseListenerEntity> {
+export default class ResponseListenerManager extends EntityManager<ResponseListenerEntity> {
   private readonly userManager: UserManager;
 
   constructor(connection: Connection, userManager: UserManager) {

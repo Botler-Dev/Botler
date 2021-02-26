@@ -1,22 +1,22 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
-import CacheEntityWrapper from '../wrapper/CachedEntityWrapper';
-import WrapperManager from './EntityManager';
+import CachedEntityWrapper from '../wrapper/CachedEntityWrapper';
+import EntityManager from './EntityManager';
 import {Entity} from '../wrapper/EntityWrapper';
 
 export default abstract class CacheManager<
   TEntity extends Entity,
   TCacheKey = unknown,
-  TWrapper extends CacheEntityWrapper<
+  TWrapper extends CachedEntityWrapper<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any,
     CacheManager<TEntity, TCacheKey, TWrapper>
-  > = CacheEntityWrapper<
+  > = CachedEntityWrapper<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     CacheManager<TEntity, TCacheKey, any>
   >
-> extends WrapperManager<TEntity> {
+> extends EntityManager<TEntity> {
   private readonly _cache = new Collection<TCacheKey, TWrapper>();
 
   get cache(): ReadonlyCollection<TCacheKey, TWrapper> {
