@@ -4,6 +4,7 @@ import {container} from 'tsyringe';
 import {Connection, createConnection} from 'typeorm';
 
 import DatabaseEventHub from './database/DatabaseEventHub';
+import DatabaseCleaner from './database/DatabaseCleaner';
 import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
 import GuildManager from './database/managers/GuildManager';
 import UserManager from './database/managers/UserManager';
@@ -23,6 +24,8 @@ export default class Bot {
   private connection!: Connection;
 
   private eventHub!: DatabaseEventHub;
+
+  private cleaner!: DatabaseCleaner;
 
   private globalSettingsManager!: GlobalSettingsManager;
 
@@ -58,6 +61,9 @@ export default class Bot {
     await this.globalSettingsManager.initialize();
     this.globalSettings = this.globalSettingsManager.get();
     container.register(GlobalSettingsWrapper, {useValue: this.globalSettings});
+
+    container.registerSingleton(DatabaseCleaner);
+    this.cleaner = container.resolve(DatabaseCleaner);
 
     this.client = new Client({
       disableMentions: 'everyone',

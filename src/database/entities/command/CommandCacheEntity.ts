@@ -4,6 +4,12 @@ import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
   name: 'CommandCache',
 })
 export default class CommandCacheEntity<TCache = unknown> {
+  /**
+   * Delay in milliseconds after expiration before a cache can get deleted.
+   * This prevents a cache from being deleted while still being processed.
+   */
+  static readonly DELETE_DELAY = 30000;
+
   @PrimaryGeneratedColumn('increment')
   id!: number;
 

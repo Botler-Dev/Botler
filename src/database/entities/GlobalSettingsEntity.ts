@@ -27,4 +27,7 @@ export default class GlobalSettingsEntity {
 
   @Column({type: 'integer', default: 16745728})
   colorWarn = 16745728;
+
+  @Column({type: 'integer', default: 600000})
+  cleanInterval = 600000;
 }

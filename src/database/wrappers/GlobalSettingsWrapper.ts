@@ -42,6 +42,10 @@ export default class GlobalSettingsWrapper extends CacheEntityWrapper<
     return this.entity.botMasters;
   }
 
+  get cleanInterval(): number {
+    return this.entity.cleanInterval;
+  }
+
   protected get uniqueConditions(): FindConditions<GlobalSettingsEntity> {
     return {
       version: this.version,

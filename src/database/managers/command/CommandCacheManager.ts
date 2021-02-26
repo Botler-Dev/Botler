@@ -12,6 +12,7 @@ import ResponseListenerManager from './ResponseListenerManager';
 import CommandManager from '../../../modules/command/CommandManager';
 import ScopedLogger from '../../../logger/ScopedLogger';
 import Command from '../../../modules/command/command/Command';
+import DatabaseCleaner from '../../DatabaseCleaner';
 
 @injectable()
 export default class CommandCacheManager extends CacheManager<
@@ -33,6 +34,7 @@ export default class CommandCacheManager extends CacheManager<
   constructor(
     connection: Connection,
     logger: ScopedLogger,
+    cleaner: DatabaseCleaner,
     commandManager: CommandManager,
     responseListenerManager: ResponseListenerManager,
     reactionListenerManager: ReactionListenerManager
@@ -42,6 +44,8 @@ export default class CommandCacheManager extends CacheManager<
     this.commandManager = commandManager;
     this.responseListenerManager = responseListenerManager;
     this.reactionListenerManager = reactionListenerManager;
+
+    cleaner.registerCleaner(() => this.clean());
   }
 
   private async wrapEntity<TCache extends ConcreteCommandCacheWrapper>(
@@ -113,5 +117,15 @@ export default class CommandCacheManager extends CacheManager<
     }
 
     return wrappers.filter((wrapper): wrapper is Exclude<typeof wrapper, undefined> => !!wrapper);
+  }
+
+  async clean(): Promise<void> {
+    await this.repo
+      .createQueryBuilder('cache')
+      .delete()
+      .where('expirationDateTime < :dateTime', {
+        dateTime: dayjs().subtract(CommandCacheEntity.DELETE_DELAY).toISOString(),
+      })
+      .execute();
   }
 }

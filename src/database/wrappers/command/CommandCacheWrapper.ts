@@ -36,7 +36,16 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
     this.updateEntity({
       expirationDateTime: value.toDate(),
     });
+
+    clearTimeout(this.deleteTimeout);
+    if (dayjs().isAfter(value)) {
+      this.delete();
+      return;
+    }
+    this.setTimeout();
   }
+
+  private deleteTimeout!: NodeJS.Timeout;
 
   protected readonly uniqueConditions: FindConditions<CommandCacheEntity<TCache>>;
 
@@ -59,6 +68,14 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
     this.uniqueConditions = {
       id: this.id,
     };
+    this.setTimeout();
+  }
+
+  private setTimeout() {
+    this.deleteTimeout = setTimeout(
+      () => this.delete(),
+      dayjs().add(CommandCacheEntity.DELETE_DELAY).diff(this.expirationDateTime)
+    );
   }
 
   async addResponseListener(
