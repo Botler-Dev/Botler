@@ -53,6 +53,6 @@ nav:
   - Development:
       - Run Botler: Development/Run-Botler.md
       - Configuration: Development/Configuration.md
-      - Entity System: Development/Entity-System.md
-      - Database Schema: Development/Database-Schema.md
+      - Database:
+          - Entity System: Development/Database/Entity-System.md
       - Documentation: Development/Documentation.md

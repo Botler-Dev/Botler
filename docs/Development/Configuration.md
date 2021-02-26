@@ -26,8 +26,8 @@ Botler can be configured via the environment variables below.
 | `LOGGER_STAMP_FORMAT`  | `YYYY/MM/DD HH:mm:ss.sss` |     same     | Format of timestamp label. See the [Day.js documentation](https://day.js.org/docs/en/display/format) for more information.    |
 
 !!! tip "Additional Database Connection Options"
-    The variables with a `TYPEORM` prefix are for the database connection but not all possible options are listed.
-    All options are listed in the [TypeORM documentation](https://github.com/typeorm/typeorm/blob/master/docs/using-ormconfig.md#using-environment-variables).
+    Variables with a `TYPEORM` prefix are for the database connection. There are more but note that those only get respected by TypeORM itself and not by the DatabaseEventHub.
+    All TypeORM options are listed in the [TypeORM documentation](https://github.com/typeorm/typeorm/blob/master/docs/using-ormconfig.md#using-environment-variables).
 
 !!! tip "More Logger Colors"
     You can set label colors to any [CSS color keyword](https://www.w3.org/wiki/CSS/Properties/color/keywords)
