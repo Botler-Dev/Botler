@@ -1,5 +1,7 @@
 import {Message} from 'discord.js';
-import {ConcreteCommandCacheWrapper} from '../../../database/wrappers/command/CommandCacheWrapper';
+import CommandCacheWrapper, {
+  ConcreteCommandCacheWrapper,
+} from '../../../database/wrappers/command/CommandCacheWrapper';
 import UserWrapper from '../../../database/wrappers/UserWrapper';
 import type Command from '../command/Command';
 import MissingParameterError from '../errors/MissingParameterError';
@@ -14,7 +16,7 @@ export type ParseResults<TValues extends ParsedValues = ParsedValues> = {
 };
 
 export default abstract class MessageExecutionContext<
-  TCommand extends Command<ConcreteCommandCacheWrapper, ParsedValues>,
+  TCommand extends Command<CommandCacheWrapper, ParsedValues>,
   TCacheState extends ConcreteCommandCacheWrapper | undefined,
   TParsedValues extends ParsedValues
 > extends UserExecutionContext<TCommand, TCacheState> {

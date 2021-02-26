@@ -2,7 +2,7 @@ import {EmojiResolvable, Message, MessageReaction, MessageResolvable, User} from
 import {injectable} from 'tsyringe';
 import {Connection, FindConditions} from 'typeorm';
 import ReactionListenerEntity from '../../entities/command/ReactionListenerEntity';
-import WrapperManager from '../../manager/WrapperManager';
+import WrapperManager from '../../manager/EntityManager';
 import {UserWrapperResolvable} from '../../wrappers/UserWrapper';
 import UserManager from '../UserManager';
 

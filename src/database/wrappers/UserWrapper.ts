@@ -4,14 +4,14 @@ import {FindConditions} from 'typeorm';
 import UserEntity from '../entities/UserEntity';
 import type UserManager from '../managers/UserManager';
 import {SyncStream} from '../synchronizer/CacheSynchronizer';
-import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
 import DiscordWrapper from '../wrapper/DiscordWrapper';
+import SynchronizedEntityWrapper from '../wrapper/SynchronizedEntityWrapper';
 import type GuildMemberWrapper from './GuildMemberWrapper';
 
 export type UserWrapperResolvable = UserWrapper | GuildMemberWrapper | UserResolvable;
 
 export default class UserWrapper
-  extends CacheEntityWrapper<UserEntity | undefined, UserManager, UserWrapper>
+  extends SynchronizedEntityWrapper<UserEntity | undefined, UserManager>
   implements DiscordWrapper<User> {
   readonly discord: User;
 

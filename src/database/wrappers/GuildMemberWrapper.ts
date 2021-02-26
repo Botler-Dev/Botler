@@ -4,15 +4,15 @@ import GuildMemberEntity from '../entities/GuildMemberEntity';
 import type GuildMemberManager from '../managers/GuildMemberManager';
 import type UserManager from '../managers/UserManager';
 import {SyncStream} from '../synchronizer/CacheSynchronizer';
-import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
 import DiscordWrapper from '../wrapper/DiscordWrapper';
+import SynchronizedEntityWrapper from '../wrapper/SynchronizedEntityWrapper';
 import type GuildWrapper from './GuildWrapper';
 import UserWrapper from './UserWrapper';
 
 export type GuildMemberWrapperResolvable = GuildMemberWrapper | UserWrapper | GuildMemberResolvable;
 
 export default class GuildMemberWrapper
-  extends CacheEntityWrapper<GuildMemberEntity | undefined, GuildMemberManager, GuildMemberWrapper>
+  extends SynchronizedEntityWrapper<GuildMemberEntity | undefined, GuildMemberManager>
   implements DiscordWrapper<GuildMember> {
   readonly discord: GuildMember;
 

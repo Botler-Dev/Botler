@@ -13,9 +13,8 @@ import UserManager from './UserManager';
 
 export default class GuildMemberManager extends CacheManager<
   GuildMemberEntity,
-  GuildMemberWrapper,
   Snowflake,
-  GuildMemberManager
+  GuildMemberWrapper
 > {
   readonly guild: GuildWrapper;
 
@@ -58,7 +57,7 @@ export default class GuildMemberManager extends CacheManager<
       this.guild,
       this.userManager
     );
-    wrapper.afterCacheStateChange.subscribe(() => this.synchronizer.removeSyncStream(syncCacheKey));
+    wrapper.afterUncache.subscribe(() => this.synchronizer.removeSyncStream(syncCacheKey));
     this.cacheWrapper(id, wrapper);
     return wrapper;
   }

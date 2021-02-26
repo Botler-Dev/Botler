@@ -18,10 +18,8 @@ import DatabaseCleaner from '../../DatabaseCleaner';
 export default class CommandCacheManager extends CacheManager<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   CommandCacheEntity<any>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  CommandCacheWrapper<any>,
   number,
-  CommandCacheManager
+  ConcreteCommandCacheWrapper
 > {
   private readonly logger: ScopedLogger;
 

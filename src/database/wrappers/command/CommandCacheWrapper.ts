@@ -1,8 +1,7 @@
 import dayjs, {Dayjs} from 'dayjs';
-import {Observable} from 'rxjs';
 import {FindConditions} from 'typeorm';
 import {EmojiResolvable, MessageResolvable, TextBasedChannelResolvable} from 'discord.js';
-import CacheEntityWrapper from '../../wrapper/CacheEntityWrapper';
+import CacheEntityWrapper from '../../wrapper/CachedEntityWrapper';
 import CommandCacheEntity from '../../entities/command/CommandCacheEntity';
 import type CommandCacheManager from '../../managers/command/CommandCacheManager';
 import {UserWrapperResolvable} from '../UserWrapper';
@@ -19,9 +18,14 @@ export type ConcreteCommandCacheWrapper = CommandCacheWrapper<any>;
 
 export default abstract class CommandCacheWrapper<TCache = unknown> extends CacheEntityWrapper<
   CommandCacheEntity<TCache>,
-  CommandCacheManager,
-  CommandCacheWrapper<TCache>
+  CommandCacheManager
 > {
+  private _entity: CommandCacheEntity<TCache>;
+
+  get entity(): Readonly<CommandCacheEntity<TCache>> {
+    return this._entity;
+  }
+
   get id(): number {
     return this.entity.id;
   }
@@ -33,9 +37,7 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
   }
 
   set expirationDateTime(value: Dayjs) {
-    this.updateEntity({
-      expirationDateTime: value.toDate(),
-    });
+    this._entity.expirationDateTime = value.toDate();
 
     clearTimeout(this.deleteTimeout);
     if (dayjs().isAfter(value)) {
@@ -60,7 +62,8 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
     responseListenerManager: ResponseListenerManager,
     reactionListenerManager: ReactionListenerManager
   ) {
-    super(manager, new Observable<CommandCacheEntity<TCache>>(), entity);
+    super(manager);
+    this._entity = entity;
     this.command = command;
     this.responseListenerManager = responseListenerManager;
     this.reactionListenerManager = reactionListenerManager;
@@ -76,6 +79,10 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
       () => this.delete(),
       dayjs().add(CommandCacheEntity.DELETE_DELAY).diff(this.expirationDateTime)
     );
+  }
+
+  protected setCache(cache: TCache): void {
+    this._entity.cache = cache;
   }
 
   async addResponseListener(

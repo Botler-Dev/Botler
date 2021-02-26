@@ -1,19 +1,20 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
-import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
-import WrapperManager from './WrapperManager';
+import CacheEntityWrapper from '../wrapper/CachedEntityWrapper';
+import WrapperManager from './EntityManager';
 import {Entity} from '../wrapper/EntityWrapper';
 
 export default abstract class CacheManager<
   TEntity extends Entity,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TWrapper extends CacheEntityWrapper<any, This>,
   TCacheKey = unknown,
-  This extends CacheManager<TEntity, TWrapper, TCacheKey> = CacheManager<
-    TEntity,
-    TWrapper,
-    TCacheKey,
+  TWrapper extends CacheEntityWrapper<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    any
+    any,
+    CacheManager<TEntity, TCacheKey, TWrapper>
+  > = CacheEntityWrapper<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    CacheManager<TEntity, TCacheKey, any>
   >
 > extends WrapperManager<TEntity> {
   private readonly _cache = new Collection<TCacheKey, TWrapper>();
@@ -24,7 +25,7 @@ export default abstract class CacheManager<
 
   protected cacheWrapper(key: TCacheKey, wrapper: TWrapper): void {
     this._cache.set(key, wrapper);
-    wrapper.afterCacheStateChange.subscribe(() => this._cache.delete(key));
+    wrapper.afterUncache.subscribe(() => this._cache.delete(key));
   }
 
   uncache(key: TCacheKey): TWrapper | undefined {

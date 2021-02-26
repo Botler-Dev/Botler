@@ -7,12 +7,7 @@ import CacheSynchronizer from '../synchronizer/CacheSynchronizer';
 import GuildMemberWrapper from '../wrappers/GuildMemberWrapper';
 import GuildWrapper, {GuildWrapperResolvable} from '../wrappers/GuildWrapper';
 
-export default class GuildManager extends CacheManager<
-  GuildEntity,
-  GuildWrapper,
-  Snowflake,
-  GuildManager
-> {
+export default class GuildManager extends CacheManager<GuildEntity, Snowflake, GuildWrapper> {
   private readonly discordGuilds: DiscordGuildManager;
 
   private readonly synchronizer: CacheSynchronizer<GuildEntity, 'id', Snowflake>;
@@ -38,7 +33,7 @@ export default class GuildManager extends CacheManager<
     const entity = await this.repo.createQueryBuilder().select().where({id}).getOne();
     const syncStream = this.synchronizer.getSyncStream(id);
     const wrapper = new GuildWrapper(this, syncStream, entity, discordGuild);
-    wrapper.afterCacheStateChange.subscribe(() => this.synchronizer.removeSyncStream(id));
+    wrapper.afterUncache.subscribe(() => this.synchronizer.removeSyncStream(id));
     this.cacheWrapper(id, wrapper);
     return wrapper;
   }

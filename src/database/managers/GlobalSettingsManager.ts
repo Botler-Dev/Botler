@@ -9,9 +9,8 @@ export const GlobalSettingsCacheKey = 0 as const;
 
 export default class GlobalSettingsManager extends CacheManager<
   GlobalSettingsEntity,
-  GlobalSettingsWrapper,
   typeof GlobalSettingsCacheKey,
-  GlobalSettingsManager
+  GlobalSettingsWrapper
 > {
   private readonly synchronizer: GlobalSettingsSynchronizer;
 

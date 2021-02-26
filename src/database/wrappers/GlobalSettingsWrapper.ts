@@ -7,7 +7,7 @@ import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
 import type GlobalSettingsManager from '../managers/GlobalSettingsManager';
 import UserManager from '../managers/UserManager';
 import {SyncStream} from '../synchronizer/CacheSynchronizer';
-import CacheEntityWrapper from '../wrapper/CacheEntityWrapper';
+import SynchronizedEntityWrapper from '../wrapper/SynchronizedEntityWrapper';
 import {UserWrapperResolvable} from './UserWrapper';
 
 export enum ColorType {
@@ -17,7 +17,7 @@ export enum ColorType {
   Warn,
 }
 
-export default class GlobalSettingsWrapper extends CacheEntityWrapper<
+export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
   GlobalSettingsEntity,
   GlobalSettingsManager
 > {
