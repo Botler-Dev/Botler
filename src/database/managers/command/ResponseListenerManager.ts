@@ -43,6 +43,7 @@ export default class ResponseListenerManager extends EntityManager<ResponseListe
   }
 
   async findCacheIds(message: Message): Promise<number[]> {
+    // TODO: refactor findCacheIds methods in Response and ReactionListenerManager and add the distinct flag
     const result = await this.repo.find({
       where: [
         {

@@ -55,4 +55,9 @@ nav:
       - Configuration: Development/Configuration.md
       - Database:
           - Entity System: Development/Database/Entity-System.md
+      - Modules:
+          - Command:
+              - Overview: Development/Modules/Command/Overview.md
+              - Argument Parser: Development/Modules/Command/Argument-Parser.md
+              - Command Cache: Development/Modules/Command/Command-Cache.md
       - Documentation: Development/Documentation.md
