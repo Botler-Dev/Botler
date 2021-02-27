@@ -67,6 +67,7 @@ export default abstract class MessageExecutionContext<
     name?: string
   ): Promise<TValue | undefined> {
     const result = (await parser(this.remainingContent)) ?? {value: undefined, length: 0};
+    // TODO: only add parse result if successful
     this.addParseResult(name, result);
     return result.value;
   }
@@ -84,4 +85,6 @@ export default abstract class MessageExecutionContext<
     // @ts-expect-error index type is correct
     this._parseResults[name] = result;
   }
+
+  // TODO: add backtracking function
 }
