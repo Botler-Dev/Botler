@@ -9,7 +9,7 @@ import {
 } from '../../../database/wrappers/command/CommandCacheWrapper';
 import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import type CommandCategory from '../CommandCategory';
-import SilentError from '../errors/SilentError';
+import CommandError from '../error/CommandError';
 import WrongScopeError from '../errors/WrongScopeError';
 import type ExecutionContext from '../executionContexts/ExecutionContext';
 import InitialExecutionContext from '../executionContexts/InitialExecutionContext';
@@ -71,7 +71,9 @@ export default abstract class Command<
       this.isBotMasterOnly &&
       !this.globalSettings.isBotMaster(context.user)
     )
-      throw new SilentError();
+      throw new CommandError(
+        'Silent permission denied error. Execution requestor is not bot master.'
+      );
     if (
       context instanceof InitialExecutionContext &&
       ((context.guild && !this.isGuildCapable) || (!context.guild && !this.isDmCapable))

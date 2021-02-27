@@ -1,8 +1,8 @@
 import {DMChannel, TextBasedChannel} from 'discord.js';
 import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
-import ResponseError from './ResponseError';
+import SimpleErrorResponseError from '../error/SimpleErrorResponseError';
 
-export default class WrongScopeError extends ResponseError {
+export default class WrongScopeError extends SimpleErrorResponseError {
   constructor(channel: TextBasedChannel, globalSettings?: GlobalSettingsWrapper) {
     super(
       channel,

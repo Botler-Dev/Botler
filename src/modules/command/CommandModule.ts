@@ -10,7 +10,7 @@ import {ModuleConstructor} from '../ModuleConstructor';
 import CommandCategory from './CommandCategory';
 import CommandManager from './CommandManager';
 import CommandCacheManager from '../../database/managers/command/CommandCacheManager';
-import CommandError from './errors/CommandError';
+import CommandError from './error/CommandError';
 import UnexpectedError from './errors/UnexpectedError';
 import GuildMemberContext from './executionContexts/guild/GuildMemberContext';
 import InitialExecutionContext from './executionContexts/InitialExecutionContext';
@@ -164,11 +164,17 @@ export default class CommandModule extends Module {
       let commandError: CommandError | undefined;
       if (error instanceof CommandError) {
         commandError = error;
-      } else {
-        this.logger.error(`Uncaught error while executing command "${command.name}".`, error);
-        if (context instanceof MessageExecutionContext)
-          commandError = new UnexpectedError(context.message.channel);
+      } else if (context instanceof MessageExecutionContext) {
+        commandError = new UnexpectedError(context.message.channel, error);
+      } else if (context instanceof ReactionExecutionContext) {
+        commandError = new UnexpectedError(context.reaction.message.channel, error);
       }
+
+      if (commandError?.realError)
+        this.logger.error(
+          `Encountered real error while executing command "${command.name}".`,
+          commandError.realError
+        );
       await commandError?.send?.();
     }
   }

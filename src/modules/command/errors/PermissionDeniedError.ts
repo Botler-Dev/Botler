@@ -1,8 +1,8 @@
 import {TextBasedChannel} from 'discord.js';
 import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
-import ResponseError from './ResponseError';
+import SimpleErrorResponseError from '../error/SimpleErrorResponseError';
 
-export default class PermissionDeniedError extends ResponseError {
+export default class PermissionDeniedError extends SimpleErrorResponseError {
   /**
    * @param {string} action String inserted into the following: `You are not allowed to [action].` (Default `perform this action`)
    */
