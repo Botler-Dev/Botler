@@ -15,6 +15,12 @@ export type ParseResults<TValues extends ParsedValues = ParsedValues> = {
   [name in keyof TValues]: ParseResult<TValues[name]>;
 };
 
+export interface ParseHistoryEntry {
+  name?: string;
+  previousResult?: ParseResult;
+  result: ParseResult;
+}
+
 export default abstract class MessageExecutionContext<
   TCommand extends Command<CommandCacheWrapper, ParsedValues>,
   TCacheState extends ConcreteCommandCacheWrapper | undefined,
@@ -32,6 +38,12 @@ export default abstract class MessageExecutionContext<
 
   get parseResults(): Readonly<ParseResults<TParsedValues & ParsedValues>> {
     return this._parseResults;
+  }
+
+  private _parseHistory: ParseHistoryEntry[] = [];
+
+  get parseHistory(): ReadonlyArray<Readonly<ParseHistoryEntry>> {
+    return this._parseHistory;
   }
 
   private _parseIndex = 0;
@@ -66,10 +78,9 @@ export default abstract class MessageExecutionContext<
     parser: Parser<TValue>,
     name?: string
   ): Promise<TValue | undefined> {
-    const result = (await parser(this.remainingContent)) ?? {value: undefined, length: 0};
-    // TODO: only add parse result if successful
-    this.addParseResult(name, result);
-    return result.value;
+    const result = await parser(this.remainingContent);
+    if (result) this.addParseResult(name, result);
+    return result?.value;
   }
 
   protected addParseResult<TName extends keyof TParsedValues>(
@@ -80,11 +91,39 @@ export default abstract class MessageExecutionContext<
   protected addParseResult(name: string | undefined, result: ParseResult): void {
     this._parseIndex += result.length;
     if (!name) return;
+    this._parseHistory.push({
+      name,
+      previousResult: this._parseResults[name],
+      result,
+    });
+    this.setParseResult(name, result);
+  }
+
+  backtrackParse(stepCount = 1): ParseHistoryEntry[] {
+    const rollbackHistory = this._parseHistory.splice(
+      -Math.min(this.parseHistory.length, stepCount)
+    );
+    rollbackHistory.reverse().forEach(entry => {
+      this._parseIndex -= entry.result.length;
+      if (entry.name === undefined) return;
+      if (!entry.previousResult) {
+        delete this._values[entry.name];
+        delete this._parseResults[entry.name];
+        return;
+      }
+      this.setParseResult(entry.name, entry.previousResult);
+    });
+    return rollbackHistory;
+  }
+
+  clearHistory(): void {
+    this._parseHistory = [];
+  }
+
+  private setParseResult(name: string, result: ParseResult): void {
     // @ts-expect-error index type is correct
     this._values[name] = result.value;
     // @ts-expect-error index type is correct
     this._parseResults[name] = result;
   }
-
-  // TODO: add backtracking function
 }

@@ -98,6 +98,7 @@ export default class CommandModule extends Module {
         member ? new GuildMemberContext(member) : undefined,
         prefix
       );
+      // TODO: don't execute command when it triggers a response listener
       await this.executeCommand(command, context);
     });
 
