@@ -13,14 +13,14 @@ import CommandError from '../error/CommandError';
 import WrongScopeError from '../errors/WrongScopeError';
 import type ExecutionContext from '../executionContexts/ExecutionContext';
 import InitialExecutionContext from '../executionContexts/InitialExecutionContext';
-import {ParsedValues} from '../executionContexts/MessageExecutionContext';
 import UserExecutionContext from '../executionContexts/UserExecutionContext';
+import {EmptyParseResults, ParseResults} from '../parser/ParserEngine';
 
 export type CommandName = string;
 
 export default abstract class Command<
   TCache extends ConcreteCommandCacheWrapper = ConcreteCommandCacheWrapper,
-  TParsedValues extends ParsedValues = Record<string, never>
+  TAlreadyParsedResults extends ParseResults = EmptyParseResults
 > {
   abstract readonly name: CommandName;
 
@@ -64,7 +64,7 @@ export default abstract class Command<
   ): Promise<TCache>;
 
   protected async checkContextValidity(
-    context: ExecutionContext<TCache, TParsedValues, this>
+    context: ExecutionContext<TCache, TAlreadyParsedResults, this>
   ): Promise<void> {
     if (
       context instanceof UserExecutionContext &&
@@ -81,5 +81,5 @@ export default abstract class Command<
       throw new WrongScopeError(context.message.channel, this.globalSettings);
   }
 
-  abstract execute(context: ExecutionContext<TCache, TParsedValues, this>): Promise<void>;
+  abstract execute(context: ExecutionContext<TCache, TAlreadyParsedResults, this>): Promise<void>;
 }

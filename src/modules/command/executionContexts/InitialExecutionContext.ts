@@ -7,22 +7,24 @@ import CommandCacheWrapper, {
 } from '../../../database/wrappers/command/CommandCacheWrapper';
 import UserWrapper from '../../../database/wrappers/UserWrapper';
 import type Command from '../command/Command';
+import {ParseResult} from '../parser/parser';
+import ParserEngine, {EmptyParseResults, ParseResults} from '../parser/ParserEngine';
 import GuildMemberContext from './guild/GuildMemberContext';
-import MessageExecutionContext, {ParsedValues} from './MessageExecutionContext';
+import MessageExecutionContext from './MessageExecutionContext';
 
 export type InitialParsedValues = {
-  prefix: string;
-  command: Command;
+  prefix: ParseResult<string>;
+  command: ParseResult<Command>;
 };
 
 export default class InitialExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
-  TParsedValues extends ParsedValues = Record<string, never>,
-  TCommand extends Command<TCache, ParsedValues> = Command<TCache, TParsedValues>
+  TExistingParseResults extends ParseResults = EmptyParseResults,
+  TCommand extends Command<TCache, TExistingParseResults> = Command<TCache, TExistingParseResults>
 > extends MessageExecutionContext<
   TCommand,
   TCache | undefined,
-  InitialParsedValues & TParsedValues
+  InitialParsedValues & TExistingParseResults
 > {
   private readonly cacheManager: CommandCacheManager;
 
@@ -30,20 +32,12 @@ export default class InitialExecutionContext<
     command: TCommand,
     cacheManager: CommandCacheManager,
     message: Message,
+    parser: ParserEngine<InitialParsedValues & TExistingParseResults>,
     user: UserWrapper,
-    guild: GuildMemberContext | undefined,
-    prefix: string
+    guild: GuildMemberContext | undefined
   ) {
-    super(command, undefined, message, user, guild);
+    super(command, undefined, message, parser, user, guild);
     this.cacheManager = cacheManager;
-    this.addParseResult('prefix', {
-      value: prefix,
-      length: prefix.length,
-    });
-    this.addParseResult('command', {
-      value: command,
-      length: command.name.length,
-    });
   }
 
   async createCache(

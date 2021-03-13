@@ -1,17 +1,11 @@
 import UserManager from '../../../database/managers/UserManager';
 import UserWrapper from '../../../database/wrappers/UserWrapper';
 import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
-import {
-  generateDefaultOrNothing,
-  ParseOptions,
-  parseOptionsDefinition,
-  Parser,
-  ParseResult,
-} from './parser';
+import {Parser, ParseResult} from '../parser/parser';
 import snowflakeParser, {SnowflakeType} from './snowflakeParser';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface UserParseOptions extends ParseOptions<UserWrapper> {
+export interface UserParseOptions {
   // TODO: add name search support in guilds
 }
 
@@ -21,22 +15,21 @@ interface CleanUserParseOptions extends UserParseOptions {}
 const userParseOptionsDefinition: OptionsCleanerDefinition<
   UserParseOptions,
   CleanUserParseOptions
-> = {
-  ...parseOptionsDefinition,
-};
+> = {};
 
 export type UserParseResult = ParseResult<UserWrapper>;
 
 export function userParser(
   userManager: UserManager,
   options?: UserParseOptions
-): Parser<UserWrapper> {
+): Parser<UserParseResult> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const cleaned = cleanOptions(userParseOptionsDefinition, options ?? {});
   return async (raw: string): Promise<UserParseResult | undefined> => {
     const snowflakeResult = await snowflakeParser({
       types: [SnowflakeType.Plain, SnowflakeType.User],
     })(raw);
-    if (!snowflakeResult) return generateDefaultOrNothing(cleaned);
+    if (!snowflakeResult) return undefined;
     try {
       const user = await userManager.fetch(snowflakeResult.value);
       return {
@@ -44,7 +37,7 @@ export function userParser(
         length: snowflakeResult.length,
       };
     } catch {
-      return generateDefaultOrNothing(cleaned);
+      return undefined;
     }
   };
 }

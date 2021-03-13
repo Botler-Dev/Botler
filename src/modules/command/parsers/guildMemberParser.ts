@@ -4,17 +4,11 @@ import GuildMemberManager from '../../../database/managers/GuildMemberManager';
 import GuildMemberWrapper from '../../../database/wrappers/GuildMemberWrapper';
 import {optional} from '../../../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
-import {
-  generateDefaultOrNothing,
-  ParseOptions,
-  parseOptionsDefinition,
-  Parser,
-  ParseResult,
-} from './parser';
+import {Parser, ParseResult} from '../parser/parser';
 import snowflakeParser, {SnowflakeType} from './snowflakeParser';
 import stringParser, {StringParseOptions} from './stringParser';
 
-export interface GuildMemberParserOptions extends ParseOptions<GuildMemberWrapper> {
+export interface GuildMemberParserOptions {
   /**
    * If same user id should be searched for. (default `true`)
    */
@@ -54,7 +48,6 @@ const guildMemberParseOptionsDefinition: OptionsCleanerDefinition<
   GuildMemberParserOptions,
   CleanGuildMemberParserOptions
 > = {
-  ...parseOptionsDefinition,
   searchId: optional(true),
   searchUsername: optional(true),
   searchNickname: optional(true),
@@ -79,7 +72,7 @@ const DISCORD_NAME_MAX_LENGTH = 32;
 export function guildMemberParser(
   guildMemberManager: GuildMemberManager,
   options?: GuildMemberParserOptions
-): Parser<GuildMemberWrapper> {
+): Parser<GuildMemberParseResult> {
   const cleaned = cleanOptions(guildMemberParseOptionsDefinition, options ?? {});
   return async (raw: string): Promise<GuildMemberParseResult | undefined> => {
     if (cleaned.searchId) {
@@ -94,11 +87,10 @@ export function guildMemberParser(
         } catch {}
     }
 
-    if (!cleaned.searchUsername && !cleaned.searchNickname)
-      return generateDefaultOrNothing(cleaned);
+    if (!cleaned.searchUsername && !cleaned.searchNickname) return undefined;
 
     const nameResult = await stringParser(cleaned.nameParseOptions)(raw);
-    if (!nameResult) return generateDefaultOrNothing(cleaned);
+    if (!nameResult) return undefined;
     const generateNameSearchResult = async (member: GuildMember) => ({
       value: await guildMemberManager.fetch(member),
       length: nameResult.length,
@@ -121,7 +113,7 @@ export function guildMemberParser(
       if (member) return generateNameSearchResult(member);
     }
 
-    if (!cleaned.allowSimilar) return generateDefaultOrNothing(cleaned);
+    if (!cleaned.allowSimilar) return undefined;
 
     const queryName = nameResult.value.slice(0, DISCORD_NAME_MAX_LENGTH).toLowerCase();
     let highestSimilarity = 0;
@@ -141,8 +133,7 @@ export function guildMemberParser(
       member = potentialMember;
     });
 
-    if (!member || highestSimilarity < cleaned.similarityThreshold)
-      return generateDefaultOrNothing(cleaned);
+    if (!member || highestSimilarity < cleaned.similarityThreshold) return undefined;
     return generateNameSearchResult(member);
   };
 }

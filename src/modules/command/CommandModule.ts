@@ -13,15 +13,19 @@ import CommandCacheManager from '../../database/managers/command/CommandCacheMan
 import CommandError from './error/CommandError';
 import UnexpectedError from './errors/UnexpectedError';
 import GuildMemberContext from './executionContexts/guild/GuildMemberContext';
-import InitialExecutionContext from './executionContexts/InitialExecutionContext';
+import InitialExecutionContext, {
+  InitialParsedValues,
+} from './executionContexts/InitialExecutionContext';
 import ReactionListenerManager from '../../database/managers/command/ReactionListenerManager';
 import ResponseListenerManager from '../../database/managers/command/ResponseListenerManager';
 import Command from './command/Command';
 import {ConcreteCommandCacheWrapper} from '../../database/wrappers/command/CommandCacheWrapper';
-import MessageExecutionContext, {ParsedValues} from './executionContexts/MessageExecutionContext';
+import MessageExecutionContext from './executionContexts/MessageExecutionContext';
 import ExecutionContext from './executionContexts/ExecutionContext';
 import ResponseExecutionContext from './executionContexts/ResponseExecutionContext';
 import ReactionExecutionContext from './executionContexts/ReactionExecutionContext';
+import ParserEngine, {ParseResults} from './parser/ParserEngine';
+import {commandParser} from './parsers/commandParser';
 
 @StaticImplements<ModuleConstructor>()
 export default class CommandModule extends Module {
@@ -83,20 +87,22 @@ export default class CommandModule extends Module {
       const prefix = guild?.prefix ?? this.globalSettings.prefix;
       if (!message.content.startsWith(prefix)) return;
 
-      const user = await this.userManager.fetch(message.author);
-      const member = await guild?.members.fetch(user);
+      const parser = new ParserEngine(message.content, {
+        prefix: {value: prefix, length: prefix.length},
+      });
 
-      const commandName = message.content.slice(prefix.length).split(' ', 1)[0].toLowerCase();
-      const command = this.commands.lookup.get(commandName);
+      const command = (await parser.next(commandParser(this.commands), 'command'))?.value;
       if (!command) return;
 
+      const user = await this.userManager.fetch(message.author);
+      const member = await guild?.members.fetch(user);
       const context = new InitialExecutionContext(
         command,
         this.commandCaches,
         message,
+        parser as ParserEngine<InitialParsedValues>,
         user,
-        member ? new GuildMemberContext(member) : undefined,
-        prefix
+        member ? new GuildMemberContext(member) : undefined
       );
       // TODO: don't execute command when it triggers a response listener
       await this.executeCommand(command, context);
@@ -156,9 +162,12 @@ export default class CommandModule extends Module {
 
   private async executeCommand<
     TCache extends ConcreteCommandCacheWrapper,
-    TParsedValues extends ParsedValues,
-    TCommand extends Command<TCache, ParsedValues>
-  >(command: TCommand, context: ExecutionContext<TCache, TParsedValues, TCommand>): Promise<void> {
+    TExistingParseResults extends ParseResults,
+    TCommand extends Command<TCache>
+  >(
+    command: TCommand,
+    context: ExecutionContext<TCache, TExistingParseResults, TCommand>
+  ): Promise<void> {
     try {
       await command.execute(context);
     } catch (error) {
