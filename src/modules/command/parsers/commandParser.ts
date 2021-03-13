@@ -12,7 +12,11 @@ export interface CommandParseOptions {
    */
   searchAliases?: boolean;
   /**
-   * Threshold for when a similarity search result can be considered valid. (`0.95`)
+   * If similar matches also count. (default `false`)
+   */
+  allowSimilar?: boolean;
+  /**
+   * Threshold for when a similarity search result can be considered valid. (default `0.8`)
    */
   similarityThreshold?: number;
 }
@@ -24,7 +28,8 @@ const commandParseOptionsDefinition: OptionsCleanerDefinition<
   CleanCommandParseOptions
 > = {
   searchAliases: optional(true),
-  similarityThreshold: optional(0.95),
+  allowSimilar: optional(false),
+  similarityThreshold: optional(0.8),
 };
 
 export type CommandParseResult = ParseResult<Command>;
@@ -40,17 +45,19 @@ export function commandParser(
       whitespaceStopper: true,
     })(raw);
     if (!nameResult) return undefined;
+    const name = nameResult.value.toLowerCase();
     const generateResult = (command: Command): CommandParseResult => ({
       value: command,
       length: nameResult.length,
     });
 
-    const commandList = cleaned.searchAliases ? commandManager.instances : commandManager.lookup;
+    const commandList = cleaned.searchAliases ? commandManager.lookup : commandManager.instances;
 
-    const exactMatch = commandList.get(nameResult.value);
+    const exactMatch = commandList.get(name);
     if (exactMatch) return generateResult(exactMatch);
 
-    const similarityResult = findBestMatch(nameResult.value, [...commandList.keys()]);
+    if (!cleaned.allowSimilar) return undefined;
+    const similarityResult = findBestMatch(name, [...commandList.keys()]);
     if (similarityResult.bestMatch.rating < cleaned.similarityThreshold) return undefined;
     const similarMatch = commandList.get(similarityResult.bestMatch.target);
     if (!similarMatch) return undefined;
