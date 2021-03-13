@@ -86,9 +86,8 @@ export default class CommandModule extends Module {
       const guild = message.guild ? await this.guildManager.fetch(message.guild) : undefined;
 
       const cacheIds = await this.responseListeners.findCacheIds(message);
-      if (cacheIds.length > 0) {
-        const caches = await this.commandCaches.fetchCaches(cacheIds);
-
+      const caches = await this.commandCaches.fetchCaches(cacheIds);
+      if (caches.length > 0) {
         const user = await this.userManager.fetch(message.author);
         const member = await guild?.members.fetch(user);
         const guildContext = member ? new GuildMemberContext(member) : undefined;
