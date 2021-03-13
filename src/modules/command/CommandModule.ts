@@ -84,6 +84,26 @@ export default class CommandModule extends Module {
       if (message.author.bot) return;
 
       const guild = message.guild ? await this.guildManager.fetch(message.guild) : undefined;
+
+      const cacheIds = await this.responseListeners.findCacheIds(message);
+      if (cacheIds.length > 0) {
+        const caches = await this.commandCaches.fetchCaches(cacheIds);
+
+        const user = await this.userManager.fetch(message.author);
+        const member = await guild?.members.fetch(user);
+        const guildContext = member ? new GuildMemberContext(member) : undefined;
+
+        await Promise.all(
+          caches.map(cache =>
+            this.executeCommand(
+              cache.command,
+              new ResponseExecutionContext(cache.command, cache, message, user, guildContext)
+            )
+          )
+        );
+        return;
+      }
+
       const prefix = guild?.prefix ?? this.globalSettings.prefix;
       if (!message.content.startsWith(prefix)) return;
 
@@ -104,30 +124,7 @@ export default class CommandModule extends Module {
         user,
         member ? new GuildMemberContext(member) : undefined
       );
-      // TODO: don't execute command when it triggers a response listener
       await this.executeCommand(command, context);
-    });
-
-    this.client.on('message', async (message: Message) => {
-      if (message.author.bot) return;
-
-      const cacheIds = await this.responseListeners.findCacheIds(message);
-      if (cacheIds.length === 0) return;
-      const caches = await this.commandCaches.fetchCaches(cacheIds);
-
-      const user = await this.userManager.fetch(message.author);
-      const guild = message.guild ? await this.guildManager.fetch(message.guild) : undefined;
-      const member = await guild?.members.fetch(user);
-      const guildContext = member ? new GuildMemberContext(member) : undefined;
-
-      await Promise.all(
-        caches.map(cache =>
-          this.executeCommand(
-            cache.command,
-            new ResponseExecutionContext(cache.command, cache, message, user, guildContext)
-          )
-        )
-      );
     });
 
     this.client.on('messageReactionAdd', async (reaction, user) => {
