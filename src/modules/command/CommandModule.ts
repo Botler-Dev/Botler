@@ -1,8 +1,6 @@
-import {Client, Message} from 'discord.js';
+import {Client, GuildMember, Message, User} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 
-import GuildManager from '../../database/managers/GuildManager';
-import UserManager from '../../database/managers/UserManager';
 import GlobalSettingsWrapper from '../../database/wrappers/GlobalSettingsWrapper';
 import StaticImplements from '../../utils/StaticImplements';
 import Module from '../Module';
@@ -26,6 +24,7 @@ import ResponseExecutionContext from './executionContexts/ResponseExecutionConte
 import ReactionExecutionContext from './executionContexts/ReactionExecutionContext';
 import ParserEngine, {ParseResults} from './parser/ParserEngine';
 import {commandParser} from './parsers/commandParser';
+import CommandGuildSettingsManager from '../../database/managers/command/CommandGuildSettingsManager';
 
 @StaticImplements<ModuleConstructor>()
 export default class CommandModule extends Module {
@@ -45,19 +44,15 @@ export default class CommandModule extends Module {
 
   private readonly commandCaches: CommandCacheManager;
 
+  private readonly guildSettings: CommandGuildSettingsManager;
+
   private readonly client: Client;
-
-  private readonly userManager: UserManager;
-
-  private readonly guildManager: GuildManager;
 
   private readonly globalSettings: GlobalSettingsWrapper;
 
   constructor(
     moduleContainer: DependencyContainer,
     client = moduleContainer.resolve(Client),
-    userManager = moduleContainer.resolve(UserManager),
-    guildManager = moduleContainer.resolve(GuildManager),
     globalSettings = moduleContainer.resolve(GlobalSettingsWrapper)
   ) {
     super(moduleContainer);
@@ -73,37 +68,40 @@ export default class CommandModule extends Module {
     this.reactionListeners = this.container.resolve(ReactionListenerManager);
     this.commandCaches = this.container.resolve(CommandCacheManager);
 
+    this.container.registerSingleton(CommandGuildSettingsManager);
+    this.guildSettings = this.container.resolve(CommandGuildSettingsManager);
+
     this.client = client;
-    this.userManager = userManager;
-    this.guildManager = guildManager;
     this.globalSettings = globalSettings;
+  }
+
+  async preInitialize(): Promise<void> {
+    await this.guildSettings.initialize();
   }
 
   async postInitialize(): Promise<void> {
     this.client.on('message', async (message: Message) => {
       if (message.author.bot) return;
 
-      const guild = message.guild ? await this.guildManager.fetch(message.guild) : undefined;
+      const guildContext = message.member
+        ? await this.createGuildMemberContext(message.member)
+        : undefined;
 
       const cacheIds = await this.responseListeners.findCacheIds(message);
       const caches = await this.commandCaches.fetchCaches(cacheIds);
       if (caches.length > 0) {
-        const user = await this.userManager.fetch(message.author);
-        const member = await guild?.members.fetch(user);
-        const guildContext = member ? new GuildMemberContext(member) : undefined;
-
         await Promise.all(
           caches.map(cache =>
             this.executeCommand(
               cache.command,
-              new ResponseExecutionContext(cache.command, cache, message, user, guildContext)
+              new ResponseExecutionContext(cache.command, cache, message, guildContext)
             )
           )
         );
         return;
       }
 
-      const prefix = guild?.prefix ?? this.globalSettings.prefix;
+      const prefix = guildContext?.settings.prefix ?? this.globalSettings.prefix;
       if (!message.content.startsWith(prefix)) return;
 
       const parser = new ParserEngine(message.content, {
@@ -113,15 +111,12 @@ export default class CommandModule extends Module {
       const command = (await parser.next(commandParser(this.commands), 'command'))?.value;
       if (!command) return;
 
-      const user = await this.userManager.fetch(message.author);
-      const member = await guild?.members.fetch(user);
       const context = new InitialExecutionContext(
         command,
         this.commandCaches,
         message,
         parser as ParserEngine<InitialParsedValues>,
-        user,
-        member ? new GuildMemberContext(member) : undefined
+        guildContext
       );
       await this.executeCommand(command, context);
     });
@@ -136,24 +131,24 @@ export default class CommandModule extends Module {
       if (cacheIds.length === 0) return;
       const caches = await this.commandCaches.fetchCaches(cacheIds);
 
-      const userWrapper = await this.userManager.fetch(user);
-
       if (reaction.message.partial) await reaction.message.fetch();
-      const guild = reaction.message.guild
-        ? await this.guildManager.fetch(reaction.message.guild)
+      const guildContext = reaction.message.guild
+        ? await this.createGuildMemberContext(await reaction.message.guild.members.fetch(user))
         : undefined;
-      const member = await guild?.members.fetch(user);
-      const guildContext = member ? new GuildMemberContext(member) : undefined;
 
       await Promise.all(
         caches.map(cache =>
           this.executeCommand(
             cache.command,
-            new ReactionExecutionContext(cache.command, cache, reaction, userWrapper, guildContext)
+            new ReactionExecutionContext(cache.command, cache, reaction, user as User, guildContext)
           )
         )
       );
     });
+  }
+
+  private async createGuildMemberContext(member: GuildMember): Promise<GuildMemberContext> {
+    return new GuildMemberContext(await this.guildSettings.fetch(member), member);
   }
 
   private async executeCommand<

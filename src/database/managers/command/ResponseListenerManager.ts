@@ -1,11 +1,9 @@
-import {Message, TextBasedChannelResolvable} from 'discord.js';
+import {Message, TextBasedChannelResolvable, UserManager, UserResolvable} from 'discord.js';
 import {injectable} from 'tsyringe';
 import {Connection, FindConditions} from 'typeorm';
-import resolveTextBasedChannelId from '../../../utils/resolveTextBasedChannelId';
+import {resolveTextBasedChannelId, resolveIdChecked} from '../../../utils/resolve';
 import ResponseListenerEntity from '../../entities/command/ResponseListenerEntity';
 import EntityManager from '../../manager/EntityManager';
-import {UserWrapperResolvable} from '../../wrappers/UserWrapper';
-import UserManager from '../UserManager';
 
 @injectable()
 export default class ResponseListenerManager extends EntityManager<ResponseListenerEntity> {
@@ -19,12 +17,12 @@ export default class ResponseListenerManager extends EntityManager<ResponseListe
   async addListener(
     cacheId: number,
     channel: TextBasedChannelResolvable,
-    user?: UserWrapperResolvable
+    user?: UserResolvable
   ): Promise<void> {
     await this.removeListener(cacheId, channel, user);
     await this.repo.insert({
       channel: resolveTextBasedChannelId(channel),
-      user: user === undefined ? '' : this.userManager.resolveIdChecked(user),
+      user: user === undefined ? '' : resolveIdChecked(this.userManager, user),
       cache: cacheId,
     });
   }
@@ -32,13 +30,13 @@ export default class ResponseListenerManager extends EntityManager<ResponseListe
   async removeListener(
     cacheId: number,
     channel?: TextBasedChannelResolvable,
-    user?: UserWrapperResolvable
+    user?: UserResolvable
   ): Promise<void> {
     const conditions: FindConditions<ResponseListenerEntity> = {
       cache: cacheId,
     };
     if (channel) conditions.channel = resolveTextBasedChannelId(channel);
-    if (user) conditions.user = this.userManager.resolveIdChecked(user);
+    if (user) conditions.user = resolveIdChecked(this.userManager, user);
     await this.repo.delete(conditions);
   }
 

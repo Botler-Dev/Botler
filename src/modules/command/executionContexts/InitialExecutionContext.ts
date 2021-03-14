@@ -5,7 +5,6 @@ import CommandCacheWrapper, {
   CacheFromCommandCacheWrapper,
   ConcreteCommandCacheWrapper,
 } from '../../../database/wrappers/command/CommandCacheWrapper';
-import UserWrapper from '../../../database/wrappers/UserWrapper';
 import type Command from '../command/Command';
 import {ParseResult} from '../parser/parser';
 import ParserEngine, {EmptyParseResults, ParseResults} from '../parser/ParserEngine';
@@ -33,10 +32,9 @@ export default class InitialExecutionContext<
     cacheManager: CommandCacheManager,
     message: Message,
     parser: ParserEngine<InitialParsedValues & TExistingParseResults>,
-    user: UserWrapper,
     guild: GuildMemberContext | undefined
   ) {
-    super(command, undefined, message, parser, user, guild);
+    super(command, undefined, message, parser, guild);
     this.cacheManager = cacheManager;
   }
 

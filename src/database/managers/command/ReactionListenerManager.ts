@@ -1,10 +1,17 @@
-import {EmojiResolvable, Message, MessageReaction, MessageResolvable, User} from 'discord.js';
+import {
+  EmojiResolvable,
+  Message,
+  MessageReaction,
+  MessageResolvable,
+  User,
+  UserManager,
+  UserResolvable,
+} from 'discord.js';
 import {injectable} from 'tsyringe';
 import {Connection, FindConditions} from 'typeorm';
+import {resolveIdChecked} from '../../../utils/resolve';
 import ReactionListenerEntity from '../../entities/command/ReactionListenerEntity';
 import EntityManager from '../../manager/EntityManager';
-import {UserWrapperResolvable} from '../../wrappers/UserWrapper';
-import UserManager from '../UserManager';
 
 @injectable()
 export default class ReactionListenerManager extends EntityManager<ReactionListenerEntity> {
@@ -23,13 +30,13 @@ export default class ReactionListenerManager extends EntityManager<ReactionListe
   async addListener(
     cacheId: number,
     message: MessageResolvable,
-    user?: UserWrapperResolvable,
+    user?: UserResolvable,
     emoji?: EmojiResolvable | string
   ): Promise<void> {
     await this.removeListener(cacheId, message, user, emoji);
     await this.repo.insert({
       message: message instanceof Message ? message.id : message,
-      user: user === undefined ? '' : this.userManager.resolveIdChecked(user),
+      user: user === undefined ? '' : resolveIdChecked(this.userManager, user),
       emoji: emoji === undefined ? '' : ReactionListenerManager.resolveEmojiIdentifier(emoji),
       cache: cacheId,
     });
@@ -38,14 +45,14 @@ export default class ReactionListenerManager extends EntityManager<ReactionListe
   async removeListener(
     cacheId: number,
     message?: MessageResolvable,
-    user?: UserWrapperResolvable,
+    user?: UserResolvable,
     emoji?: EmojiResolvable | string
   ): Promise<void> {
     const conditions: FindConditions<ReactionListenerEntity> = {
       cache: cacheId,
     };
     if (message) conditions.message = message instanceof Message ? message.id : message;
-    if (user) conditions.user = this.userManager.resolveIdChecked(user);
+    if (user) conditions.user = resolveIdChecked(this.userManager, user);
     if (emoji) conditions.emoji = ReactionListenerManager.resolveEmojiIdentifier(emoji);
     await this.repo.delete(conditions);
   }

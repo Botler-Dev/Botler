@@ -1,8 +1,7 @@
-import {MessageReaction} from 'discord.js';
+import {MessageReaction, User} from 'discord.js';
 import CommandCacheWrapper, {
   ConcreteCommandCacheWrapper,
 } from '../../../database/wrappers/command/CommandCacheWrapper';
-import UserWrapper from '../../../database/wrappers/UserWrapper';
 import Command from '../command/Command';
 import GuildMemberContext from './guild/GuildMemberContext';
 import UserExecutionContext from './UserExecutionContext';
@@ -17,7 +16,7 @@ export default class ReactionExecutionContext<
     command: TCommand,
     cache: TCache,
     reaction: MessageReaction,
-    user: UserWrapper,
+    user: User,
     guild: GuildMemberContext | undefined
   ) {
     super(command, cache, user, guild);

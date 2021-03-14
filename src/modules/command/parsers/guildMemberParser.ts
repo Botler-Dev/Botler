@@ -1,7 +1,5 @@
-import {GuildMember} from 'discord.js';
+import {GuildMember, GuildMemberManager} from 'discord.js';
 import {compareTwoStrings} from 'string-similarity';
-import GuildMemberManager from '../../../database/managers/GuildMemberManager';
-import GuildMemberWrapper from '../../../database/wrappers/GuildMemberWrapper';
 import {optional} from '../../../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
 import {Parser, ParseResult} from '../parser/parser';
@@ -56,7 +54,7 @@ const guildMemberParseOptionsDefinition: OptionsCleanerDefinition<
   similarityThreshold: optional(0.3),
 };
 
-export type GuildMemberParseResult = ParseResult<GuildMemberWrapper>;
+export type GuildMemberParseResult = ParseResult<GuildMember>;
 
 const DISCORD_NAME_MAX_LENGTH = 32;
 
@@ -91,26 +89,26 @@ export function guildMemberParser(
 
     const nameResult = await stringParser(cleaned.nameParseOptions)(raw);
     if (!nameResult) return undefined;
-    const generateNameSearchResult = async (member: GuildMember) => ({
-      value: await guildMemberManager.fetch(member),
+    const generateResult = (member: GuildMember) => ({
+      value: member,
       length: nameResult.length,
     });
 
     if (cleaned.searchUsername && nameResult.value.length <= DISCORD_NAME_MAX_LENGTH) {
       const member = (
-        await guildMemberManager.guild.discord.members.fetch({
+        await guildMemberManager.guild.members.fetch({
           query: nameResult.value,
           limit: 1,
         })
       ).first();
-      if (member?.user.username === nameResult.value) return generateNameSearchResult(member);
+      if (member?.user.username === nameResult.value) return generateResult(member);
     }
 
-    const members = await guildMemberManager.guild.discord.members.fetch();
+    const members = await guildMemberManager.guild.members.fetch();
 
     if (cleaned.searchNickname && nameResult.value.length <= DISCORD_NAME_MAX_LENGTH) {
       const member = members.find(potentialMember => potentialMember.nickname === nameResult.value);
-      if (member) return generateNameSearchResult(member);
+      if (member) return generateResult(member);
     }
 
     if (!cleaned.allowSimilar) return undefined;
@@ -134,6 +132,6 @@ export function guildMemberParser(
     });
 
     if (!member || highestSimilarity < cleaned.similarityThreshold) return undefined;
-    return generateNameSearchResult(member);
+    return generateResult(member);
   };
 }

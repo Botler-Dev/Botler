@@ -2,7 +2,6 @@ import {Message} from 'discord.js';
 import CommandCacheWrapper, {
   ConcreteCommandCacheWrapper,
 } from '../../../database/wrappers/command/CommandCacheWrapper';
-import UserWrapper from '../../../database/wrappers/UserWrapper';
 import type Command from '../command/Command';
 import ParserEngine, {ParseResults} from '../parser/ParserEngine';
 import GuildMemberContext from './guild/GuildMemberContext';
@@ -22,10 +21,9 @@ export default abstract class MessageExecutionContext<
     cache: TCacheState,
     message: Message,
     parser: ParserEngine<TExistingParseResults>,
-    user: UserWrapper,
     guild: GuildMemberContext | undefined
   ) {
-    super(command, cache, user, guild);
+    super(command, cache, message.author, guild);
     this.message = message;
     this.parser = parser;
   }

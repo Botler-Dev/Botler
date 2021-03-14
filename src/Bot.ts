@@ -1,4 +1,4 @@
-import {Client} from 'discord.js';
+import {ChannelManager, Client, GuildEmojiManager, GuildManager, UserManager} from 'discord.js';
 import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {container} from 'tsyringe';
 import {Connection, createConnection} from 'typeorm';
@@ -6,9 +6,6 @@ import {Connection, createConnection} from 'typeorm';
 import DatabaseEventHub from './database/DatabaseEventHub';
 import DatabaseCleaner from './database/DatabaseCleaner';
 import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
-import GuildManager from './database/managers/GuildManager';
-import UserManager from './database/managers/UserManager';
-import GuildMemberSynchronizer from './database/synchronizers/GuildMemberSynchronizer';
 import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
 import MasterLogger from './logger/MasterLogger';
 import ScopedLogger, {proxyNativeConsole} from './logger/ScopedLogger';
@@ -32,12 +29,6 @@ export default class Bot {
   private globalSettings!: GlobalSettingsWrapper;
 
   private client!: Client;
-
-  private userManager!: UserManager;
-
-  private guildMemberSynchronizer!: GuildMemberSynchronizer;
-
-  private guildManager!: GuildManager;
 
   private moduleLoader!: ModuleLoader;
 
@@ -69,19 +60,11 @@ export default class Bot {
       disableMentions: 'everyone',
       partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
     });
-    container.register(Client, {useValue: this.client});
-
-    this.userManager = new UserManager();
-    container.registerInstance(UserManager, this.userManager);
-    await this.userManager.initialize();
-
-    this.guildMemberSynchronizer = new GuildMemberSynchronizer();
-    container.registerInstance(GuildMemberSynchronizer, this.guildMemberSynchronizer);
-    await this.guildMemberSynchronizer.initialize();
-
-    this.guildManager = new GuildManager();
-    container.register(GuildManager, {useValue: this.guildManager});
-    await this.guildManager.initialize();
+    container.registerInstance(Client, this.client);
+    container.registerInstance(UserManager, this.client.users);
+    container.registerInstance(GuildManager, this.client.guilds);
+    container.registerInstance(ChannelManager, this.client.channels);
+    container.registerInstance(GuildEmojiManager, this.client.emojis);
 
     this.moduleLoader = new ModuleLoader([CommandModule]);
     container.registerInstance(ModuleLoader, this.moduleLoader);

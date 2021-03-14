@@ -1,9 +1,13 @@
-import GuildWrapper from '../../../../database/wrappers/GuildWrapper';
+import {Guild} from 'discord.js';
+import CommandGuildSettingsWrapper from '../../../../database/wrappers/command/CommandGuildSettingsWrapper';
 
 export default class GuildContext {
-  readonly guild: GuildWrapper;
+  readonly guild: Guild;
 
-  constructor(guild: GuildWrapper) {
-    this.guild = guild;
+  readonly settings: CommandGuildSettingsWrapper;
+
+  constructor(guildSettings: CommandGuildSettingsWrapper) {
+    this.guild = guildSettings.guild;
+    this.settings = guildSettings;
   }
 }

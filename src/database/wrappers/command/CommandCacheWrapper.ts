@@ -1,10 +1,9 @@
 import dayjs, {Dayjs} from 'dayjs';
 import {FindConditions} from 'typeorm';
-import {EmojiResolvable, MessageResolvable, TextBasedChannelResolvable} from 'discord.js';
+import {EmojiResolvable, MessageResolvable, TextBasedChannelResolvable, UserResolvable} from 'discord.js';
 import CachedEntityWrapper from '../../wrapper/CachedEntityWrapper';
 import CommandCacheEntity from '../../entities/command/CommandCacheEntity';
 import type CommandCacheManager from '../../managers/command/CommandCacheManager';
-import {UserWrapperResolvable} from '../UserWrapper';
 import ResponseListenerManager from '../../managers/command/ResponseListenerManager';
 import ReactionListenerManager from '../../managers/command/ReactionListenerManager';
 import type Command from '../../../modules/command/command/Command';
@@ -87,21 +86,21 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
 
   async addResponseListener(
     channel: TextBasedChannelResolvable,
-    user?: UserWrapperResolvable
+    user?: UserResolvable
   ): Promise<void> {
     this.responseListenerManager.addListener(this.id, channel, user);
   }
 
   async removeResponseListener(
     channel?: TextBasedChannelResolvable,
-    user?: UserWrapperResolvable
+    user?: UserResolvable
   ): Promise<void> {
     this.responseListenerManager.removeListener(this.id, channel, user);
   }
 
   async addReactionListener(
     message: MessageResolvable,
-    user?: UserWrapperResolvable,
+    user?: UserResolvable,
     emoji?: EmojiResolvable | string
   ): Promise<void> {
     this.reactionListenerManager.addListener(this.id, message, user, emoji);
@@ -109,7 +108,7 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
 
   async removeReactionListener(
     message?: MessageResolvable,
-    user?: UserWrapperResolvable,
+    user?: UserResolvable,
     emoji?: EmojiResolvable | string
   ): Promise<void> {
     this.reactionListenerManager.removeListener(this.id, message, user, emoji);

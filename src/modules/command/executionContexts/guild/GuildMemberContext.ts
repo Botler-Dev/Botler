@@ -1,11 +1,12 @@
-import GuildMemberWrapper from '../../../../database/wrappers/GuildMemberWrapper';
+import {GuildMember} from 'discord.js';
+import CommandGuildSettingsWrapper from '../../../../database/wrappers/command/CommandGuildSettingsWrapper';
 import GuildContext from './GuildContext';
 
 export default class GuildMemberContext extends GuildContext {
-  readonly member: GuildMemberWrapper;
+  readonly member: GuildMember;
 
-  constructor(member: GuildMemberWrapper) {
-    super(member.guild);
+  constructor(guildSettings: CommandGuildSettingsWrapper, member: GuildMember) {
+    super(guildSettings);
     this.member = member;
   }
 }

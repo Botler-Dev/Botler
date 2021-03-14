@@ -1,14 +1,13 @@
-import {Snowflake} from 'discord.js';
+import {Snowflake, UserManager, UserResolvable} from 'discord.js';
 import {filter, tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
 import {FindConditions} from 'typeorm';
 import ScopedLogger from '../../logger/ScopedLogger';
+import {resolveIdChecked} from '../../utils/resolve';
 import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
 import type GlobalSettingsManager from '../managers/GlobalSettingsManager';
-import UserManager from '../managers/UserManager';
 import {SyncStream} from '../synchronizer/CacheSynchronizer';
 import SynchronizedEntityWrapper from '../wrapper/SynchronizedEntityWrapper';
-import {UserWrapperResolvable} from './UserWrapper';
 
 export enum ColorType {
   Default,
@@ -89,8 +88,8 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
     return false;
   }
 
-  isBotMaster(user: UserWrapperResolvable): boolean {
-    const id = this.userManager.resolveIdChecked(user);
+  isBotMaster(user: UserResolvable): boolean {
+    const id = resolveIdChecked(this.userManager, user);
     return this.botMasterIds.includes(id);
   }
 

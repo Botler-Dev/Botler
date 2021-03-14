@@ -1,5 +1,4 @@
-import UserManager from '../../../database/managers/UserManager';
-import UserWrapper from '../../../database/wrappers/UserWrapper';
+import {User, UserManager} from 'discord.js';
 import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
 import {Parser, ParseResult} from '../parser/parser';
 import snowflakeParser, {SnowflakeType} from './snowflakeParser';
@@ -17,7 +16,7 @@ const userParseOptionsDefinition: OptionsCleanerDefinition<
   CleanUserParseOptions
 > = {};
 
-export type UserParseResult = ParseResult<UserWrapper>;
+export type UserParseResult = ParseResult<User>;
 
 export function userParser(
   userManager: UserManager,
