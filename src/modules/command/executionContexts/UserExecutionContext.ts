@@ -1,4 +1,4 @@
-import { User } from 'discord.js';
+import {User} from 'discord.js';
 import {ConcreteCommandCacheWrapper} from '../../../database/wrappers/command/CommandCacheWrapper';
 import type Command from '../command/Command';
 import BaseExecutionContext from './BaseExecutionContext';
