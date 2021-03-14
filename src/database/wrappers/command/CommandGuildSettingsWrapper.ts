@@ -1,7 +1,7 @@
 import {Guild} from 'discord.js';
 import {FindConditions} from 'typeorm';
 import CommandGuildSettingsEntity from '../../entities/command/CommandGuildSettingsEntity';
-import CommandGuildSettingsManager from '../../managers/command/CommandGuildSettingsManager';
+import type CommandGuildSettingsManager from '../../managers/command/CommandGuildSettingsManager';
 import {SyncStream} from '../../synchronizer/CacheSynchronizer';
 import SynchronizedEntityWrapper from '../../wrapper/SynchronizedEntityWrapper';
 import GlobalSettingsWrapper from '../GlobalSettingsWrapper';
