@@ -10,6 +10,12 @@ export function generateUpdateSyncTriggerCreateStatement(tableName: string): str
   `;
 }
 
+export function generateUpdateSyncTriggerDropStatement(tableName: string): string {
+  return `
+    DROP TRIGGER ${tableName}_update_trigger ON "${tableName}";
+  `;
+}
+
 export function generateInsertSyncTriggerCreateStatement(tableName: string): string {
   return `
     CREATE CONSTRAINT TRIGGER ${tableName}_insert_trigger
@@ -18,6 +24,12 @@ export function generateInsertSyncTriggerCreateStatement(tableName: string): str
       DEFERRABLE INITIALLY DEFERRED
       FOR EACH ROW
     EXECUTE FUNCTION trigger_notify_entity_insert_or_update();
+  `;
+}
+
+export function generateInsertSyncTriggerDropStatement(tableName: string): string {
+  return `
+    DROP TRIGGER ${tableName}_insert_trigger ON "${tableName}";
   `;
 }
 
@@ -36,6 +48,12 @@ export function generateDeleteSyncTriggerCreateStatement(
   `;
 }
 
+export function generateDeleteSyncTriggerDropStatement(tableName: string): string {
+  return `
+    DROP TRIGGER ${tableName}_delete_trigger ON "${tableName}";
+  `;
+}
+
 export function generateAllSyncTriggerCreateStatements(
   tableName: string,
   deletePayloadColumns: string[]
@@ -44,5 +62,13 @@ export function generateAllSyncTriggerCreateStatements(
     generateUpdateSyncTriggerCreateStatement(tableName) +
     generateInsertSyncTriggerCreateStatement(tableName) +
     generateDeleteSyncTriggerCreateStatement(tableName, deletePayloadColumns)
+  );
+}
+
+export function generateAllSyncTriggerDropStatements(tableName: string): string {
+  return (
+    generateUpdateSyncTriggerDropStatement(tableName) +
+    generateInsertSyncTriggerDropStatement(tableName) +
+    generateDeleteSyncTriggerDropStatement(tableName)
   );
 }
