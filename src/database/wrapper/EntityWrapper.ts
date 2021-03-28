@@ -31,7 +31,7 @@ export default abstract class EntityWrapper<
 
   async save(): Promise<void> {
     if (this.entity === undefined || this.isEntityUseless()) {
-      await this.manager.repo.delete(this.uniqueConditions);
+      await this.delete();
       return;
     }
     await this.manager.repo.save(this.entity as Exclude<TEntityState, undefined>);
