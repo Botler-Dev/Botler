@@ -9,7 +9,10 @@ export default class CommandCacheEntity<TCache = unknown> {
    * Delay in milliseconds after expiration before a cache can get deleted.
    * This prevents a cache from being deleted while still being processed.
    */
-  static readonly DELETE_DELAY = dayjs.duration(5, 'minutes');
+  // TODO: switch to Prisma and move this constant somewhere else
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  static readonly DELETE_DELAY = dayjs.duration?.(5, 'minutes');
 
   @PrimaryGeneratedColumn('increment')
   id!: number;
