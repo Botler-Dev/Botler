@@ -12,16 +12,24 @@ import {from} from 'rxjs';
 import {mergeAll} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
 import {Connection} from 'typeorm';
+import {ReactionAction} from '../../../../modules/command/executionContexts/ReactionExecutionContext';
 import {resolveIdChecked} from '../../../../utils/resolve';
 import DatabaseEventHub from '../../../DatabaseEventHub';
-import ReactionListenerEntity from '../../../entities/command/ReactionListenerEntity';
+import ReactionListenerEntity, {
+  toReactiveListenerActionFilter,
+} from '../../../entities/command/ReactionListenerEntity';
 import EntityManager from '../../../manager/EntityManager';
 import ListenerCriterionCache from './ListenerCriterionCache';
 
 @injectable()
 export default class ReactionListenerManager extends EntityManager<ReactionListenerEntity> {
   private readonly cache = new ListenerCriterionCache<
-    [messageId?: Snowflake, userId?: Snowflake, emojiId?: Snowflake | string]
+    [
+      messageId?: Snowflake,
+      userId?: Snowflake,
+      emojiId?: Snowflake | string,
+      action?: ReactionAction
+    ]
   >();
 
   private readonly userManager: UserManager;
@@ -74,15 +82,17 @@ export default class ReactionListenerManager extends EntityManager<ReactionListe
     cacheId: number,
     message: MessageResolvable,
     user?: UserResolvable,
-    emoji?: EmojiResolvable | string
+    emoji?: EmojiResolvable | string,
+    action?: ReactionAction
   ): Promise<void> {
     const {messageId, userId, emojiId} = this.resolveParameters<never>(message, user, emoji);
-    await this.removeListener(cacheId, messageId, userId, emojiId);
-    this.cache.add(cacheId, messageId, userId, emojiId);
+    await this.removeListener(cacheId, messageId, userId, emojiId, action);
+    this.cache.add(cacheId, messageId, userId, emojiId, action);
     await this.repo.insert({
       message: messageId,
       user: userId ?? '',
       emoji: emojiId ?? '',
+      action: toReactiveListenerActionFilter(action),
       cache: cacheId,
     });
   }
@@ -91,23 +101,26 @@ export default class ReactionListenerManager extends EntityManager<ReactionListe
     cacheId: number,
     message?: MessageResolvable,
     user?: UserResolvable,
-    emoji?: EmojiResolvable | string
+    emoji?: EmojiResolvable | string,
+    action?: ReactionAction
   ): Promise<void> {
     const {messageId, userId, emojiId} = this.resolveParameters(message, user, emoji);
-    this.cache.remove(cacheId, messageId, userId, emojiId);
+    this.cache.remove(cacheId, messageId, userId, emojiId, action);
     await this.repo.delete({
       cache: cacheId,
       message: messageId,
       user: userId,
       emoji: emojiId,
+      action: action !== undefined ? toReactiveListenerActionFilter(action) : undefined,
     });
   }
 
-  findCacheIds(reaction: MessageReaction, user: User): number[] {
+  findCacheIds(reaction: MessageReaction, user: User, action: ReactionAction): number[] {
     return this.cache.find(
       reaction.message.id,
       user.id,
-      ReactionListenerManager.resolveEmojiIdentifier(reaction.emoji)
+      ReactionListenerManager.resolveEmojiIdentifier(reaction.emoji),
+      action
     );
   }
 }

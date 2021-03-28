@@ -10,8 +10,9 @@ import CachedEntityWrapper from '../../wrapper/CachedEntityWrapper';
 import CommandCacheEntity from '../../entities/command/CommandCacheEntity';
 import type CommandCacheManager from '../../managers/command/CommandCacheManager';
 import ResponseListenerManager from '../../managers/command/listener/ResponseListenerManager';
-import ReactionListenerManager from '../../managers/command/listener/ReactionListenerManager';
+import type ReactionListenerManager from '../../managers/command/listener/ReactionListenerManager';
 import type Command from '../../../modules/command/command/Command';
+import type {ReactionAction} from '../../../modules/command/executionContexts/ReactionExecutionContext';
 
 export type CacheFromCommandCacheWrapper<
   TWrapper extends ConcreteCommandCacheWrapper
@@ -106,17 +107,19 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
   async addReactionListener(
     message: MessageResolvable,
     user?: UserResolvable,
-    emoji?: EmojiResolvable | string
+    emoji?: EmojiResolvable | string,
+    action?: ReactionAction
   ): Promise<void> {
-    this.reactionListenerManager.addListener(this.id, message, user, emoji);
+    this.reactionListenerManager.addListener(this.id, message, user, emoji, action);
   }
 
   async removeReactionListener(
     message?: MessageResolvable,
     user?: UserResolvable,
-    emoji?: EmojiResolvable | string
+    emoji?: EmojiResolvable | string,
+    action?: ReactionAction
   ): Promise<void> {
-    this.reactionListenerManager.removeListener(this.id, message, user, emoji);
+    this.reactionListenerManager.removeListener(this.id, message, user, emoji, action);
   }
 
   // eslint-disable-next-line class-methods-use-this

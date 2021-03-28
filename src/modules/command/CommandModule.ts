@@ -1,4 +1,4 @@
-import {Client, GuildMember, Message, User} from 'discord.js';
+import {Client, GuildMember, Message, MessageReaction, PartialUser, User} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 
 import GlobalSettingsWrapper from '../../database/wrappers/GlobalSettingsWrapper';
@@ -21,7 +21,9 @@ import {ConcreteCommandCacheWrapper} from '../../database/wrappers/command/Comma
 import MessageExecutionContext from './executionContexts/MessageExecutionContext';
 import ExecutionContext from './executionContexts/ExecutionContext';
 import ResponseExecutionContext from './executionContexts/ResponseExecutionContext';
-import ReactionExecutionContext from './executionContexts/ReactionExecutionContext';
+import ReactionExecutionContext, {
+  ReactionAction,
+} from './executionContexts/ReactionExecutionContext';
 import ParserEngine, {ParseResults} from './parser/ParserEngine';
 import {commandParser} from './parsers/commandParser';
 import CommandGuildSettingsManager from '../../database/managers/command/CommandGuildSettingsManager';
@@ -123,30 +125,47 @@ export default class CommandModule extends Module {
       await this.executeCommand(command, context);
     });
 
-    this.client.on('messageReactionAdd', async (reaction, user) => {
-      if (user.bot) return;
-      if (reaction.partial) await reaction.fetch();
-      // eslint-disable-next-line no-param-reassign
-      if (user.partial) user = await user.fetch();
+    this.client.on('messageReactionAdd', (reaction, user) =>
+      this.processReactionEvent(reaction, user, ReactionAction.Add)
+    );
+    this.client.on('messageReactionRemove', (reaction, user) =>
+      this.processReactionEvent(reaction, user, ReactionAction.Remove)
+    );
+  }
 
-      const cacheIds = this.reactionListeners.findCacheIds(reaction, user);
-      if (cacheIds.length === 0) return;
-      const caches = await this.commandCaches.fetchCaches(cacheIds);
+  private async processReactionEvent(
+    reaction: MessageReaction,
+    user: User | PartialUser,
+    action: ReactionAction
+  ): Promise<void> {
+    if (user.bot) return;
+    if (reaction.partial) await reaction.fetch();
+    // eslint-disable-next-line no-param-reassign
+    if (user.partial) user = await user.fetch();
+    const cacheIds = this.reactionListeners.findCacheIds(reaction, user, action);
+    if (cacheIds.length === 0) return;
+    const caches = await this.commandCaches.fetchCaches(cacheIds);
 
-      if (reaction.message.partial) await reaction.message.fetch();
-      const guildContext = reaction.message.guild
-        ? await this.createGuildMemberContext(await reaction.message.guild.members.fetch(user))
-        : undefined;
+    if (reaction.message.partial) await reaction.message.fetch();
+    const guildContext = reaction.message.guild
+      ? await this.createGuildMemberContext(await reaction.message.guild.members.fetch(user))
+      : undefined;
 
-      await Promise.all(
-        caches.map(cache =>
-          this.executeCommand(
+    await Promise.all(
+      caches.map(cache =>
+        this.executeCommand(
+          cache.command,
+          new ReactionExecutionContext(
             cache.command,
-            new ReactionExecutionContext(cache.command, cache, reaction, user as User, guildContext)
+            cache,
+            reaction,
+            action,
+            user as User,
+            guildContext
           )
         )
-      );
-    });
+      )
+    );
   }
 
   private async createGuildMemberContext(member: GuildMember): Promise<GuildMemberContext> {

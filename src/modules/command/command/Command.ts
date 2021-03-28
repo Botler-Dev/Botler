@@ -1,7 +1,7 @@
 import {DependencyContainer} from 'tsyringe';
 import CommandCacheEntity from '../../../database/entities/command/CommandCacheEntity';
 import type CommandCacheManager from '../../../database/managers/command/CommandCacheManager';
-import ReactionListenerManager from '../../../database/managers/command/listener/ReactionListenerManager';
+import type ReactionListenerManager from '../../../database/managers/command/listener/ReactionListenerManager';
 import ResponseListenerManager from '../../../database/managers/command/listener/ResponseListenerManager';
 import {
   CacheFromCommandCacheWrapper,
