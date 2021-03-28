@@ -5,6 +5,7 @@ import {singleton} from 'tsyringe';
 import ScopedLogger from '../logger/ScopedLogger';
 import {required, stack, toNumber} from '../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
+import {exit, ExitCode, exitWithError} from '../utils/process';
 
 export interface RawClientConfig {
   user?: string;
@@ -57,9 +58,10 @@ export default class DatabaseEventHub {
     this.subscriber.events.on('connected', () =>
       this.logger.info('Successfully reconnected to database.')
     );
-    this.subscriber.events.on('error', error =>
-      this.logger.error('Encountered an unexpected error.', error)
-    );
+    this.subscriber.events.on('error', error => {
+      this.logger.error('Subscriber encountered an unexpected error.', error);
+      exit(ExitCode.DatabaseEventHubError);
+    });
     this.subscriber.events.on('reconnect', attempts =>
       this.logger.warn(`Lost connection to database. Attempt ${attempts} of trying to reconnect.`)
     );

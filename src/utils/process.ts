@@ -5,6 +5,7 @@ export enum ExitCode {
   UnexpectedError = 1,
   InvalidConfiguration = 2,
   BotTokenChanged = 3,
+  DatabaseEventHubError = 4,
 }
 
 export function exit(code: ExitCode): never {
