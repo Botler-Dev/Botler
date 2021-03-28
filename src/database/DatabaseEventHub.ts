@@ -5,7 +5,7 @@ import {singleton} from 'tsyringe';
 import ScopedLogger from '../logger/ScopedLogger';
 import {required, stack, toNumber} from '../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
-import {exit, ExitCode, exitWithError} from '../utils/process';
+import {exit, ExitCode} from '../utils/process';
 
 export interface RawClientConfig {
   user?: string;
