@@ -14,8 +14,8 @@ import GuildMemberContext from './executionContexts/guild/GuildMemberContext';
 import InitialExecutionContext, {
   InitialParsedValues,
 } from './executionContexts/InitialExecutionContext';
-import ReactionListenerManager from '../../database/managers/command/ReactionListenerManager';
-import ResponseListenerManager from '../../database/managers/command/ResponseListenerManager';
+import ReactionListenerManager from '../../database/managers/command/listener/ReactionListenerManager';
+import ResponseListenerManager from '../../database/managers/command/listener/ResponseListenerManager';
 import Command from './command/Command';
 import {ConcreteCommandCacheWrapper} from '../../database/wrappers/command/CommandCacheWrapper';
 import MessageExecutionContext from './executionContexts/MessageExecutionContext';
@@ -76,6 +76,8 @@ export default class CommandModule extends Module {
   }
 
   async preInitialize(): Promise<void> {
+    await this.responseListeners.initialize();
+    await this.reactionListeners.initialize();
     await this.guildSettings.initialize();
   }
 
@@ -87,7 +89,7 @@ export default class CommandModule extends Module {
         ? await this.createGuildMemberContext(message.member)
         : undefined;
 
-      const cacheIds = await this.responseListeners.findCacheIds(message);
+      const cacheIds = this.responseListeners.findCacheIds(message);
       const caches = await this.commandCaches.fetchCaches(cacheIds);
       if (caches.length > 0) {
         await Promise.all(
@@ -127,7 +129,7 @@ export default class CommandModule extends Module {
       // eslint-disable-next-line no-param-reassign
       if (user.partial) user = await user.fetch();
 
-      const cacheIds = await this.reactionListeners.findCacheIds(reaction, user);
+      const cacheIds = this.reactionListeners.findCacheIds(reaction, user);
       if (cacheIds.length === 0) return;
       const caches = await this.commandCaches.fetchCaches(cacheIds);
 

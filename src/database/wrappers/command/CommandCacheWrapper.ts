@@ -9,8 +9,8 @@ import {
 import CachedEntityWrapper from '../../wrapper/CachedEntityWrapper';
 import CommandCacheEntity from '../../entities/command/CommandCacheEntity';
 import type CommandCacheManager from '../../managers/command/CommandCacheManager';
-import ResponseListenerManager from '../../managers/command/ResponseListenerManager';
-import ReactionListenerManager from '../../managers/command/ReactionListenerManager';
+import ResponseListenerManager from '../../managers/command/listener/ResponseListenerManager';
+import ReactionListenerManager from '../../managers/command/listener/ReactionListenerManager';
 import type Command from '../../../modules/command/command/Command';
 
 export type CacheFromCommandCacheWrapper<
@@ -126,5 +126,10 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
 
   isExpired(now = dayjs()): boolean {
     return now.isAfter(this.expirationDateTime);
+  }
+
+  async delete(): Promise<void> {
+    this.uncache();
+    await super.delete();
   }
 }

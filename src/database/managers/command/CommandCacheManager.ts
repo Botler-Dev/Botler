@@ -7,8 +7,8 @@ import CommandCacheWrapper, {
   CacheFromCommandCacheWrapper,
   ConcreteCommandCacheWrapper,
 } from '../../wrappers/command/CommandCacheWrapper';
-import ReactionListenerManager from './ReactionListenerManager';
-import ResponseListenerManager from './ResponseListenerManager';
+import ReactionListenerManager from './listener/ReactionListenerManager';
+import ResponseListenerManager from './listener/ResponseListenerManager';
 import CommandManager from '../../../modules/command/CommandManager';
 import ScopedLogger from '../../../logger/ScopedLogger';
 import Command from '../../../modules/command/command/Command';
