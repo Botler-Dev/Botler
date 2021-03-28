@@ -130,6 +130,7 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
 
   async delete(): Promise<void> {
     this.uncache();
+    clearTimeout(this.deleteTimeout);
     await super.delete();
   }
 }

@@ -10,6 +10,10 @@ export default class ListenerCriterionCache<TCriteria extends unknown[] = unknow
     ListenerCriterionCache<RemoveFirst<TCriteria>>
   >();
 
+  isEmpty(): boolean {
+    return this.commandCaches.size === 0 && this.nextCriterion.size === 0;
+  }
+
   add(cacheId: number, ...criteria: TCriteria): void {
     if (criteria.length === 0) {
       this.commandCaches.add(cacheId);
@@ -25,16 +29,19 @@ export default class ListenerCriterionCache<TCriteria extends unknown[] = unknow
 
   remove(cacheId: number, ...criteria: TCriteria): void {
     if (criteria.length === 0) this.commandCaches.delete(cacheId);
-    let nextCaches: ListenerCriterionCache[];
+    let nextCaches: [value: TCriteria[0], cache: ListenerCriterionCache<RemoveFirst<TCriteria>>][];
     if (criteria[0] === undefined) {
-      nextCaches = [...this.nextCriterion.values()];
+      nextCaches = [...this.nextCriterion.entries()];
     } else {
       const nextCache = this.nextCriterion.get(criteria[0]);
       if (!nextCache) return;
-      nextCaches = [nextCache];
+      nextCaches = [[criteria[0], nextCache]];
     }
-    const nextCriteria = criteria.slice(1);
-    nextCaches.forEach(cache => cache.remove(cacheId, nextCriteria));
+    const nextCriteria = criteria.slice(1) as RemoveFirst<TCriteria>;
+    nextCaches.forEach(([, cache]) => cache.remove(cacheId, ...nextCriteria));
+    nextCaches
+      .filter(([, cache]) => cache.isEmpty())
+      .forEach(([key]) => this.nextCriterion.delete(key));
   }
 
   find(...criteria: TCriteria): number[] {
