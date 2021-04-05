@@ -1,4 +1,5 @@
 import {Connection} from 'typeorm';
+import Logger from '../../logger/Logger';
 import {ExitCode, exitWithError} from '../../utils/process';
 import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
 import CacheManager from '../manager/CacheManager';
@@ -14,8 +15,11 @@ export default class GlobalSettingsManager extends CacheManager<
 > {
   private readonly synchronizer: GlobalSettingsSynchronizer;
 
-  constructor(connection?: Connection) {
+  private readonly logger: Logger;
+
+  constructor(connection: Connection, logger: Logger) {
     super(GlobalSettingsEntity, connection);
+    this.logger = logger;
     this.synchronizer = new GlobalSettingsSynchronizer(this.repo.metadata.tableName);
   }
 
@@ -23,7 +27,7 @@ export default class GlobalSettingsManager extends CacheManager<
     await this.synchronizer.initialize();
     const entity = await this.fetchEntity();
     const syncStream = this.synchronizer.getSyncStream(GlobalSettingsCacheKey);
-    const wrapper = new GlobalSettingsWrapper(this, syncStream, entity);
+    const wrapper = new GlobalSettingsWrapper(this, syncStream, entity, this.logger);
     this.cacheWrapper(GlobalSettingsCacheKey, wrapper);
     this.synchronizer.registerGlobalSettings(wrapper);
   }

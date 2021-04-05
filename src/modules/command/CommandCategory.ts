@@ -1,6 +1,6 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
-import ScopedLogger from '../../logger/ScopedLogger';
+import Logger from '../../logger/Logger';
 import type Command from './command/Command';
 import type {CommandName} from './command/Command';
 import CommandManager from './CommandManager';
@@ -32,7 +32,7 @@ export default class CommandCategory {
 
   private readonly container: DependencyContainer;
 
-  private readonly logger: ScopedLogger;
+  private readonly logger: Logger;
 
   private readonly commandManager: CommandManager;
 
@@ -47,7 +47,7 @@ export default class CommandCategory {
     this.description = description;
     this.path = `${parent?.path ?? ''}${name}/`;
     this.container = container;
-    this.logger = container.resolve(ScopedLogger);
+    this.logger = container.resolve(Logger);
     this.commandManager = container.resolve(CommandManager);
   }
 

@@ -2,7 +2,8 @@ import {ClientConfig} from 'pg';
 import createPostgresSubscriber, {Subscriber} from 'pg-listen';
 import {fromEvent, Observable} from 'rxjs';
 import {singleton} from 'tsyringe';
-import ScopedLogger from '../logger/ScopedLogger';
+import Logger from '../logger/Logger';
+import MasterLogger from '../logger/MasterLogger';
 import {required, stack, toNumber} from '../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
 import {exit, ExitCode} from '../utils/process';
@@ -19,7 +20,7 @@ export interface RawClientConfig {
 export default class DatabaseEventHub {
   private readonly subscriber: Subscriber;
 
-  private readonly logger = new ScopedLogger('event hub');
+  private readonly logger: Logger;
 
   private readonly _channels: Map<string, Observable<unknown>> = new Map();
 
@@ -28,7 +29,7 @@ export default class DatabaseEventHub {
   }
 
   // Don't use defaults here because they are defined in src/utils/environment.ts
-  private static readonly configCleanerDefinition: OptionsCleanerDefinition<
+  private static readonly envCleanerDefinition: OptionsCleanerDefinition<
     RawClientConfig,
     ClientConfig
   > = {
@@ -39,12 +40,13 @@ export default class DatabaseEventHub {
     host: required(),
   };
 
-  constructor(clientConfig = DatabaseEventHub.getEnvConfig()) {
+  constructor(masterLogger: MasterLogger, clientConfig = DatabaseEventHub.getEnvConfig()) {
     this.subscriber = createPostgresSubscriber(clientConfig);
+    this.logger = masterLogger.getScope('event hub');
   }
 
   private static getEnvConfig(): ClientConfig {
-    return cleanOptions(this.configCleanerDefinition, {
+    return cleanOptions(this.envCleanerDefinition, {
       user: process.env.TYPEORM_USERNAME,
       database: process.env.TYPEORM_DATABASE,
       password: process.env.TYPEORM_PASSWORD,

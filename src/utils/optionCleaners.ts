@@ -12,12 +12,12 @@ export function required<TRaw>(): SimpleOptionValueCleaner<TRaw, Exclude<TRaw, n
   };
 }
 
-export function optional<TInput, TOutput = Exclude<TInput, undefined | null>>(
-  defaultValue: TOutput
-): SimpleOptionValueCleaner<TInput, TOutput> {
+export function optional<TInput, TDefault = Exclude<TInput, undefined | null>>(
+  defaultValue: TDefault
+): SimpleOptionValueCleaner<TInput, Exclude<TInput, undefined | null> | TDefault> {
   return raw => {
     if (raw === undefined || raw === null) return defaultValue;
-    return (raw as unknown) as TOutput;
+    return raw as Exclude<TInput, undefined | null>;
   };
 }
 

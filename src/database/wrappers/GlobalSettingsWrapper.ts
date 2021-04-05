@@ -2,7 +2,7 @@ import {Snowflake, UserManager, UserResolvable} from 'discord.js';
 import {filter, tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
 import {FindConditions} from 'typeorm';
-import ScopedLogger from '../../logger/ScopedLogger';
+import Logger from '../../logger/Logger';
 import {resolveIdChecked} from '../../utils/resolve';
 import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
 import type GlobalSettingsManager from '../managers/GlobalSettingsManager';
@@ -51,7 +51,7 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
     };
   }
 
-  private readonly logger: ScopedLogger;
+  private readonly logger: Logger;
 
   // Cannot get the UserManager on object creation, because then it does not exist yet.
   private _userManager?: UserManager;
@@ -65,7 +65,7 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
     manager: GlobalSettingsManager,
     syncStream: SyncStream<GlobalSettingsEntity>,
     entity: GlobalSettingsEntity,
-    logger = container.resolve(ScopedLogger)
+    logger: Logger
   ) {
     super(
       manager,

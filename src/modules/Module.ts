@@ -1,6 +1,7 @@
 import {DependencyContainer} from 'tsyringe';
 
-import ScopedLogger from '../logger/ScopedLogger';
+import Logger from '../logger/Logger';
+import MasterLogger from '../logger/MasterLogger';
 import {ModuleConstructor, ModuleResolvable, resolveModuleName} from './ModuleConstructor';
 import ModuleLoader from './ModuleLoader';
 
@@ -17,13 +18,13 @@ export default abstract class Module {
 
   protected readonly moduleLoader: ModuleLoader;
 
-  protected readonly logger: ScopedLogger;
+  protected readonly logger: Logger;
 
   constructor(moduleContainer: DependencyContainer) {
     this.container = moduleContainer;
     this.moduleLoader = this.container.resolve(ModuleLoader);
-    this.logger = new ScopedLogger(this.name);
-    this.container.registerInstance(ScopedLogger, this.logger);
+    this.logger = this.container.resolve(MasterLogger).getScope(this.name);
+    this.container.registerInstance(Logger, this.logger);
   }
 
   protected getModule<TModule extends Module>(

@@ -1,6 +1,7 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
-import {container, DependencyContainer} from 'tsyringe';
-import ScopedLogger from '../logger/ScopedLogger';
+import {DependencyContainer} from 'tsyringe';
+import Logger from '../logger/Logger';
+import MasterLogger from '../logger/MasterLogger';
 import type Module from './Module';
 import {ModuleConstructor, ModuleResolvable, resolveModuleName} from './ModuleConstructor';
 
@@ -19,18 +20,18 @@ export default class ModuleLoader {
 
   private readonly globalContainer: DependencyContainer;
 
-  private readonly logger: ScopedLogger;
+  private readonly logger: Logger;
 
   // TODO: implement default from environment variables or global settings
   constructor(
+    container: DependencyContainer,
+    masterLogger: MasterLogger,
     modules: ModuleConstructor[],
     enabledModules?: string[],
-    disabledModules?: string[],
-    globalContainer = container,
-    logger = new ScopedLogger('modules')
+    disabledModules?: string[]
   ) {
-    this.globalContainer = globalContainer;
-    this.logger = logger;
+    this.globalContainer = container;
+    this.logger = masterLogger.getScope('modules');
     this.moduleConstructors = new Collection(
       modules.map(constructor => [constructor.moduleName, constructor])
     );

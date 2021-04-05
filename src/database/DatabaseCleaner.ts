@@ -1,7 +1,7 @@
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
 import MasterLogger from '../logger/MasterLogger';
-import ScopedLogger from '../logger/ScopedLogger';
+import Logger from '../logger/Logger';
 import GlobalSettingsWrapper from './wrappers/GlobalSettingsWrapper';
 
 export type Cleaner = () => Promise<void>;
@@ -12,10 +12,10 @@ export default class DatabaseCleaner {
 
   private interval!: NodeJS.Timeout;
 
-  private readonly logger: ScopedLogger;
+  private readonly logger: Logger;
 
   constructor(globalSettings: GlobalSettingsWrapper, masterLogger: MasterLogger) {
-    this.logger = new ScopedLogger('Cleaner', masterLogger);
+    this.logger = masterLogger.getScope('cleaner');
     globalSettings.afterEntityChangeWithInitial
       .pipe(
         map(entity => entity.cleanInterval),

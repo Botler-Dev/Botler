@@ -2,11 +2,12 @@
 import chalk from 'chalk';
 import dayjs from 'dayjs';
 
-import {optional, stack, stringToBoolean, toNumber} from '../utils/optionCleaners';
+import {optional, stringToBoolean, toNumber, unchecked} from '../utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
+import Logger from './Logger';
 import LogLevel, {LOG_LEVEL_STRINGS} from './LogLevel';
 
-export type MasterLoggerConfig = {
+interface CleanedMasterLoggerConfig {
   stampLabel: boolean;
   scopeLabel: boolean;
   levelLabel: boolean;
@@ -19,39 +20,62 @@ export type MasterLoggerConfig = {
   labelSuffix: string;
 
   stampPad: number;
-  scopePad: number;
+  scopePad?: number;
 
   stampFormat: string;
+}
+
+export type MasterLoggerConfig = Partial<CleanedMasterLoggerConfig>;
+
+type EnvMasterLoggerConfig = {
+  [option in keyof MasterLoggerConfig]: string;
 };
 
-export type RawMasterLoggerConfig = {
-  [option in keyof MasterLoggerConfig]?: string;
-};
-
-export type LogMetadata = {
+export type LogMetadata = Readonly<{
   scope: string;
   level: LogLevel;
-};
+}>;
 
 export type LogLevelMetadata = Omit<LogMetadata, 'level'>;
 
 export default class MasterLogger {
-  private config: MasterLoggerConfig;
+  private readonly config: CleanedMasterLoggerConfig;
 
-  private static readonly configCleanerDefinition: OptionsCleanerDefinition<
-    RawMasterLoggerConfig,
+  private maxScopeLength = 0;
+
+  private readonly scopes = new Map<string, Logger>();
+
+  private static readonly envCleanerDefinition: OptionsCleanerDefinition<
+    EnvMasterLoggerConfig,
     MasterLoggerConfig
   > = {
-    stampLabel: stack(stringToBoolean(), optional(true)),
-    scopeLabel: stack(stringToBoolean(), optional(true)),
-    levelLabel: stack(stringToBoolean(), optional(true)),
+    stampLabel: stringToBoolean(),
+    scopeLabel: stringToBoolean(),
+    levelLabel: stringToBoolean(),
+    stampColor: unchecked(),
+    scopeColor: unchecked(),
+    levelColor: unchecked(),
+    labelPrefix: unchecked(),
+    labelSuffix: unchecked(),
+    stampPad: toNumber(),
+    scopePad: toNumber(),
+    stampFormat: unchecked(),
+  };
+
+  private static readonly configCleanerDefinition: OptionsCleanerDefinition<
+    MasterLoggerConfig,
+    CleanedMasterLoggerConfig
+  > = {
+    stampLabel: optional(true),
+    scopeLabel: optional(true),
+    levelLabel: optional(true),
     stampColor: optional('gray'),
     scopeColor: optional('yellow'),
     levelColor: optional('cyan'),
     labelPrefix: optional('['),
     labelSuffix: optional(']'),
-    stampPad: stack(toNumber(), optional(0)),
-    scopePad: stack(toNumber(), optional(10)),
+    stampPad: optional(0),
+    scopePad: unchecked(),
     stampFormat: optional('YYYY/MM/DD HH:mm:ss.SSS'),
   };
 
@@ -66,8 +90,12 @@ export default class MasterLogger {
     error: console.error,
   };
 
-  constructor() {
-    this.config = cleanOptions(MasterLogger.configCleanerDefinition, {
+  constructor(config = MasterLogger.getEnvConfig()) {
+    this.config = cleanOptions(MasterLogger.configCleanerDefinition, config);
+  }
+
+  static getEnvConfig(): MasterLoggerConfig {
+    return cleanOptions(this.envCleanerDefinition, {
       stampLabel: process.env.LOGGER_STAMP_LABEL,
       scopeLabel: process.env.LOGGER_SCOPE_LABEL,
       levelLabel: process.env.LOGGER_LEVEL_LABEL,
@@ -80,6 +108,15 @@ export default class MasterLogger {
       scopePad: process.env.LOGGER_SCOPE_PAD,
       stampFormat: process.env.LOGGER_STAMP_FORMAT,
     });
+  }
+
+  getScope(scope: string): Logger {
+    let logger = this.scopes.get(scope);
+    if (logger) return logger;
+    if (scope.length > this.maxScopeLength) this.maxScopeLength = scope.length;
+    logger = new Logger(this, {scope});
+    this.scopes.set(scope, logger);
+    return logger;
   }
 
   private finalizeLabel(value: string, color: string, minLength?: number) {
@@ -102,7 +139,7 @@ export default class MasterLogger {
       metaString += this.finalizeLabel(
         metadata.scope.toUpperCase(),
         this.config.scopeColor,
-        this.config.scopePad
+        this.config.scopePad ?? this.maxScopeLength
       );
     }
     const logLevel = LOG_LEVEL_STRINGS[metadata.level];
@@ -113,18 +150,18 @@ export default class MasterLogger {
   }
 
   log(metadata: LogLevelMetadata, ...objs: unknown[]): void {
-    this.advancedLog({level: LogLevel.Log, ...metadata}, ...objs);
+    this.advancedLog({...metadata, level: LogLevel.Log}, ...objs);
   }
 
   info(metadata: LogLevelMetadata, ...objs: unknown[]): void {
-    this.advancedLog({level: LogLevel.Info, ...metadata}, ...objs);
+    this.advancedLog({...metadata, level: LogLevel.Info}, ...objs);
   }
 
   warn(metadata: LogLevelMetadata, ...objs: unknown[]): void {
-    this.advancedLog({level: LogLevel.Warn, ...metadata}, ...objs);
+    this.advancedLog({...metadata, level: LogLevel.Warn}, ...objs);
   }
 
   error(metadata: LogLevelMetadata, ...objs: unknown[]): void {
-    this.advancedLog({level: LogLevel.Error, ...metadata}, ...objs);
+    this.advancedLog({...metadata, level: LogLevel.Error}, ...objs);
   }
 }

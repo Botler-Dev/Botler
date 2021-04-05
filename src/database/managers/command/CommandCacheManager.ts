@@ -10,7 +10,7 @@ import CommandCacheWrapper, {
 import ReactionListenerManager from './listener/ReactionListenerManager';
 import ResponseListenerManager from './listener/ResponseListenerManager';
 import CommandManager from '../../../modules/command/CommandManager';
-import ScopedLogger from '../../../logger/ScopedLogger';
+import Logger from '../../../logger/Logger';
 import Command from '../../../modules/command/command/Command';
 import DatabaseCleaner from '../../DatabaseCleaner';
 
@@ -21,7 +21,7 @@ export default class CommandCacheManager extends CacheManager<
   number,
   ConcreteCommandCacheWrapper
 > {
-  private readonly logger: ScopedLogger;
+  private readonly logger: Logger;
 
   private readonly commandManager: CommandManager;
 
@@ -31,7 +31,7 @@ export default class CommandCacheManager extends CacheManager<
 
   constructor(
     connection: Connection,
-    logger: ScopedLogger,
+    logger: Logger,
     cleaner: DatabaseCleaner,
     commandManager: CommandManager,
     responseListenerManager: ResponseListenerManager,

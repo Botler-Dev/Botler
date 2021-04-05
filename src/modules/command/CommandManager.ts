@@ -1,6 +1,6 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
-import ScopedLogger from '../../logger/ScopedLogger';
+import Logger from '../../logger/Logger';
 import Command, {CommandName} from './command/Command';
 
 export default class CommandManager {
@@ -22,10 +22,10 @@ export default class CommandManager {
     return this._lookup;
   }
 
-  private readonly logger: ScopedLogger;
+  private readonly logger: Logger;
 
   constructor(container: DependencyContainer) {
-    this.logger = container.resolve(ScopedLogger);
+    this.logger = container.resolve(Logger);
   }
 
   register(command: Command): void {
