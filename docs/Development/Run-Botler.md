@@ -37,8 +37,8 @@ Both configurations are also additionally configurable via the following environ
 
 |        Name         |               Default               | Description                                              |
 | :-----------------: | :---------------------------------: | :------------------------------------------------------- |
-| `POSTGRES_PASSWORD` | `botler` in dev <br /> none in prod | Password of the `postgres` Postgres user used by the bot |
-|   `POSTGRES_PORT`   |               `5432`                | Port the database will be mounted to                     |
+| `DATABASE_PASSWORD` | `botler` in dev <br /> none in prod | Password of the `postgres` database user used by the bot |
+|   `DATABASE_PORT`   |               `5432`                | Port the database will be mounted to                     |
 
 !!! note "Yarn usage"
     The examples here all use `yarn [script name]` to make the commands shorter and easier to use/remember. If you want to use the `docker-compose` command directly, check the `scripts` property in `package.json` to see the contents of those scripts.
@@ -72,22 +72,22 @@ The command for the production configuration is just like the development comman
 yarn docker:prod up --detach --build
 ```
 
-## Using Docker only for Postgres
+## Using Docker only for the database
 
-If you want to just run Postgres in Docker there are some commands provided to only managing the `postgres` service:
+If you want to just run the database in Docker there are some commands provided to only managing the `db` service:
 
 ```shell
-# Start Postgres
-yarn postgres:start
+# Start the database
+yarn db:start
 
-# Start Postgres and detach from command
-yarn postgres:deploy
+# Start the database and detach from command
+yarn db:deploy
 
-# Stop Postgres
-yarn postgres:stop
+# Stop the database
+yarn db:stop
 
-# Stop Postgres and delete all data
-yarn postgres:reset
+# Stop the database and delete all data
+yarn db:reset
 ```
 
 All those commands use the development configuration and are configurable via the same environment variables.

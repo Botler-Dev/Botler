@@ -21,10 +21,10 @@
     "docker:base": "docker-compose --project-directory . --file ./docker/docker-compose.yml",
     "docker:dev": "yarn docker:base --file ./docker/docker-compose.dev.yml",
     "docker:prod": "yarn docker:base --file ./docker/docker-compose.prod.yml",
-    "postgres:start": "yarn docker:dev up postgres",
-    "postgres:deploy": "yarn docker:dev up --detach postgres",
-    "postgres:stop": "yarn docker:dev stop postgres",
-    "postgres:reset": "yarn docker:dev rm -v --stop postgres"
+    "db:start": "yarn docker:dev up db",
+    "db:deploy": "yarn docker:dev up --detach db",
+    "db:stop": "yarn docker:dev stop db",
+    "db:reset": "yarn docker:dev rm -v --stop db"
   },
   "repository": {
     "type": "git",

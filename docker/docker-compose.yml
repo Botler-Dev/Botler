@@ -1,18 +1,18 @@
 version: '3.8'
 
 services:
-  postgres:
+  db:
     image: postgres:alpine
-    container_name: postgres
+    container_name: botler-database
     restart: unless-stopped
     ports:
-      - '5432:${POSTGRES_PORT:-5432}'
+      - '5432:${DATABASE_PORT:-5432}'
   bot:
     build:
       context: .
     depends_on:
-      - 'postgres'
+      - 'db'
     environment:
-      TYPEORM_HOST: postgres
+      TYPEORM_HOST: botler-database
       TYPEORM_USERNAME: postgres
-      TYPEORM_PORT: ${POSTGRES_PORT:-5432}
+      TYPEORM_PORT: ${DATABASE_PORT:-5432}
