@@ -1,0 +1,11 @@
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Postgres password not specified}
+  bot:
+    image: botler:latest
+    build:
+      dockerfile: ./docker/Dockerfile.prod
+    restart: unless-stopped
+    environment:
+      TYPEORM_PASSWORD: ${POSTGRES_PASSWORD:?Postgres password not specified}

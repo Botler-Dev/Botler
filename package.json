@@ -17,7 +17,14 @@
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "typeorm:migration:generate": "yarn typeorm migration:generate --pretty --name",
     "typeorm:migration:run": "yarn typeorm migration:run",
-    "test": "jest"
+    "test": "jest",
+    "docker:base": "docker-compose --project-directory . --file ./docker/docker-compose.yml",
+    "docker:dev": "yarn docker:base --file ./docker/docker-compose.dev.yml",
+    "docker:prod": "yarn docker:base --file ./docker/docker-compose.prod.yml",
+    "postgres:start": "yarn docker:dev up postgres",
+    "postgres:deploy": "yarn docker:dev up --detach postgres",
+    "postgres:stop": "yarn docker:dev stop postgres",
+    "postgres:reset": "yarn docker:dev rm -v --stop postgres"
   },
   "repository": {
     "type": "git",

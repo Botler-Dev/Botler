@@ -6,17 +6,13 @@ services:
     container_name: postgres
     restart: unless-stopped
     ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      - '5432:${POSTGRES_PORT:-5432}'
   bot:
-    image: botler:dev
     build:
-      context: ../
-      dockerfile: docker/Dockerfile.dev
+      context: .
     depends_on:
       - 'postgres'
     environment:
       TYPEORM_HOST: postgres
       TYPEORM_USERNAME: postgres
-      TYPEORM_PASSWORD: ${POSTGRES_PASSWORD}
+      TYPEORM_PORT: ${POSTGRES_PORT:-5432}

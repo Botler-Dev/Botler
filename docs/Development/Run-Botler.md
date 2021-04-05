@@ -2,7 +2,7 @@
 
 There are several different ways to run Botler. For development only running Postgres in Docker is recommended.
 
-## Using YARN
+## Using Yarn
 
 First, install the dependencies:
 
@@ -18,7 +18,7 @@ yarn run build:dev
 yarn run build:watch
 ```
 
-Now there should be a `dist` folder in the root of the compiled code.
+Now there should be a `dist` folder in the root with the compiled code.
 Before running Botler you will need to configure him first. See the [Configuration](Configuration.md) page for more information.
 
 After configuring the bot run the following command to start it:
@@ -32,8 +32,16 @@ yarn run start:dev
 
 ## Using Docker
 
-The bot and the database can be entirely run inside Docker using Docker Compose, which is useful for testing Docker compatibility.
-There is a development configuration and a production configuration.
+The bot and the database can be entirely run inside Docker using Docker Compose in development and production environments.
+Both configurations are also additionally configurable via the following environment variables:
+
+|        Name         |               Default               | Description                                              |
+| :-----------------: | :---------------------------------: | :------------------------------------------------------- |
+| `POSTGRES_PASSWORD` | `botler` in dev <br /> none in prod | Password of the `postgres` Postgres user used by the bot |
+|   `POSTGRES_PORT`   |               `5432`                | Port the database will be mounted to                     |
+
+!!! note "Yarn usage"
+    The examples here all use `yarn [script name]` to make the commands shorter and easier to use/remember. If you want to use the `docker-compose` command directly, check the `scripts` property in `package.json` to see the contents of those scripts.
 
 ### Development
 
@@ -42,14 +50,14 @@ This configuration does not try to be as small as possible and runs the bot in d
 Start the development config by running the following command in the project root:
 
 ```shell
-docker-compose -f ./docker/docker-compose.yml --env-file ./docker/.env.dev up --detach --build
+yarn docker:dev up --detach --build
 ```
+
+This command script calls `docker-compose` with the correct compose files which set the Postgres password to `botler` by default.
 
 !!! info "Parameter Meanings"
     - `--detach` will run the containers in the background and is optional. To inspect them use Docker Desktop or the Docker CLI.
     - `--build` will make docker-compose build the bot image even if it was previously built. This is needed for applying changes since the last build.
-    - `--env-file ./docker/.env.dev` will set following default environment variable values:
-        - `POSTGRES_PASSWORD` = `botler`
 
 ### Production
 
@@ -58,22 +66,28 @@ It first builds the bot in the same environment as the development configuration
 but then copies the final build into the [`mhart/alpine-node:slim`](https://hub.docker.com/r/mhart/alpine-node/) image and starts the bot in production mode.
 Additionally, the bot like the database always restarts unless manually stopped.
 
-The command for the production configuration is just the like the development command but with `-f ./docker/production.yml` in between.
+The command for the production configuration is just like the development command but needs some environment variables manually provided (Check out the [Docker Compose Docs](https://docs.docker.com/compose/environment-variables/)) and has a different script name.
 
 ```shell
-docker-compose -f ./docker/docker-compose.yml -f ./docker/production.yml --env-file ./docker/.env.dev up -d --build
+yarn docker:prod up --detach --build
 ```
-
-!!! warning
-    Do not use the `./docker/.env.dev` values in actual production.
-    Instead, provide your own passwords and provide them with a `.env` file or inline environment variables.
 
 ## Using Docker only for Postgres
 
-If you want to just run Postgres in Docker you can use the following command:
+If you want to just run Postgres in Docker there are some commands provided to only managing the `postgres` service:
 
 ```shell
-docker run --name botler-db -p "5432:5432" -e "POSTGRES_PASSWORD=botler" -d postgres
+# Start Postgres
+yarn postgres:start
+
+# Start Postgres and detach from command
+yarn postgres:deploy
+
+# Stop Postgres
+yarn postgres:stop
+
+# Stop Postgres and delete all data
+yarn postgres:reset
 ```
 
-Those default values can be changed but this way you won't have to modify the default configuration of Botler.
+All those commands use the development configuration and are configurable via the same environment variables.

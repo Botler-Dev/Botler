@@ -1,0 +1,10 @@
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-botler}
+  bot:
+    image: botler:dev
+    build:
+      dockerfile: ./docker/Dockerfile.dev
+    environment:
+      TYPEORM_PASSWORD: ${POSTGRES_PASSWORD:-botler}

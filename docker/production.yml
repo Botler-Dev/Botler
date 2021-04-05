@@ -1,6 +1,0 @@
-services:
-  bot:
-    image: botler:latest
-    build:
-      dockerfile: docker/Dockerfile.prod
-    restart: unless-stopped
