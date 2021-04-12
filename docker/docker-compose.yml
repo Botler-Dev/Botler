@@ -6,13 +6,30 @@ services:
     container_name: botler-database
     restart: unless-stopped
     ports:
-      - '5432:${DATABASE_PORT:-5432}'
+      - 5432:${DATABASE_PORT:-5432}
   bot:
     build:
       context: .
     depends_on:
-      - 'db'
+      - db
     environment:
-      TYPEORM_HOST: botler-database
-      TYPEORM_USERNAME: postgres
-      TYPEORM_PORT: ${DATABASE_PORT:-5432}
+      - LOGGER_STAMP_LABEL
+      - LOGGER_SCOPE_LABEL
+      - LOGGER_LEVEL_LABEL
+      - LOGGER_STAMP_COLOR
+      - LOGGER_SCOPE_COLOR
+      - LOGGER_LEVEL_COLOR
+      - LOGGER_LABEL_PREFIX
+      - LOGGER_LABEL_SUFFIX
+      - LOGGER_STAMP_PAD
+      - LOGGER_SCOPE_PAD
+      - LOGGER_STAMP_FORMAT
+
+      - DATABASE_USERNAME
+      - DATABASE_HOST=${DATABASE_HOST:-botler-database}
+      - DATABASE_PORT=${DATABASE_PORT:-5432}
+      - DATABASE_DATABASE
+      - DATABASE_ARGS
+      - DATABASE_URL
+
+      - PRISMA_LOG_QUERIES

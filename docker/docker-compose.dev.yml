@@ -7,4 +7,4 @@ services:
     build:
       dockerfile: ./docker/Dockerfile.dev
     environment:
-      TYPEORM_PASSWORD: ${DATABASE_PASSWORD:-botler}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-botler}

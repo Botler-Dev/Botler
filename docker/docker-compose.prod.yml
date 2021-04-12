@@ -1,11 +1,12 @@
 services:
   db:
     environment:
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Database password not specified}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?Database password not specified}
   bot:
     image: botler:latest
     build:
       dockerfile: ./docker/Dockerfile.prod
     restart: unless-stopped
     environment:
-      TYPEORM_PASSWORD: ${DATABASE_PASSWORD:?Database password not specified}
+      NODE_ENV: production
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?Database password not specified}
