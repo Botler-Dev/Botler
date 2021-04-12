@@ -1,10 +1,9 @@
+import {GlobalSettings} from '@prisma/client';
 import {Snowflake, UserManager, UserResolvable} from 'discord.js';
 import {filter, tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
-import {FindConditions} from 'typeorm';
 import Logger from '../../logger/Logger';
 import {resolveIdChecked} from '../../utils/resolve';
-import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
 import type GlobalSettingsManager from '../managers/GlobalSettingsManager';
 import {SyncStream} from '../synchronizer/CacheSynchronizer';
 import SynchronizedEntityWrapper from '../wrapper/SynchronizedEntityWrapper';
@@ -17,7 +16,7 @@ export enum ColorType {
 }
 
 export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
-  GlobalSettingsEntity,
+  GlobalSettings,
   GlobalSettingsManager
 > {
   get version(): number {
@@ -29,12 +28,12 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
     return this.entity.botToken;
   }
 
-  get prefix(): string {
-    return this.entity.prefix;
+  get defaultPrefix(): string {
+    return this.entity.defaultPrefix;
   }
 
-  set prefix(prefix: string) {
-    this.updateEntity({prefix});
+  set defaultPrefix(value: string) {
+    this.updateEntity({defaultPrefix: value});
   }
 
   get botMasterIds(): ReadonlyArray<Snowflake> {
@@ -43,12 +42,6 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
 
   get cleanInterval(): number {
     return this.entity.cleanInterval;
-  }
-
-  protected get uniqueConditions(): FindConditions<GlobalSettingsEntity> {
-    return {
-      version: this.version,
-    };
   }
 
   private readonly logger: Logger;
@@ -63,8 +56,8 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
 
   constructor(
     manager: GlobalSettingsManager,
-    syncStream: SyncStream<GlobalSettingsEntity>,
-    entity: GlobalSettingsEntity,
+    syncStream: SyncStream<GlobalSettings>,
+    entity: GlobalSettings,
     logger: Logger
   ) {
     super(
@@ -74,7 +67,7 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
           if (newEntity) return;
           this.manager.refetch();
         }),
-        filter((newEntity): newEntity is GlobalSettingsEntity => !!newEntity)
+        filter((newEntity): newEntity is GlobalSettings => !!newEntity)
       ),
       entity
     );
@@ -82,11 +75,6 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
   }
 
   protected createDefaultEntity = undefined;
-
-  // eslint-disable-next-line class-methods-use-this
-  isEntityUseless(): boolean {
-    return false;
-  }
 
   isBotMaster(user: UserResolvable): boolean {
     const id = resolveIdChecked(this.userManager, user);
@@ -105,5 +93,14 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
       case ColorType.Warn:
         return this.entity.colorWarn;
     }
+  }
+
+  async save(): Promise<void> {
+    await this.manager.model.update({
+      where: {
+        version: this.version,
+      },
+      data: this.entity as GlobalSettings,
+    });
   }
 }

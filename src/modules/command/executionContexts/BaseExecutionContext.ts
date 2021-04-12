@@ -1,4 +1,4 @@
-import {ConcreteCommandCacheWrapper} from '../../../database/wrappers/command/CommandCacheWrapper';
+import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import type Command from '../command/Command';
 import GuildContext from './guild/GuildContext';
 

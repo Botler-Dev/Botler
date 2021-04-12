@@ -1,6 +1,4 @@
-import CommandCacheWrapper, {
-  ConcreteCommandCacheWrapper,
-} from '../../../database/wrappers/command/CommandCacheWrapper';
+import CommandCacheWrapper, {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import Command from '../command/Command';
 import {EmptyParseResults, ParseResults} from '../parser/ParserEngine';
 import InitialExecutionContext from './InitialExecutionContext';

@@ -1,14 +1,14 @@
+import {PrismaClient} from '@prisma/client';
 import {ChannelManager, Client, GuildEmojiManager, GuildManager, UserManager} from 'discord.js';
 import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {container} from 'tsyringe';
-import {Connection, createConnection} from 'typeorm';
 
-import DatabaseEventHub from './database/DatabaseEventHub';
 import DatabaseCleaner from './database/DatabaseCleaner';
+import DatabaseEventHub from './database/DatabaseEventHub';
 import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
 import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
-import MasterLogger from './logger/MasterLogger';
 import Logger, {proxyNativeConsole} from './logger/Logger';
+import MasterLogger from './logger/MasterLogger';
 import CommandModule from './modules/command/CommandModule';
 import ModuleLoader from './modules/ModuleLoader';
 import {ExitCode, exitWithMessage} from './utils/process';
@@ -18,7 +18,7 @@ export default class Bot {
 
   private globalLogger!: Logger;
 
-  private connection!: Connection;
+  private prisma!: PrismaClient;
 
   private eventHub!: DatabaseEventHub;
 
@@ -40,15 +40,28 @@ export default class Bot {
     container.register(Logger, {useValue: this.globalLogger});
     proxyNativeConsole(this.globalLogger);
 
-    this.connection = await createConnection();
-    container.register(Connection, {useValue: this.connection});
-    await this.connection.runMigrations({transaction: 'all'});
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url:
+            process.env.DATABASE_URL ??
+            `postgresql://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@` +
+              `${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_DATABASE}?${process.env.DATABASE_ARGS}`,
+        },
+      },
+    });
+    // TODO: add logging of prisma events
+    container.registerInstance(PrismaClient, this.prisma);
 
     this.eventHub = new DatabaseEventHub(this.masterLogger);
     container.register(DatabaseEventHub, {useValue: this.eventHub});
     await this.eventHub.initialize();
 
-    this.globalSettingsManager = new GlobalSettingsManager(this.connection, this.globalLogger);
+    this.globalSettingsManager = new GlobalSettingsManager(
+      this.prisma,
+      this.globalLogger,
+      this.eventHub
+    );
     await this.globalSettingsManager.initialize();
     this.globalSettings = this.globalSettingsManager.get();
     container.register(GlobalSettingsWrapper, {useValue: this.globalSettings});

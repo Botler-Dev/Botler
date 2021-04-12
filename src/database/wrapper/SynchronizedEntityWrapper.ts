@@ -7,7 +7,7 @@ import {Entity} from './EntityWrapper';
 
 export default abstract class SynchronizedEntityWrapper<
   TEntityState extends Entity | undefined,
-  TManager extends CacheManager<Exclude<TEntityState, undefined>>
+  TManager extends CacheManager
 > extends CachedEntityWrapper<TEntityState, TManager> {
   protected entitySubject: BehaviorSubject<TEntityState>;
 

@@ -1,22 +1,19 @@
-import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
+import {GlobalSettings, Prisma} from '@prisma/client';
 import CacheSynchronizer from '../synchronizer/CacheSynchronizer';
 import GlobalSettingsWrapper from '../wrappers/GlobalSettingsWrapper';
 import type {GlobalSettingsCacheKey} from '../managers/GlobalSettingsManager';
 import DatabaseEventHub from '../DatabaseEventHub';
 
 export default class GlobalSettingsSynchronizer extends CacheSynchronizer<
-  GlobalSettingsEntity,
+  GlobalSettings,
   'version',
   typeof GlobalSettingsCacheKey
 > {
   private globalSettings?: GlobalSettingsWrapper;
 
-  constructor(tableName: string, eventHub?: DatabaseEventHub) {
-    super(
-      tableName,
-      ({version}) =>
-        !!this.globalSettings && version >= this.globalSettings.version ? 0 : undefined,
-      eventHub
+  constructor(eventHub: DatabaseEventHub) {
+    super(eventHub, Prisma.ModelName.GlobalSettings, ({version}) =>
+      !!this.globalSettings && version >= this.globalSettings.version ? 0 : undefined
     );
   }
 
@@ -24,7 +21,7 @@ export default class GlobalSettingsSynchronizer extends CacheSynchronizer<
     this.globalSettings = wrapper;
   }
 
-  injectNewEntity(entity: GlobalSettingsEntity): void {
+  injectNewEntity(entity: GlobalSettings): void {
     this.syncStreams.get(0)?.next(entity);
   }
 }

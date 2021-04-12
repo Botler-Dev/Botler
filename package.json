@@ -14,9 +14,8 @@
     "lint:fix": "yarn lint --fix",
     "format:check": "yarn prettier --check .",
     "format": "yarn prettier --write .",
-    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
-    "typeorm:migration:generate": "yarn typeorm migration:generate --pretty --name",
-    "typeorm:migration:run": "yarn typeorm migration:run",
+    "prisma:merge": "prisma-merge --baseFile ./src/database/schema.prisma --schemaFilePatterns src/modules/**/*.prisma --outputFile ./schema.prisma --excludedFilePattern _",
+    "prisma": "yarn prisma:merge & prisma",
     "test": "jest",
     "docker:base": "docker-compose --project-directory . --file ./docker/docker-compose.yml",
     "docker:dev": "yarn docker:base --file ./docker/docker-compose.dev.yml",
@@ -44,6 +43,7 @@
     "node": ">=15"
   },
   "dependencies": {
+    "@prisma/client": "^2.20.1",
     "chalk": "^4.1.0",
     "dayjs": "^1.9.3",
     "discord.js": "^12.3.1",
@@ -52,8 +52,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.6.3",
     "string-similarity": "^4.0.4",
-    "tsyringe": "^4.3.0",
-    "typeorm": "^0.2.28"
+    "tsyringe": "^4.3.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
@@ -73,6 +72,8 @@
     "jest": "^26.6.3",
     "prettier": "^2.1.2",
     "prettier-airbnb-config": "^1.0.0",
+    "prisma": "^2.20.1",
+    "prisma-merge": "^0.2.0",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   }

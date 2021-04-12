@@ -1,10 +1,11 @@
 import {Dayjs} from 'dayjs';
 import {Message} from 'discord.js';
-import type CommandCacheManager from '../../../database/managers/command/CommandCacheManager';
-import CommandCacheWrapper, {
+import type CommandCacheManager from '../cache/CommandCacheManager';
+import type CommandCacheWrapper from '../cache/CommandCacheWrapper';
+import type {
   CacheFromCommandCacheWrapper,
   ConcreteCommandCacheWrapper,
-} from '../../../database/wrappers/command/CommandCacheWrapper';
+} from '../cache/CommandCacheWrapper';
 import type Command from '../command/Command';
 import {ParseResult} from '../parser/parser';
 import ParserEngine, {EmptyParseResults, ParseResults} from '../parser/ParserEngine';

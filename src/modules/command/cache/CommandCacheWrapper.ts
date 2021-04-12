@@ -1,18 +1,21 @@
+import {CommandCommandCache, Prisma} from '@prisma/client';
 import dayjs, {Dayjs} from 'dayjs';
-import {FindConditions} from 'typeorm';
 import {
   EmojiResolvable,
   MessageResolvable,
   TextBasedChannelResolvable,
   UserResolvable,
 } from 'discord.js';
-import CachedEntityWrapper from '../../wrapper/CachedEntityWrapper';
-import CommandCacheEntity from '../../entities/command/CommandCacheEntity';
-import type CommandCacheManager from '../../managers/command/CommandCacheManager';
-import ResponseListenerManager from '../../managers/command/listener/ResponseListenerManager';
-import type ReactionListenerManager from '../../managers/command/listener/ReactionListenerManager';
-import type Command from '../../../modules/command/command/Command';
-import type {ReactionAction} from '../../../modules/command/executionContexts/ReactionExecutionContext';
+import CachedEntityWrapper from '../../../database/wrapper/CachedEntityWrapper';
+import Command from '../command/Command';
+import {ReactionAction} from '../executionContexts/ReactionExecutionContext';
+import type CommandCacheManager from './CommandCacheManager';
+import ReactionListenerManager from './listeners/ReactionListenerManager';
+import ResponseListenerManager from './listeners/ResponseListenerManager';
+
+export interface GenericCommandCommandCache<TCache> extends CommandCommandCache {
+  cache: TCache;
+}
 
 export type CacheFromCommandCacheWrapper<
   TWrapper extends ConcreteCommandCacheWrapper
@@ -22,12 +25,14 @@ export type CacheFromCommandCacheWrapper<
 export type ConcreteCommandCacheWrapper = CommandCacheWrapper<any>;
 
 export default abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntityWrapper<
-  CommandCacheEntity<TCache>,
+  GenericCommandCommandCache<TCache>,
   CommandCacheManager
 > {
-  private _entity: CommandCacheEntity<TCache>;
+  static DELETE_DELAY = dayjs.duration(5, 'minutes');
 
-  get entity(): Readonly<CommandCacheEntity<TCache>> {
+  private _entity: GenericCommandCommandCache<TCache>;
+
+  get entity(): Readonly<GenericCommandCommandCache<TCache>> {
     return this._entity;
   }
 
@@ -38,7 +43,7 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
   readonly command: Command;
 
   get expirationDateTime(): Dayjs {
-    return dayjs(this.entity.expirationDateTime as Date);
+    return dayjs(this.entity.expirationDateTime);
   }
 
   set expirationDateTime(value: Dayjs) {
@@ -54,15 +59,13 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
 
   private deleteTimeout!: NodeJS.Timeout;
 
-  protected readonly uniqueConditions: FindConditions<CommandCacheEntity<TCache>>;
-
   private readonly responseListenerManager: ResponseListenerManager;
 
   private readonly reactionListenerManager: ReactionListenerManager;
 
   constructor(
     manager: CommandCacheManager,
-    entity: CommandCacheEntity<TCache>,
+    entity: GenericCommandCommandCache<TCache>,
     command: Command,
     responseListenerManager: ResponseListenerManager,
     reactionListenerManager: ReactionListenerManager
@@ -73,16 +76,13 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
     this.responseListenerManager = responseListenerManager;
     this.reactionListenerManager = reactionListenerManager;
 
-    this.uniqueConditions = {
-      id: this.id,
-    };
     this.setTimeout();
   }
 
   private setTimeout() {
     this.deleteTimeout = setTimeout(
       () => this.delete(),
-      this.expirationDateTime.add(CommandCacheEntity.DELETE_DELAY).diff(dayjs())
+      this.expirationDateTime.add(CommandCacheWrapper.DELETE_DELAY).diff(dayjs())
     );
   }
 
@@ -122,18 +122,26 @@ export default abstract class CommandCacheWrapper<TCache = unknown> extends Cach
     this.reactionListenerManager.removeListener(this.id, message, user, emoji, action);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  isEntityUseless(): boolean {
-    return false;
-  }
-
   isExpired(now = dayjs()): boolean {
     return now.isAfter(this.expirationDateTime);
+  }
+
+  async save(): Promise<void> {
+    await this.manager.model.update({
+      data: this._entity,
+      where: {
+        id: this.id,
+      },
+    });
   }
 
   async delete(): Promise<void> {
     this.uncache();
     clearTimeout(this.deleteTimeout);
-    await super.delete();
+    await this.manager.model.delete({
+      where: {
+        id: this.id,
+      },
+    });
   }
 }

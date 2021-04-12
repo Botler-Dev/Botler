@@ -1,3 +1,4 @@
+import {CommandResponseListener, Prisma, PrismaClient} from '@prisma/client';
 import {
   Message,
   Snowflake,
@@ -8,33 +9,39 @@ import {
 import {from} from 'rxjs';
 import {mergeAll} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
-import {Connection} from 'typeorm';
-import {resolveTextBasedChannelId, resolveIdChecked} from '../../../../utils/resolve';
-import DatabaseEventHub from '../../../DatabaseEventHub';
-import ResponseListenerEntity from '../../../entities/command/ResponseListenerEntity';
-import EntityManager from '../../../manager/EntityManager';
+import DatabaseEventHub from '../../../../database/DatabaseEventHub';
+import EntityManager from '../../../../database/manager/EntityManager';
+import {resolveIdChecked, resolveTextBasedChannelId} from '../../../../utils/resolve';
 import ListenerCriterionCache from './ListenerCriterionCache';
 
 @injectable()
-export default class ResponseListenerManager extends EntityManager<ResponseListenerEntity> {
+export default class ResponseListenerManager extends EntityManager<
+  PrismaClient['commandResponseListener']
+> {
   private readonly cache = new ListenerCriterionCache<
     [channelId?: Snowflake, userId?: Snowflake]
   >();
 
   private readonly userManager: UserManager;
 
-  constructor(connection: Connection, eventHub: DatabaseEventHub, userManager: UserManager) {
-    super(ResponseListenerEntity, connection);
+  constructor(prisma: PrismaClient, eventHub: DatabaseEventHub, userManager: UserManager) {
+    super(prisma.commandResponseListener);
     this.userManager = userManager;
-    from(eventHub.listenTo<ResponseListenerEntity>(`sync_${this.repo.metadata.tableName}_DELETE`))
+    from(
+      eventHub.listenTo<CommandResponseListener>(
+        `sync_${Prisma.ModelName.CommandResponseListener}_DELETE`
+      )
+    )
       .pipe(mergeAll())
-      .subscribe(entity => this.cache.remove(entity.cache, entity.user || undefined));
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      .subscribe(entity => this.cache.remove(entity.cacheId!, entity.user || undefined));
   }
 
   async initialize(): Promise<void> {
-    const listeners = await this.repo.find();
+    const listeners = await this.model.findMany();
     listeners.forEach(listener =>
-      this.cache.add(listener.cache, listener.channel, listener.user || undefined)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.cache.add(listener.cacheId!, listener.channel, listener.user || undefined)
     );
   }
 
@@ -56,10 +63,12 @@ export default class ResponseListenerManager extends EntityManager<ResponseListe
     const {channelId, userId} = this.resolveParameters<never>(channel, user);
     await this.removeListener(cacheId, channelId, userId);
     this.cache.add(cacheId, channelId, userId);
-    await this.repo.insert({
-      channel: channelId,
-      user: userId,
-      cache: cacheId,
+    await this.model.create({
+      data: {
+        channel: channelId,
+        user: userId ?? '',
+        cacheId,
+      },
     });
   }
 
@@ -70,10 +79,12 @@ export default class ResponseListenerManager extends EntityManager<ResponseListe
   ): Promise<void> {
     const {channelId, userId} = this.resolveParameters(channel, user);
     this.cache.remove(cacheId, channelId, userId);
-    await this.repo.delete({
-      cache: cacheId,
-      channel: channelId,
-      user: userId,
+    await this.model.deleteMany({
+      where: {
+        cacheId,
+        channel: channelId,
+        user: userId,
+      },
     });
   }
 

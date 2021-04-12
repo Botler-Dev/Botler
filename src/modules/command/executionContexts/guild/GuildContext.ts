@@ -1,5 +1,5 @@
 import {Guild} from 'discord.js';
-import CommandGuildSettingsWrapper from '../../../../database/wrappers/command/CommandGuildSettingsWrapper';
+import CommandGuildSettingsWrapper from '../../settings/CommandGuildSettingsWrapper';
 
 export default class GuildContext {
   readonly guild: Guild;

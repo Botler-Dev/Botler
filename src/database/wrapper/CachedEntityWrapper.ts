@@ -4,10 +4,8 @@ import type CacheManager from '../manager/CacheManager';
 import EntityWrapper, {Entity} from './EntityWrapper';
 
 export default abstract class CachedEntityWrapper<
-  TEntityState extends Entity | undefined = Entity | undefined,
-  TManager extends CacheManager<Exclude<TEntityState, undefined>> = CacheManager<
-    Exclude<TEntityState, undefined>
-  >
+  TEntityState extends Entity | undefined,
+  TManager extends CacheManager
 > extends EntityWrapper<TEntityState, TManager> {
   private isCachedSubject = new BehaviorSubject<boolean>(true);
 

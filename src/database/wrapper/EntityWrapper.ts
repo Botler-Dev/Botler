@@ -1,16 +1,12 @@
-import {FindConditions} from 'typeorm';
 import type EntityManager from '../manager/EntityManager';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Entity {}
+export type Entity = Record<never, never>;
 
 export default abstract class EntityWrapper<
   TEntityState extends Entity | undefined,
-  TManager extends EntityManager<Exclude<TEntityState, undefined>>
+  TManager extends EntityManager
 > {
   abstract entity: TEntityState | Immutable<TEntityState>;
-
-  protected abstract uniqueConditions: FindConditions<Exclude<TEntityState, undefined>>;
 
   protected readonly manager: TManager;
 
@@ -27,17 +23,5 @@ export default abstract class EntityWrapper<
     return this.createDefaultEntity();
   }
 
-  abstract isEntityUseless(): boolean;
-
-  async save(): Promise<void> {
-    if (this.entity === undefined || this.isEntityUseless()) {
-      await this.delete();
-      return;
-    }
-    await this.manager.repo.save(this.entity as Exclude<TEntityState, undefined>);
-  }
-
-  async delete(): Promise<void> {
-    await this.manager.repo.delete(this.uniqueConditions);
-  }
+  abstract save(): Promise<void>;
 }

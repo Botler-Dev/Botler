@@ -1,13 +1,13 @@
 import {DependencyContainer} from 'tsyringe';
-import CommandCacheEntity from '../../../database/entities/command/CommandCacheEntity';
-import type CommandCacheManager from '../../../database/managers/command/CommandCacheManager';
-import type ReactionListenerManager from '../../../database/managers/command/listener/ReactionListenerManager';
-import ResponseListenerManager from '../../../database/managers/command/listener/ResponseListenerManager';
-import {
+import type CommandCacheManager from '../cache/CommandCacheManager';
+import type ReactionListenerManager from '../cache/listeners/ReactionListenerManager';
+import type ResponseListenerManager from '../cache/listeners/ResponseListenerManager';
+import type {
   CacheFromCommandCacheWrapper,
   ConcreteCommandCacheWrapper,
-} from '../../../database/wrappers/command/CommandCacheWrapper';
+} from '../cache/CommandCacheWrapper';
 import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
+import type {GenericCommandCommandCache} from '../cache/CommandCacheWrapper';
 import type CommandCategory from '../CommandCategory';
 import CommandError from '../error/CommandError';
 import WrongScopeError from '../errors/WrongScopeError';
@@ -58,7 +58,7 @@ export default abstract class Command<
 
   async wrapCacheEntity?(
     manager: CommandCacheManager,
-    entity: CommandCacheEntity<CacheFromCommandCacheWrapper<TCache>>,
+    entity: GenericCommandCommandCache<CacheFromCommandCacheWrapper<TCache>>,
     responseListenerManager: ResponseListenerManager,
     reactionListenerManager: ReactionListenerManager
   ): Promise<TCache>;

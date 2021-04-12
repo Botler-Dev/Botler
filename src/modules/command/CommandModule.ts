@@ -7,17 +7,17 @@ import Module from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
 import CommandCategory from './CommandCategory';
 import CommandManager from './CommandManager';
-import CommandCacheManager from '../../database/managers/command/CommandCacheManager';
+import CommandCacheManager from './cache/CommandCacheManager';
 import CommandError from './error/CommandError';
 import UnexpectedError from './errors/UnexpectedError';
 import GuildMemberContext from './executionContexts/guild/GuildMemberContext';
 import InitialExecutionContext, {
   InitialParsedValues,
 } from './executionContexts/InitialExecutionContext';
-import ReactionListenerManager from '../../database/managers/command/listener/ReactionListenerManager';
-import ResponseListenerManager from '../../database/managers/command/listener/ResponseListenerManager';
+import ReactionListenerManager from './cache/listeners/ReactionListenerManager';
+import ResponseListenerManager from './cache/listeners/ResponseListenerManager';
 import Command from './command/Command';
-import {ConcreteCommandCacheWrapper} from '../../database/wrappers/command/CommandCacheWrapper';
+import {ConcreteCommandCacheWrapper} from './cache/CommandCacheWrapper';
 import MessageExecutionContext from './executionContexts/MessageExecutionContext';
 import ExecutionContext from './executionContexts/ExecutionContext';
 import ResponseExecutionContext from './executionContexts/ResponseExecutionContext';
@@ -26,7 +26,7 @@ import ReactionExecutionContext, {
 } from './executionContexts/ReactionExecutionContext';
 import ParserEngine, {ParseResults} from './parser/ParserEngine';
 import {commandParser} from './parsers/commandParser';
-import CommandGuildSettingsManager from '../../database/managers/command/CommandGuildSettingsManager';
+import CommandGuildSettingsManager from './settings/CommandGuildSettingsManager';
 
 @StaticImplements<ModuleConstructor>()
 export default class CommandModule extends Module {
@@ -105,7 +105,7 @@ export default class CommandModule extends Module {
         return;
       }
 
-      const prefix = guildContext?.settings.prefix ?? this.globalSettings.prefix;
+      const prefix = guildContext?.settings.prefix ?? this.globalSettings.defaultPrefix;
       if (!message.content.startsWith(prefix)) return;
 
       const parser = new ParserEngine(message.content, {

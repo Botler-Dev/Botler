@@ -1,7 +1,6 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {merge, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {container} from 'tsyringe';
 import {Entity} from '../wrapper/EntityWrapper';
 import DatabaseEventHub from '../DatabaseEventHub';
 
@@ -42,9 +41,9 @@ export default class CacheSynchronizer<
   protected readonly eventHub: DatabaseEventHub;
 
   constructor(
+    eventHub: DatabaseEventHub,
     tableName: string,
-    cacheKeyResolver: CacheKeyResolver<Pick<TEntity, TMinimalPayloadKeys>, TCacheKey>,
-    eventHub = container.resolve(DatabaseEventHub)
+    cacheKeyResolver: CacheKeyResolver<Pick<TEntity, TMinimalPayloadKeys>, TCacheKey>
   ) {
     this.tableName = tableName;
     this.cacheKeyResolver = cacheKeyResolver;

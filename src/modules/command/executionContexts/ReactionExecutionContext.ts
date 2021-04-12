@@ -1,7 +1,6 @@
 import {MessageReaction, User} from 'discord.js';
-import CommandCacheWrapper, {
-  ConcreteCommandCacheWrapper,
-} from '../../../database/wrappers/command/CommandCacheWrapper';
+import type CommandCacheWrapper from '../cache/CommandCacheWrapper';
+import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import Command from '../command/Command';
 import GuildMemberContext from './guild/GuildMemberContext';
 import UserExecutionContext from './UserExecutionContext';

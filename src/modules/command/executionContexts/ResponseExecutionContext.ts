@@ -1,7 +1,5 @@
 import {Message} from 'discord.js';
-import CommandCacheWrapper, {
-  ConcreteCommandCacheWrapper,
-} from '../../../database/wrappers/command/CommandCacheWrapper';
+import CommandCacheWrapper, {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import Command from '../command/Command';
 import ParserEngine, {ParseResults} from '../parser/ParserEngine';
 import GuildMemberContext from './guild/GuildMemberContext';

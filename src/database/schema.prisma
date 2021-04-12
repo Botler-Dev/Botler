@@ -1,0 +1,22 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// TODO: refactor all column names
+
+model GlobalSettings {
+  version       Int      @id @default(autoincrement())
+  botToken      String
+  defaultPrefix String   @default("?!")
+  colorDefault  Int      @default(7506394)
+  colorBad      Int      @default(16718602)
+  colorGood     Int      @default(3461464)
+  colorWarn     Int      @default(16745728)
+  cleanInterval Int      @default(600000)
+  botMasters    String[] @db.VarChar(20)
+}

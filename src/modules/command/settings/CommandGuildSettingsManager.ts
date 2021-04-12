@@ -1,34 +1,39 @@
+import {CommandGuildSettings, Prisma, PrismaClient} from '@prisma/client';
 import {GuildManager, GuildResolvable, Snowflake} from 'discord.js';
 import {injectable} from 'tsyringe';
-import {Connection} from 'typeorm';
+import DatabaseEventHub from '../../../database/DatabaseEventHub';
+import CacheManager from '../../../database/manager/CacheManager';
+import CacheSynchronizer from '../../../database/synchronizer/CacheSynchronizer';
+import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import {resolveIdChecked} from '../../../utils/resolve';
-import CommandGuildSettingsEntity from '../../entities/command/CommandGuildSettingsEntity';
-import CacheManager from '../../manager/CacheManager';
-import CacheSynchronizer from '../../synchronizer/CacheSynchronizer';
-import CommandGuildSettingsWrapper from '../../wrappers/command/CommandGuildSettingsWrapper';
-import GlobalSettingsWrapper from '../../wrappers/GlobalSettingsWrapper';
+import CommandGuildSettingsWrapper from './CommandGuildSettingsWrapper';
 
 @injectable()
 export default class CommandGuildSettingsManager extends CacheManager<
-  CommandGuildSettingsEntity,
+  PrismaClient['commandGuildSettings'],
   Snowflake,
   CommandGuildSettingsWrapper
 > {
-  private readonly synchronizer: CacheSynchronizer<CommandGuildSettingsEntity, 'guild', Snowflake>;
+  private readonly synchronizer: CacheSynchronizer<CommandGuildSettings, 'guild', Snowflake>;
 
   private readonly globalSettings: GlobalSettingsWrapper;
 
   private readonly guildManager: GuildManager;
 
   constructor(
-    connection: Connection,
+    prisma: PrismaClient,
     globalSettings: GlobalSettingsWrapper,
-    guildManager: GuildManager
+    guildManager: GuildManager,
+    eventHub: DatabaseEventHub
   ) {
-    super(CommandGuildSettingsEntity, connection);
+    super(prisma.commandGuildSettings);
     this.globalSettings = globalSettings;
     this.guildManager = guildManager;
-    this.synchronizer = new CacheSynchronizer(this.repo.metadata.tableName, ({guild}) => guild);
+    this.synchronizer = new CacheSynchronizer(
+      eventHub,
+      Prisma.ModelName.CommandGuildSettings,
+      ({guild}) => guild
+    );
   }
 
   async initialize(): Promise<void> {
@@ -42,24 +47,16 @@ export default class CommandGuildSettingsManager extends CacheManager<
     if (cached) return cached;
 
     const syncStream = this.synchronizer.getSyncStream(id);
+    const entity = await this.model.findUnique({where: {guild: id}});
     const wrapper = new CommandGuildSettingsWrapper(
       this,
       syncStream,
-      await this.repo.findOne(id),
+      entity ?? undefined,
       await this.guildManager.fetch(id),
       this.globalSettings
     );
     wrapper.afterUncache.subscribe(() => this.synchronizer.removeSyncStream(id));
     this.cacheWrapper(id, wrapper);
     return wrapper;
-  }
-
-  async hasDatabaseEntry(guild: GuildResolvable): Promise<boolean> {
-    const id: Snowflake = resolveIdChecked(this.guildManager, guild);
-
-    const cached = this.cache.get(id);
-    if (cached) return !!cached.entity;
-
-    return !!(await this.repo.findOne(id, {select: []}));
   }
 }

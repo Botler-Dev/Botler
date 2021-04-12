@@ -1,0 +1,46 @@
+model CommandGuildSettings {
+  guild  String  @id @db.VarChar(20)
+  prefix String?
+}
+
+model CommandCommandCache {
+  id                 Int      @id @default(autoincrement())
+  command            String
+  expirationDateTime DateTime @db.Timestamptz(6)
+  cache              Json     @db.Json
+
+  reactionListeners CommandReactionListener[]
+  responseListeners CommandResponseListener[]
+}
+
+// All listeners need to have cacheId be optional because Prisma currently does not support cascading deletes
+
+model CommandReactionListener {
+  id      Int                                 @id @default(autoincrement())
+  message String                              @db.VarChar(20)
+  user    String                              @db.VarChar(20)
+  emoji   String                              @db.VarChar(20)
+  action  CommandReactionListenerActionFilter
+  cacheId Int?
+
+  cache CommandCommandCache? @relation(fields: [cacheId], references: [id])
+
+  @@unique([message, user, emoji, action, cacheId])
+}
+
+enum CommandReactionListenerActionFilter {
+  Both
+  Add
+  Remove
+}
+
+model CommandResponseListener {
+  id      Int    @id @default(autoincrement())
+  channel String @db.VarChar(20)
+  user    String @db.VarChar(20)
+  cacheId Int?
+
+  cache CommandCommandCache? @relation(fields: [cacheId], references: [id])
+
+  @@unique([channel, user, cacheId])
+}

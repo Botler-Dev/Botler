@@ -1,4 +1,10 @@
 import {
+  CommandReactionListener,
+  CommandReactionListenerActionFilter,
+  Prisma,
+  PrismaClient,
+} from '@prisma/client';
+import {
   EmojiResolvable,
   Message,
   MessageReaction,
@@ -11,18 +17,16 @@ import {
 import {from} from 'rxjs';
 import {mergeAll} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
-import {Connection} from 'typeorm';
-import {ReactionAction} from '../../../../modules/command/executionContexts/ReactionExecutionContext';
+import DatabaseEventHub from '../../../../database/DatabaseEventHub';
+import EntityManager from '../../../../database/manager/EntityManager';
 import {resolveIdChecked} from '../../../../utils/resolve';
-import DatabaseEventHub from '../../../DatabaseEventHub';
-import ReactionListenerEntity, {
-  toReactiveListenerActionFilter,
-} from '../../../entities/command/ReactionListenerEntity';
-import EntityManager from '../../../manager/EntityManager';
+import {ReactionAction} from '../../executionContexts/ReactionExecutionContext';
 import ListenerCriterionCache from './ListenerCriterionCache';
 
 @injectable()
-export default class ReactionListenerManager extends EntityManager<ReactionListenerEntity> {
+export default class ReactionListenerManager extends EntityManager<
+  PrismaClient['commandReactionListener']
+> {
   private readonly cache = new ListenerCriterionCache<
     [
       messageId?: Snowflake,
@@ -34,31 +38,67 @@ export default class ReactionListenerManager extends EntityManager<ReactionListe
 
   private readonly userManager: UserManager;
 
-  constructor(connection: Connection, eventHub: DatabaseEventHub, userManager: UserManager) {
-    super(ReactionListenerEntity, connection);
+  constructor(prisma: PrismaClient, eventHub: DatabaseEventHub, userManager: UserManager) {
+    super(prisma.commandReactionListener);
     this.userManager = userManager;
-    from(eventHub.listenTo<ReactionListenerEntity>(`sync_${this.repo.metadata.tableName}_DELETE`))
+    from(
+      eventHub.listenTo<CommandReactionListener>(
+        `sync_${Prisma.ModelName.CommandReactionListener}_DELETE`
+      )
+    )
       .pipe(mergeAll())
       .subscribe(entity =>
         this.cache.remove(
-          entity.cache,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          entity.cacheId!,
           entity.message,
           entity.user || undefined,
-          entity.emoji || undefined
+          entity.emoji || undefined,
+          ReactionListenerManager.actionFilterToReactionAction(entity.action)
         )
       );
   }
 
   async initialize(): Promise<void> {
-    const listeners = await this.repo.find();
+    const listeners = await this.model.findMany();
     listeners.forEach(listener =>
       this.cache.add(
-        listener.cache,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        listener.cacheId!,
         listener.message,
         listener.user || undefined,
-        listener.emoji || undefined
+        listener.emoji || undefined,
+        ReactionListenerManager.actionFilterToReactionAction(listener.action)
       )
     );
+  }
+
+  private static actionFilterToReactionAction(
+    action: CommandReactionListenerActionFilter
+  ): ReactionAction | undefined {
+    switch (action) {
+      case CommandReactionListenerActionFilter.Add:
+        return ReactionAction.Add;
+      case CommandReactionListenerActionFilter.Remove:
+        return ReactionAction.Remove;
+      default:
+      case CommandReactionListenerActionFilter.Both:
+        return undefined;
+    }
+  }
+
+  private static reactionActionToActionFilter(
+    action: ReactionAction | undefined
+  ): CommandReactionListenerActionFilter {
+    switch (action) {
+      case ReactionAction.Add:
+        return CommandReactionListenerActionFilter.Add;
+      case ReactionAction.Remove:
+        return CommandReactionListenerActionFilter.Remove;
+      default:
+      case undefined:
+        return CommandReactionListenerActionFilter.Both;
+    }
   }
 
   private static resolveEmojiIdentifier(emoji: EmojiResolvable | string): string {
@@ -88,12 +128,14 @@ export default class ReactionListenerManager extends EntityManager<ReactionListe
     const {messageId, userId, emojiId} = this.resolveParameters<never>(message, user, emoji);
     await this.removeListener(cacheId, messageId, userId, emojiId, action);
     this.cache.add(cacheId, messageId, userId, emojiId, action);
-    await this.repo.insert({
-      message: messageId,
-      user: userId ?? '',
-      emoji: emojiId ?? '',
-      action: toReactiveListenerActionFilter(action),
-      cache: cacheId,
+    await this.model.create({
+      data: {
+        message: messageId,
+        user: userId ?? '',
+        emoji: emojiId ?? '',
+        action: ReactionListenerManager.reactionActionToActionFilter(action),
+        cacheId,
+      },
     });
   }
 
@@ -106,12 +148,17 @@ export default class ReactionListenerManager extends EntityManager<ReactionListe
   ): Promise<void> {
     const {messageId, userId, emojiId} = this.resolveParameters(message, user, emoji);
     this.cache.remove(cacheId, messageId, userId, emojiId, action);
-    await this.repo.delete({
-      cache: cacheId,
-      message: messageId,
-      user: userId,
-      emoji: emojiId,
-      action: action !== undefined ? toReactiveListenerActionFilter(action) : undefined,
+    await this.model.deleteMany({
+      where: {
+        cacheId,
+        message: messageId,
+        user: userId,
+        emoji: emojiId,
+        action:
+          action !== undefined
+            ? ReactionListenerManager.reactionActionToActionFilter(action)
+            : undefined,
+      },
     });
   }
 

@@ -1,15 +1,16 @@
-import {Connection} from 'typeorm';
+import {GlobalSettings, Prisma, PrismaClient} from '@prisma/client';
 import Logger from '../../logger/Logger';
 import {ExitCode, exitWithError} from '../../utils/process';
-import GlobalSettingsEntity from '../entities/GlobalSettingsEntity';
+import DatabaseEventHub from '../DatabaseEventHub';
 import CacheManager from '../manager/CacheManager';
 import GlobalSettingsSynchronizer from '../synchronizers/GlobalSettingsSynchronizer';
 import GlobalSettingsWrapper from '../wrappers/GlobalSettingsWrapper';
 
 export const GlobalSettingsCacheKey = 0 as const;
 
+// TODO: add logging
 export default class GlobalSettingsManager extends CacheManager<
-  GlobalSettingsEntity,
+  PrismaClient['globalSettings'],
   typeof GlobalSettingsCacheKey,
   GlobalSettingsWrapper
 > {
@@ -17,10 +18,10 @@ export default class GlobalSettingsManager extends CacheManager<
 
   private readonly logger: Logger;
 
-  constructor(connection: Connection, logger: Logger) {
-    super(GlobalSettingsEntity, connection);
+  constructor(prisma: PrismaClient, logger: Logger, eventHub: DatabaseEventHub) {
+    super(prisma.globalSettings);
     this.logger = logger;
-    this.synchronizer = new GlobalSettingsSynchronizer(this.repo.metadata.tableName);
+    this.synchronizer = new GlobalSettingsSynchronizer(eventHub);
   }
 
   async initialize(): Promise<void> {
@@ -32,15 +33,12 @@ export default class GlobalSettingsManager extends CacheManager<
     this.synchronizer.registerGlobalSettings(wrapper);
   }
 
-  private async fetchEntity(): Promise<GlobalSettingsEntity> {
-    const result = await this.repo
-      .createQueryBuilder('a')
-      .innerJoin(
-        qb => qb.select('MAX(version)', 'version').from(GlobalSettingsEntity, 'b'),
-        'b',
-        'a.version = b.version'
-      )
-      .getOne();
+  private async fetchEntity(): Promise<GlobalSettings> {
+    const result = await this.model.findFirst({
+      orderBy: {
+        version: Prisma.SortOrder.desc,
+      },
+    });
     if (!result)
       exitWithError(ExitCode.InvalidConfiguration, 'Could not find a GlobalSettings entry.');
     return result;
