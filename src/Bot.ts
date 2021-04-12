@@ -40,17 +40,7 @@ export default class Bot {
     container.register(Logger, {useValue: this.globalLogger});
     proxyNativeConsole(this.globalLogger);
 
-    this.prisma = new PrismaClient({
-      datasources: {
-        db: {
-          url:
-            process.env.DATABASE_URL ??
-            `postgresql://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@` +
-              `${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_DATABASE}?${process.env.DATABASE_ARGS}`,
-        },
-      },
-    });
-    // TODO: add logging of prisma events
+    this.prisma = await this.createPrismaClient();
     container.registerInstance(PrismaClient, this.prisma);
 
     this.eventHub = new DatabaseEventHub(this.masterLogger);
@@ -100,5 +90,38 @@ export default class Bot {
           'Discord token changed which requires a restart.'
         )
       );
+  }
+
+  private async createPrismaClient(): Promise<PrismaClient> {
+    const client = new PrismaClient({
+      datasources: {
+        db: {
+          url:
+            process.env.DATABASE_URL ??
+            `postgresql://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@` +
+              `${process.env.DATABASE_HOST}:${process.env.DATABASE_PORT}/${process.env.DATABASE_DATABASE}?${process.env.DATABASE_ARGS}`,
+        },
+      },
+      log: [
+        {level: 'query', emit: 'event'},
+        {level: 'info', emit: 'event'},
+        {level: 'warn', emit: 'event'},
+        {level: 'error', emit: 'event'},
+      ],
+    });
+
+    const logger = this.masterLogger.getScope('prisma');
+    client.$on('info', event => {
+      if (event.target === 'quaint::connector::metrics') return;
+      logger.info(event.message);
+    });
+    client.$on('warn', event => logger.warn(event.message));
+    client.$on('error', event => logger.error(event.message));
+    if (process.env.PRISMA_LOG_QUERIES?.toLowerCase() === 'true')
+      // eslint-disable-next-line no-console
+      client.$on('query', event => console.debug(event));
+
+    await client.$connect();
+    return client;
   }
 }

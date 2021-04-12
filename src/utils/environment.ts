@@ -8,26 +8,17 @@ function warnDevelopmentDefault(envName: string, defaultValue: string) {
 }
 
 export function preprocessEnvironmentVariables(): void {
-  process.env.TYPEORM_CONNECTION = 'postgres';
-  process.env.TYPEORM_ENTITIES = 'dist/database/entities/**/*.js';
-  process.env.TYPEORM_MIGRATIONS = 'dist/database/migration/*.js';
-  process.env.TYPEORM_ENTITIES_DIR = 'dist/database/entities';
-  process.env.TYPEORM_MIGRATIONS_DIR = 'dist/database/migration';
-
-  process.env.TYPEORM_HOST = process.env.TYPEORM_HOST || 'localhost';
-  process.env.TYPEORM_DATABASE = process.env.TYPEORM_DATABASE || 'postgres';
-  process.env.TYPEORM_PORT = process.env.TYPEORM_PORT || '5432';
-  process.env.TYPEORM_SYNCHRONIZE = isRunningInProduction
-    ? 'false'
-    : process.env.TYPEORM_SYNCHRONIZE ?? 'true';
+  process.env.DATABASE_HOST = process.env.DATABASE_HOST || 'localhost';
+  process.env.DATABASE_DATABASE = process.env.DATABASE_DATABASE || 'postgres';
+  process.env.DATABASE_PORT = process.env.DATABASE_PORT || '5432';
 
   if (isRunningInProduction) return;
-  if (!process.env.TYPEORM_USERNAME) {
-    process.env.TYPEORM_USERNAME = 'postgres';
-    warnDevelopmentDefault('TYPEORM_USERNAME', process.env.TYPEORM_USERNAME);
+  if (!process.env.DATABASE_USERNAME) {
+    process.env.DATABASE_USERNAME = 'postgres';
+    warnDevelopmentDefault('DATABASE_USERNAME', process.env.DATABASE_USERNAME);
   }
-  if (!process.env.TYPEORM_PASSWORD) {
-    process.env.TYPEORM_PASSWORD = 'botler';
-    warnDevelopmentDefault('TYPEORM_PASSWORD', process.env.TYPEORM_PASSWORD);
+  if (!process.env.DATABASE_PASSWORD) {
+    process.env.DATABASE_PASSWORD = 'botler';
+    warnDevelopmentDefault('DATABASE_PASSWORD', process.env.DATABASE_PASSWORD);
   }
 }

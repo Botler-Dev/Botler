@@ -47,7 +47,7 @@ declare namespace NodeJS {
 
     LOGGER_STAMP_FORMAT?: string;
 
-    DATABASE_USER?: string;
+    DATABASE_USERNAME?: string;
     DATABASE_PASSWORD?: string;
     DATABASE_HOST?: string;
     DATABASE_PORT?: string;
@@ -55,5 +55,7 @@ declare namespace NodeJS {
     DATABASE_ARGS?: string;
 
     DATABASE_URL?: string;
+
+    PRISMA_LOG_QUERIES?: string;
   }
 }

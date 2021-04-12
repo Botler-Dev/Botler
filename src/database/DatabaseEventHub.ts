@@ -47,11 +47,11 @@ export default class DatabaseEventHub {
 
   private static getEnvConfig(): ClientConfig {
     return cleanOptions(this.envCleanerDefinition, {
-      user: process.env.TYPEORM_USERNAME,
-      database: process.env.TYPEORM_DATABASE,
-      password: process.env.TYPEORM_PASSWORD,
-      port: process.env.TYPEORM_PORT,
-      host: process.env.TYPEORM_HOST,
+      user: process.env.DATABASE_USERNAME,
+      database: process.env.DATABASE_DATABASE,
+      password: process.env.DATABASE_PASSWORD,
+      port: process.env.DATABASE_PORT,
+      host: process.env.DATABASE_HOST,
     });
   }
 
