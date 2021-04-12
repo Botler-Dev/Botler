@@ -8,5 +8,4 @@ services:
       dockerfile: ./docker/Dockerfile.prod
     restart: unless-stopped
     environment:
-      NODE_ENV: production
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:?Database password not specified}
