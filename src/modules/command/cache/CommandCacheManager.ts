@@ -101,8 +101,8 @@ export default class CommandCacheManager extends CacheManager<
           expirationDateTime: {gte: new Date()},
         },
       });
-      wrappers.concat(
-        await Promise.all(
+      wrappers.push(
+        ...(await Promise.all(
           entities.map(entity => {
             const command = this.commandManager.instances.get(entity.commandName);
             if (!command) {
@@ -113,7 +113,7 @@ export default class CommandCacheManager extends CacheManager<
             }
             return this.wrapEntity(command, entity);
           })
-        )
+        ))
       );
     }
 
