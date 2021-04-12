@@ -51,9 +51,9 @@ export default class ReactionListenerManager extends EntityManager<
         this.cache.remove(
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           entity.cacheId!,
-          entity.message,
-          entity.user || undefined,
-          entity.emoji || undefined,
+          entity.messageId,
+          entity.userId || undefined,
+          entity.emojiId || undefined,
           ReactionListenerManager.actionFilterToReactionAction(entity.action)
         )
       );
@@ -65,9 +65,9 @@ export default class ReactionListenerManager extends EntityManager<
       this.cache.add(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         listener.cacheId!,
-        listener.message,
-        listener.user || undefined,
-        listener.emoji || undefined,
+        listener.messageId,
+        listener.userId || undefined,
+        listener.emojiId || undefined,
         ReactionListenerManager.actionFilterToReactionAction(listener.action)
       )
     );
@@ -130,9 +130,9 @@ export default class ReactionListenerManager extends EntityManager<
     this.cache.add(cacheId, messageId, userId, emojiId, action);
     await this.model.create({
       data: {
-        message: messageId,
-        user: userId ?? '',
-        emoji: emojiId ?? '',
+        messageId,
+        userId: userId ?? '',
+        emojiId: emojiId ?? '',
         action: ReactionListenerManager.reactionActionToActionFilter(action),
         cacheId,
       },
@@ -151,9 +151,9 @@ export default class ReactionListenerManager extends EntityManager<
     await this.model.deleteMany({
       where: {
         cacheId,
-        message: messageId,
-        user: userId,
-        emoji: emojiId,
+        messageId,
+        userId,
+        emojiId,
         action:
           action !== undefined
             ? ReactionListenerManager.reactionActionToActionFilter(action)

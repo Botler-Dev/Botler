@@ -87,15 +87,18 @@ export default class Bot {
   }
 
   private async login(): Promise<void> {
-    await this.client.login(this.globalSettings.botToken);
+    await this.client.login(this.globalSettings.discordToken);
     this.globalSettings.afterEntityChangeWithInitial
       .pipe(
-        map(entity => entity.botToken),
+        map(entity => entity.discordToken),
         distinctUntilChanged(),
         skip(1)
       )
       .subscribe(() =>
-        exitWithMessage(ExitCode.BotTokenChanged, 'Bot token changed which requires a restart.')
+        exitWithMessage(
+          ExitCode.DiscordTokenChanged,
+          'Discord token changed which requires a restart.'
+        )
       );
   }
 }

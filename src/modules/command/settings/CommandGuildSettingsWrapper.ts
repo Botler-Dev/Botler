@@ -45,7 +45,7 @@ export default class CommandGuildSettingsWrapper extends SynchronizedEntityWrapp
 
   protected createDefaultEntity(): CommandGuildSettings {
     return {
-      guild: this.guild.id,
+      guildId: this.guild.id,
       // eslint-disable-next-line unicorn/no-null
       prefix: null,
     };
@@ -55,7 +55,7 @@ export default class CommandGuildSettingsWrapper extends SynchronizedEntityWrapp
     if (!this.rawPrefix) {
       await this.manager.model.delete({
         where: {
-          guild: this.guild.id,
+          guildId: this.guild.id,
         },
       });
       return;
@@ -64,7 +64,7 @@ export default class CommandGuildSettingsWrapper extends SynchronizedEntityWrapp
       create: this.entity as CommandGuildSettings,
       update: this.entity as CommandGuildSettings,
       where: {
-        guild: this.guild.id,
+        guildId: this.guild.id,
       },
     });
   }

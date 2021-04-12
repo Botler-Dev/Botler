@@ -23,9 +23,9 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
     return this.entity.version;
   }
 
-  get botToken(): string {
-    this.logger.warn('Bot token was accessed.');
-    return this.entity.botToken;
+  get discordToken(): string {
+    this.logger.warn('Discord token was accessed.');
+    return this.entity.discordToken;
   }
 
   get defaultPrefix(): string {
@@ -36,8 +36,8 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
     this.updateEntity({defaultPrefix: value});
   }
 
-  get botMasterIds(): ReadonlyArray<Snowflake> {
-    return this.entity.botMasters;
+  get masterUserIds(): ReadonlyArray<Snowflake> {
+    return this.entity.masterUserIds;
   }
 
   get cleanInterval(): number {
@@ -78,7 +78,7 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
 
   isBotMaster(user: UserResolvable): boolean {
     const id = resolveIdChecked(this.userManager, user);
-    return this.botMasterIds.includes(id);
+    return this.masterUserIds.includes(id);
   }
 
   getColor(type?: ColorType): number {

@@ -34,14 +34,14 @@ export default class ResponseListenerManager extends EntityManager<
     )
       .pipe(mergeAll())
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      .subscribe(entity => this.cache.remove(entity.cacheId!, entity.user || undefined));
+      .subscribe(entity => this.cache.remove(entity.cacheId!, entity.userId || undefined));
   }
 
   async initialize(): Promise<void> {
     const listeners = await this.model.findMany();
     listeners.forEach(listener =>
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.cache.add(listener.cacheId!, listener.channel, listener.user || undefined)
+      this.cache.add(listener.cacheId!, listener.channelId, listener.userId || undefined)
     );
   }
 
@@ -65,8 +65,8 @@ export default class ResponseListenerManager extends EntityManager<
     this.cache.add(cacheId, channelId, userId);
     await this.model.create({
       data: {
-        channel: channelId,
-        user: userId ?? '',
+        channelId,
+        userId: userId ?? '',
         cacheId,
       },
     });
@@ -82,8 +82,8 @@ export default class ResponseListenerManager extends EntityManager<
     await this.model.deleteMany({
       where: {
         cacheId,
-        channel: channelId,
-        user: userId,
+        channelId,
+        userId,
       },
     });
   }

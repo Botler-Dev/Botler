@@ -14,7 +14,7 @@ export default class CommandGuildSettingsManager extends CacheManager<
   Snowflake,
   CommandGuildSettingsWrapper
 > {
-  private readonly synchronizer: CacheSynchronizer<CommandGuildSettings, 'guild', Snowflake>;
+  private readonly synchronizer: CacheSynchronizer<CommandGuildSettings, 'guildId', Snowflake>;
 
   private readonly globalSettings: GlobalSettingsWrapper;
 
@@ -32,7 +32,7 @@ export default class CommandGuildSettingsManager extends CacheManager<
     this.synchronizer = new CacheSynchronizer(
       eventHub,
       Prisma.ModelName.CommandGuildSettings,
-      ({guild}) => guild
+      ({guildId}) => guildId
     );
   }
 
@@ -47,7 +47,7 @@ export default class CommandGuildSettingsManager extends CacheManager<
     if (cached) return cached;
 
     const syncStream = this.synchronizer.getSyncStream(id);
-    const entity = await this.model.findUnique({where: {guild: id}});
+    const entity = await this.model.findUnique({where: {guildId: id}});
     const wrapper = new CommandGuildSettingsWrapper(
       this,
       syncStream,

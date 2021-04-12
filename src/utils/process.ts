@@ -4,7 +4,7 @@ export enum ExitCode {
   Success = 0,
   UnexpectedError = 1,
   InvalidConfiguration = 2,
-  BotTokenChanged = 3,
+  DiscordTokenChanged = 3,
   DatabaseEventHubError = 4,
 }
 

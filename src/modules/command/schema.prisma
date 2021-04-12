@@ -1,11 +1,11 @@
 model CommandGuildSettings {
-  guild  String  @id @db.VarChar(20)
-  prefix String?
+  guildId String  @id @db.VarChar(20)
+  prefix  String?
 }
 
 model CommandCommandCache {
   id                 Int      @id @default(autoincrement())
-  command            String
+  commandName        String
   expirationDateTime DateTime @db.Timestamptz(6)
   cache              Json     @db.Json
 
@@ -16,16 +16,16 @@ model CommandCommandCache {
 // All listeners need to have cacheId be optional because Prisma currently does not support cascading deletes
 
 model CommandReactionListener {
-  id      Int                                 @id @default(autoincrement())
-  message String                              @db.VarChar(20)
-  user    String                              @db.VarChar(20)
-  emoji   String                              @db.VarChar(20)
-  action  CommandReactionListenerActionFilter
-  cacheId Int?
+  id        Int                                 @id @default(autoincrement())
+  messageId String                              @db.VarChar(20)
+  userId    String                              @db.VarChar(20)
+  emojiId   String                              @db.VarChar(20)
+  action    CommandReactionListenerActionFilter
+  cacheId   Int?
 
   cache CommandCommandCache? @relation(fields: [cacheId], references: [id])
 
-  @@unique([message, user, emoji, action, cacheId])
+  @@unique([messageId, userId, emojiId, action, cacheId])
 }
 
 enum CommandReactionListenerActionFilter {
@@ -35,12 +35,12 @@ enum CommandReactionListenerActionFilter {
 }
 
 model CommandResponseListener {
-  id      Int    @id @default(autoincrement())
-  channel String @db.VarChar(20)
-  user    String @db.VarChar(20)
-  cacheId Int?
+  id        Int    @id @default(autoincrement())
+  channelId String @db.VarChar(20)
+  userId    String @db.VarChar(20)
+  cacheId   Int?
 
   cache CommandCommandCache? @relation(fields: [cacheId], references: [id])
 
-  @@unique([channel, user, cacheId])
+  @@unique([channelId, userId, cacheId])
 }

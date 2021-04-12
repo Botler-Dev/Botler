@@ -79,7 +79,7 @@ export default class CommandCacheManager extends CacheManager<
   >(command: Command<TWrapper>, expirationDateTime: Dayjs, cache: TCache): Promise<TWrapper> {
     const entity = (await this.model.create({
       data: {
-        command: command.name,
+        commandName: command.name,
         expirationDateTime: expirationDateTime.toDate(),
         cache,
       },
@@ -104,10 +104,10 @@ export default class CommandCacheManager extends CacheManager<
       wrappers.concat(
         await Promise.all(
           entities.map(entity => {
-            const command = this.commandManager.instances.get(entity.command);
+            const command = this.commandManager.instances.get(entity.commandName);
             if (!command) {
               this.logger.warn(
-                `Could not find command "${entity.command}" specified in command cache.`
+                `Could not find command "${entity.commandName}" specified in command cache.`
               );
               return undefined;
             }
