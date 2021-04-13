@@ -34,6 +34,7 @@ export default class ParseTestCommand extends Command<never, EmptyParseResults> 
     this.checkContextValidity(context);
 
     const memberResult = await context.parser.next(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       guildMemberParser(context.guild!.guild.members, {
         nameParseOptions: {whitespaceStopper: true, quotesAsLimiters: true},
       }),

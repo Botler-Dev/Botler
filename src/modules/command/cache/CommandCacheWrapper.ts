@@ -1,4 +1,4 @@
-import {CommandCommandCache, Prisma} from '@prisma/client';
+import {CommandCommandCache} from '@prisma/client';
 import dayjs, {Dayjs} from 'dayjs';
 import {
   EmojiResolvable,
