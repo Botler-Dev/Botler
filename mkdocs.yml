@@ -54,6 +54,7 @@ nav:
       - Run Botler: Development/Run-Botler.md
       - Configuration: Development/Configuration.md
       - Database:
+          - Prisma: Development/Database/Prisma.md
           - Entity System: Development/Database/Entity-System.md
       - Modules:
           - Command:
