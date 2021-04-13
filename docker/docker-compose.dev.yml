@@ -7,4 +7,5 @@ services:
     build:
       dockerfile: ./docker/Dockerfile.dev
     environment:
+      NODE_ENV: ${NODE_ENV:-development}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-botler}

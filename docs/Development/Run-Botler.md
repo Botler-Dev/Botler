@@ -1,44 +1,57 @@
 # Run Botler
 
-There are several different ways to run Botler. For development only running Postgres in Docker is recommended.
+There are two main different ways to run Botler: in a [Docker container](#using-docker) or natively [using Yarn](#using-yarn). For production running everything in Docker and for development only running the database in Docker is recommended.
 
 ## Using Yarn
 
-First, install the dependencies:
+1. Install all dependencies:
 
-```shell
-yarn install
-```
+    ```shell
+    yarn install
+    ```
 
-Then, because this project is written in TypeScript, you will have to first compile the code to JavaScript with the following command:
+2. Build the Prisma client:
 
-```shell
-yarn run build:dev
-# Or if the compiler should also watch for changes
-yarn run build:watch
-```
+    ```shell
+    yarn prisma generate
+    ```
 
-Now there should be a `dist` folder in the root with the compiled code.
-Before running Botler you will need to configure him first. See the [Configuration](Configuration.md) page for more information.
+    !!! note
+        This needs to be done each time you change a `.prisma` file. See ***[TBD docs]***
 
-After configuring the bot run the following command to start it:
+3. Compile the project from TypeScript to JavaScript:
 
-```shell
-yarn run start:dev
-```
+    ```shell
+    yarn run build:dev
+    # Or if the compiler should also watch for changes
+    yarn run build:watch
+    ```
 
-!!! note
-    The `start:dev` command supports debuggers like VSCode's [Node debugger](https://code.visualstudio.com/docs/nodejs/nodejs-debugging#_launch-configuration-support-for-npm-and-other-tools).
+    Now there should be a `dist` folder in the root with the compiled code.
+
+4. Configure Botler to your liking. See the [Configuration](Configuration.md) page for more information.
+5. Finally, run the following command to start it:
+
+    ```shell
+    yarn run start:dev
+    ```
+
+    !!! note
+        The `start:dev` command supports debuggers like VSCode's [Node debugger](https://code.visualstudio.com/docs/nodejs/nodejs-debugging#_launch-configuration-support-for-npm-and-other-tools).
 
 ## Using Docker
 
 The bot and the database can be entirely run inside Docker using Docker Compose in development and production environments.
-Both configurations are also additionally configurable via the following environment variables:
 
-|        Name         |               Default               | Description                                              |
-| :-----------------: | :---------------------------------: | :------------------------------------------------------- |
-| `DATABASE_PASSWORD` | `botler` in dev <br /> none in prod | Password of the `postgres` database user used by the bot |
-|   `DATABASE_PORT`   |               `5432`                | Port the database will be mounted to                     |
+Both configurations can be configured using the same environment variables listed on the [Configuration page](Configuration.md) with some changes to the default configuration:
+
+|      Name       |    Dev Default    | Prod Default |
+| :-------------: | :---------------: | :----------: |
+| `DATABASE_HOST` | `botler-database` |     same     |
+|   `NODE_ENV`    |   `development`   | `production` |
+
+!!! attention "The `.env` file"
+    The `docker-compose` command automatically consumes `.env` files in its working directory. Depending on its content it could accidentally set `DATABASE_HOST` to not point at the database container.
 
 !!! note "Yarn usage"
     The examples here all use `yarn [script name]` to make the commands shorter and easier to use/remember. If you want to use the `docker-compose` command directly, check the `scripts` property in `package.json` to see the contents of those scripts.
@@ -66,7 +79,7 @@ It first builds the bot in the same environment as the development configuration
 but then copies the final build into the [`mhart/alpine-node:slim`](https://hub.docker.com/r/mhart/alpine-node/) image and starts the bot in production mode.
 Additionally, the bot like the database always restarts unless manually stopped.
 
-The command for the production configuration is just like the development command but needs some environment variables manually provided (Check out the [Docker Compose Docs](https://docs.docker.com/compose/environment-variables/)) and has a different script name.
+The command for the production configuration is just like the development command but needs some environment variables manually provided (Check out the [Docker Compose Docs](https://docs.docker.com/compose/environment-variables/) to see how) and has a different script name.
 
 ```shell
 yarn docker:prod up --detach --build
