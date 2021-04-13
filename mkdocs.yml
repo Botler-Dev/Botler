@@ -49,6 +49,7 @@ markdown_extensions:
 nav:
   - Home:
       - Introduction: index.md
+      - Roadmap: Roadmap.md
       - License: License.md
   - Development:
       - Run Botler: Development/Run-Botler.md

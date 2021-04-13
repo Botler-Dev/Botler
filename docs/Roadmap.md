@@ -1,6 +1,6 @@
 # Roadmap
 
-This document roughly describes the order in which features will be implemented and what features
+This page roughly describes the order in which features will be implemented and what features
 will be implemented in what version.
 
 ## Version 0.3 - Base
