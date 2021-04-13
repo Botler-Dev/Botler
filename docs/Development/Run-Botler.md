@@ -66,7 +66,7 @@ Start the development config by running the following command in the project roo
 yarn docker:dev up --detach --build
 ```
 
-This command script calls `docker-compose` with the correct compose files which set the Postgres password to `botler` by default.
+This command script calls `docker-compose` with the correct compose files which set the PostgreSQL password to `botler` by default.
 
 !!! info "Parameter Meanings"
     - `--detach` will run the containers in the background and is optional. To inspect them use Docker Desktop or the Docker CLI.

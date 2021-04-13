@@ -29,9 +29,9 @@ In case there are unsaved changes and the bot receives changes from the database
 
 #### Database Change Notifications
 
-By default, PostgreSQL does not emit any notifications when data is manipulated. The entity system uses triggers created when running migrations to get notified of changes on specific tables.
+By default, PostgreSQL does not emit any notifications when data is manipulated. The entity system uses triggers created when running migrations to get notified of changes on specific tables. See the [Sync Triggers](Sync-Triggers.md) page for how to create these triggers.
 
 This solution is not perfect and has two key points that need to be kept in mind:
 
-- The `TRUNCATE` triggers don't work as specified in the [Documentation](https://www.postgresql.org/docs/current/sql-createtrigger.html) and are not implemented. Meaning the `TRUNCATE` statement should never be used on tables with synchronized caches as the entity system wouldn't get notified.
-- There is no way to only run the triggers on the result of a transaction. By default, they are put into a queue and executed after the transaction completes (Also called "deferred". See the [`CREATE TABLE` Documentation](https://www.postgresql.org/docs/current/sql-createtable.html)). This behavior must not be altered as it might lead to invalid change notifications. Specifically, when the transaction sends a change notification and then rolls back.
+- The `TRUNCATE` triggers don't work as specified in the [documentation](https://www.postgresql.org/docs/current/sql-createtrigger.html) and are not implemented. Meaning the `TRUNCATE` statement should never be used on tables with synchronized caches as the entity system wouldn't get notified.
+- There is no way to only run the triggers on the result of a transaction. By default, they are put into a queue and executed after the transaction completes (Also called "deferred". See the [`CREATE TABLE` documentation](https://www.postgresql.org/docs/current/sql-createtable.html)). This behavior must not be altered as it might lead to invalid change notifications. Specifically, when the transaction sends a change notification and then rolls back.

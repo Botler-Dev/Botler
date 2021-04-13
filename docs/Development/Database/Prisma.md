@@ -1,6 +1,6 @@
 # Prisma
 
-Botler uses [Prisma](https://www.prisma.io/) to interface with its Postgres database. Unfortunately, as the software is very young it still lacks some features to which the relevant workarounds are listed here.
+Botler uses [Prisma](https://www.prisma.io/) to interface with its PostgreSQL database. Unfortunately, as the software is very young it still lacks some features to which the relevant workarounds are listed here.
 
 ## Specifying the Schema
 
