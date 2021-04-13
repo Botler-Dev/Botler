@@ -1,7 +1,7 @@
 services:
   db:
     environment:
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?Database password not specified}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Database password not specified}
   bot:
     image: botler:latest
     build:
