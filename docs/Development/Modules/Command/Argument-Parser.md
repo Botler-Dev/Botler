@@ -9,4 +9,4 @@ The Command module provides already implemented parsers for the following things
 - Guild member
 - User
 
-Custom parsers can easily be implemented by created a function according to the `Parser` type. The parsers above can be used as examples.
+Custom parsers can easily be implemented by creating a function according to the `Parser` type. The parsers above can be used as examples.

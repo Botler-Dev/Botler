@@ -8,8 +8,8 @@ will be implemented in what version.
 | Name                             | Description                                                   | Status |
 | -------------------------------- | ------------------------------------------------------------- | ------ |
 | **Basic Command Implementation** | Just command execution with input parsing and simple response | Done   |
-| **Command Response Listener**    | Command can listen for a message response of the user         | WIP    |
-| **Command Reaction Listener**    | Command can listen for reactions on messages                  | WIP    |
+| **Command Response Listener**    | Command can listen for a message response of the user         | Done   |
+| **Command Reaction Listener**    | Command can listen for reactions on messages                  | Done   |
 | **Cache**                        | Cache often used database objects                             | Done   |
 | **Active Cache**                 | Actively sync the cache with the database                     | Done   |
 

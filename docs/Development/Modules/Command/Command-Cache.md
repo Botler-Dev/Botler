@@ -8,7 +8,7 @@ The benefit of creating a custom cache by extending `CommandCacheWrapper` is tha
 
 Command caches can only be created using the `InitialExecutionContext` by calling the `createCache` with an expiration date and the raw initial cache. This call will be propagated to the `CommandCacheManager` which then creates the database entity and passes it to the commands `wrapCacheEntity` method. The resulting `CommandCacheWrapper` will then be returned as a result of the `createCache` method call and set as the context's cache. The context's cache is stored in the `cache` property in all `ExecutionContext` classes. In case the cache needs to be retrieved from the database the `wrapCacheEntity` of the command will also be used. Meaning `wrapCacheEntity` is expected to handle all saved states.
 
-Once a command cache expires, it can no longer be retrieved from the `CommandCacheManager` but is guaranteed to exist at least 5 minutes (defined in `CommandCacheEntity.DELETE_DELAY`) after its expiration. This is done to prevent cache deletion while it is still being processed by a command. You can also manually delete the cache by calling the wrapper's `delete` method.
+Once a command cache expires, it can no longer be retrieved from the `CommandCacheManager` but is guaranteed to exist at least 5 minutes (defined in `CommandCacheWrapper.DELETE_DELAY`) after its expiration. This is done to prevent cache deletion while it is still being processed by a command. You can also manually delete the cache by calling the wrapper's `delete` method.
 
 ## Listeners
 
