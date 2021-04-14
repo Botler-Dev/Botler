@@ -2,7 +2,7 @@
 
 Botler uses [Prisma](https://www.prisma.io/) to interface with its PostgreSQL database. Unfortunately, as the software is very young it still lacks some features to which the relevant workarounds are listed here.
 
-## Specifying the Schema
+## Specifying the schema
 
 Officially having multiple Prisma schema files is currently not supported (See issue [#2377](https://github.com/prisma/prisma/issues/2377)) but to keep this project as modular as possible we use [prisma-merge](https://www.npmjs.com/package/prisma-merge) as a workaround. This blindly concatenates all specified schema files together into the `schema.prisma` file in the root. This merge operation can be performed in the following ways:
 
@@ -44,4 +44,12 @@ DATABASE_DATABASE="postgres"
 DATABASE_ARGS="schema=public"
 
 DATABASE_URL="postgresql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DATABASE}?${DATABASE_ARGS}"
+```
+
+## Applying migrations
+
+To apply all migrations to a database first [configure the database URL](#configuring-the-database-url) then run the following command:
+
+```shell
+yarn prisma migrate deploy
 ```

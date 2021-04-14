@@ -17,7 +17,7 @@ There are two main different ways to run Botler: in a [Docker container](#using-
     ```
 
     !!! note
-        This needs to be done each time you change a `.prisma` file. See ***[TBD docs]***
+        This needs to be done each time you change a `.prisma` file. See the [Prisma page](Database/Prisma.md#specifying-the-schema) for the reason why.
 
 3. Compile the project from TypeScript to JavaScript:
 
@@ -30,7 +30,8 @@ There are two main different ways to run Botler: in a [Docker container](#using-
     Now there should be a `dist` folder in the root with the compiled code.
 
 4. Configure Botler to your liking. See the [Configuration](Configuration.md) page for more information.
-5. Finally, run the following command to start it:
+5. Start the database (See [how to in docker](#using-docker-only-for-the-database)) and [apply all migrations](Database/Prisma.md#applying-migrations).
+6. Finally, run the following command to start it:
 
     ```shell
     yarn run start:dev
@@ -52,6 +53,9 @@ Both configurations can be configured using the same environment variables liste
 
 !!! attention "The `.env` file"
     The `docker-compose` command automatically consumes `.env` files in its working directory. Depending on its content it could accidentally set `DATABASE_HOST` to not point at the database container.
+
+!!! attention "Configuration and migrations"
+    This section expects the database to already have [all migrations applied](Database/Prisma.md#applying-migrations) and the bot to be [configured properly](Configuration.md).
 
 !!! note "Yarn usage"
     The examples here all use `yarn [script name]` to make the commands shorter and easier to use/remember. If you want to use the `docker-compose` command directly, check the `scripts` property in `package.json` to see the contents of those scripts.
@@ -93,7 +97,7 @@ If you want to just run the database in Docker there are some commands provided 
 # Start the database
 yarn db:start
 
-# Start the database and detach from command
+# Start the database and detach it from the command
 yarn db:deploy
 
 # Stop the database

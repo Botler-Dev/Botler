@@ -1,8 +1,11 @@
 # Configuration
 
-Botler can be configured via the environment variables below.
+For Botler to start there needs to be at least one entry in the `GlobalSettings` table. You can insert it yourself with your tool of choice or make Botler create it via the `DISCORD_TOKEN` environment variable.
 
-<!-- The underscores surrounding "Name" are there to force a certain column with. This should be done via CSS in the future -->
+## Environment variables
+
+This table shows all environment variables that Botler can be configured with.
+
 | <div style="width:150px">Name</div> |        Dev Default        | Prod Default | Description                                                                                                                                                                          |
 | :---------------------------------: | :-----------------------: | :----------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 |             `NODE_ENV`              |             -             |      -       | In what environment the bot is running. Options are `development` (default if empty or invalid) and `production`.                                                                    |
