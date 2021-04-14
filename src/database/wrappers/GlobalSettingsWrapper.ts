@@ -64,7 +64,11 @@ export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
       manager,
       syncStream.pipe(
         tap(newEntity => {
-          if (newEntity) return;
+          if (newEntity) {
+            this.logger.info(`Current GlobalSettings entry was updated.`);
+            return;
+          }
+          this.logger.info(`Current GlobalSettings entry was deleted.`);
           this.manager.refetch();
         }),
         filter((newEntity): newEntity is GlobalSettings => !!newEntity)

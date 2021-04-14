@@ -49,7 +49,7 @@ export default class Bot {
 
     this.globalSettingsManager = new GlobalSettingsManager(
       this.prisma,
-      this.globalLogger,
+      this.masterLogger,
       this.eventHub
     );
     await this.globalSettingsManager.initialize();

@@ -1,5 +1,6 @@
 import {GlobalSettings, Prisma, PrismaClient} from '@prisma/client';
 import Logger from '../../logger/Logger';
+import MasterLogger from '../../logger/MasterLogger';
 import {isRunningInProduction} from '../../utils/environment';
 import {ExitCode, exitWithError} from '../../utils/process';
 import DatabaseEventHub from '../DatabaseEventHub';
@@ -9,7 +10,6 @@ import GlobalSettingsWrapper from '../wrappers/GlobalSettingsWrapper';
 
 export const GlobalSettingsCacheKey = 0 as const;
 
-// TODO: add logging
 export default class GlobalSettingsManager extends CacheManager<
   PrismaClient['globalSettings'],
   typeof GlobalSettingsCacheKey,
@@ -19,9 +19,9 @@ export default class GlobalSettingsManager extends CacheManager<
 
   private readonly logger: Logger;
 
-  constructor(prisma: PrismaClient, logger: Logger, eventHub: DatabaseEventHub) {
+  constructor(prisma: PrismaClient, masterLogger: MasterLogger, eventHub: DatabaseEventHub) {
     super(prisma.globalSettings);
-    this.logger = logger;
+    this.logger = masterLogger.getScope('settings');
     this.synchronizer = new GlobalSettingsSynchronizer(eventHub);
   }
 
@@ -35,6 +35,7 @@ export default class GlobalSettingsManager extends CacheManager<
   }
 
   private async fetchEntity(): Promise<GlobalSettings> {
+    this.logger.info('Fetching GlobalSettings entry.');
     let result = await this.model.findFirst({
       orderBy: {
         version: Prisma.SortOrder.desc,

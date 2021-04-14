@@ -139,7 +139,7 @@ export default class MasterLogger {
       metaString += this.finalizeLabel(
         metadata.scope.toUpperCase(),
         this.config.scopeColor,
-        this.config.scopePad ?? this.maxScopeLength
+        this.config.scopePad ?? this.maxScopeLength + 1
       );
     }
     const logLevel = LOG_LEVEL_STRINGS[metadata.level];
