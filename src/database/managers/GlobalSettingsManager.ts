@@ -1,5 +1,6 @@
 import {GlobalSettings, Prisma, PrismaClient} from '@prisma/client';
 import Logger from '../../logger/Logger';
+import {isRunningInProduction} from '../../utils/environment';
 import {ExitCode, exitWithError} from '../../utils/process';
 import DatabaseEventHub from '../DatabaseEventHub';
 import CacheManager from '../manager/CacheManager';
@@ -34,13 +35,30 @@ export default class GlobalSettingsManager extends CacheManager<
   }
 
   private async fetchEntity(): Promise<GlobalSettings> {
-    const result = await this.model.findFirst({
+    let result = await this.model.findFirst({
       orderBy: {
         version: Prisma.SortOrder.desc,
       },
     });
-    if (!result)
-      exitWithError(ExitCode.InvalidConfiguration, 'Could not find a GlobalSettings entry.');
+    if (!result) {
+      this.logger.warn(`Could not find a GlobalSettings entry.`);
+      if (isRunningInProduction)
+        exitWithError(
+          ExitCode.InvalidConfiguration,
+          `No GlobalSettings entry in production is fatal.`
+        );
+      if (!process.env.DISCORD_TOKEN)
+        exitWithError(
+          ExitCode.InvalidConfiguration,
+          `The "DISCORD_TOKEN" environment variable is not set. No GlobalSettings entry could be generated.`
+        );
+      this.logger.warn(`Generating a GlobalSettings entry. This would be fatal in production.`);
+      result = await this.model.create({
+        data: {
+          discordToken: process.env.DISCORD_TOKEN,
+        },
+      });
+    }
     return result;
   }
 

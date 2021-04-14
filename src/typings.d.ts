@@ -57,5 +57,6 @@ declare namespace NodeJS {
     DATABASE_URL?: string;
 
     PRISMA_LOG_QUERIES?: string;
+    DISCORD_TOKEN?: string;
   }
 }

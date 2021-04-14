@@ -28,6 +28,7 @@ Botler can be configured via the environment variables below.
 |        `LOGGER_STAMP_FORMAT`        | `YYYY/MM/DD HH:mm:ss.sss` |     same     | Format of timestamp label. See the [Day.js docs](https://day.js.org/docs/en/display/format) for more information.                                                                    |
 |        **DEBUGGING OPTIONS**        |
 |        `PRISMA_LOG_QUERIES`         |          `false`          |     same     | If all database queries performed via Prisma should be logged.                                                                                                                       |
+|           `DISCORD_TOKEN`           |             -             |      -       | Discord token to generate a GlobalSettings entry with non exists. Will be ignored in production.                                                                                     |
 
 !!! tip "More Logger Colors"
     You can set label colors (`LOGGER_*_COLOR` variables) to any [CSS color keyword](https://www.w3.org/wiki/CSS/Properties/color/keywords)
