@@ -123,8 +123,7 @@ export default class ModuleLoader {
   ) {
     if (!checkedModules.get(module) || accumulatedModules.has(module)) return;
     accumulatedModules.add(module);
-    module.requiredDependencies
-      .concat(module.optionalDependencies)
+    [...module.requiredDependencies, ...module.optionalDependencies]
       .map(dependency => this.resolveModuleConstructorUnchecked(dependency))
       .filter((constructor): constructor is ModuleConstructor => !!constructor)
       .forEach(constructor => this.unwrapModule(checkedModules, accumulatedModules, constructor));

@@ -87,6 +87,6 @@ export function stack(
   ...cleaners: SimpleOptionValueCleaner<unknown, unknown>[]
 ): SimpleOptionValueCleaner<unknown, unknown> {
   return (raw, key, inputOptions) =>
-    // eslint-disable-next-line unicorn/no-reduce
+    // eslint-disable-next-line unicorn/no-array-reduce
     cleaners.reduce((accumulated, nextCleaner) => nextCleaner(accumulated, key, inputOptions), raw);
 }

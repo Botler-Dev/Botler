@@ -64,7 +64,7 @@ export default class CommandCategory {
     return (
       path
         .split('/')
-        // eslint-disable-next-line unicorn/no-reduce
+        // eslint-disable-next-line unicorn/no-array-reduce
         .reduce<CommandCategory | undefined>(
           (previousCategory, name) => previousCategory?.subcategories.get(name),
           this

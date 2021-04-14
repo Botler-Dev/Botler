@@ -89,7 +89,7 @@ export default class ResponseListenerManager extends EntityManager<
   }
 
   findCacheIds(message: Message): number[] {
-    // eslint-disable-next-line unicorn/no-fn-reference-in-iterator
+    // eslint-disable-next-line unicorn/no-array-callback-reference
     return this.cache.find(message.channel.id, message.author.id);
   }
 }

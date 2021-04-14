@@ -55,9 +55,7 @@ export default abstract class Module {
     propertyName: string
   ): void | never {
     const name = resolveModuleName(module);
-    const inDependencies = !!dependencies.find(
-      dependency => resolveModuleName(dependency) === name
-    );
+    const inDependencies = dependencies.some(dependency => resolveModuleName(dependency) === name);
     if (!inDependencies)
       throw new Error(`Tried to get module "${name}" that is not in the "${propertyName}" list.`);
   }

@@ -12,7 +12,6 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:unicorn/recommended',
     'prettier',
-    'prettier/@typescript-eslint',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -46,6 +45,8 @@ module.exports = {
     'unicorn/no-useless-undefined': 'off',
     // Database entities have their optional fields set to null
     'unicorn/no-null': 'warn',
+    // For loops are not allowed by the Airbnb style guide
+    'unicorn/no-array-for-each': 'off',
 
     // Copied from https://github.com/airbnb/javascript/issues/1536#issuecomment-547416680
     'unicorn/import-index': 'off',
