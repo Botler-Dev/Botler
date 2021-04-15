@@ -1,4 +1,3 @@
-import {DependencyContainer} from 'tsyringe';
 import type CommandCacheManager from '../cache/CommandCacheManager';
 import type ReactionListenerManager from '../cache/listeners/ReactionListenerManager';
 import type ResponseListenerManager from '../cache/listeners/ResponseListenerManager';
@@ -38,15 +37,9 @@ export default abstract class Command<
 
   abstract readonly isBotMasterOnly: boolean;
 
-  protected readonly container: DependencyContainer;
-
   protected readonly globalSettings: GlobalSettingsWrapper;
 
-  constructor(
-    container: DependencyContainer,
-    globalSettings = container.resolve(GlobalSettingsWrapper)
-  ) {
-    this.container = container;
+  constructor(globalSettings: GlobalSettingsWrapper) {
     this.globalSettings = globalSettings;
   }
 
