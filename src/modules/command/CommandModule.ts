@@ -27,8 +27,6 @@ import ReactionExecutionContext, {
 import ParserEngine, {ParseResults} from './parser/ParserEngine';
 import {commandParser} from './parsers/commandParser';
 import CommandGuildSettingsManager from './settings/CommandGuildSettingsManager';
-import CacheTestCommand from './commands/CacheTestCommand';
-import ParseTestCommand from './commands/ParseTestCommand';
 
 @StaticImplements<ModuleConstructor>()
 export default class CommandModule extends Module {
@@ -83,11 +81,6 @@ export default class CommandModule extends Module {
     await this.responseListeners.initialize();
     await this.reactionListeners.initialize();
     await this.guildSettings.initialize();
-  }
-
-  async initialize(): Promise<void> {
-    this.rootCategory.registerCommand(new CacheTestCommand(this.container));
-    this.rootCategory.registerCommand(new ParseTestCommand(this.container));
   }
 
   async postInitialize(): Promise<void> {
