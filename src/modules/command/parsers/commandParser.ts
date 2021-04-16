@@ -41,8 +41,8 @@ export function commandParser(
   const cleaned = cleanOptions(commandParseOptionsDefinition, options ?? {});
   return async (raw: string): Promise<CommandParseResult | undefined> => {
     const nameResult = await stringParser({
-      disallowEmpty: true,
       whitespaceStopper: true,
+      quotesAsLimiters: false,
     })(raw);
     if (!nameResult) return undefined;
     const name = nameResult.value.toLowerCase();

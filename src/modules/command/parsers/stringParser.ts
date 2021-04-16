@@ -4,12 +4,12 @@ import {Parser, ParseResult} from '../parser/parser';
 
 export interface StringParseOptions {
   /**
-   * If whitespace should be interpreted as a stop. (default `false`)
+   * If whitespace should be interpreted as a stop. (default `true`)
    */
   whitespaceStopper?: boolean;
   /**
    * If `"` should be interpreted as limiters if present.
-   * Will overwrite `whitespaceStopper` in that case. (default `false`)
+   * Will overwrite `whitespaceStopper` in that case. (default `true`)
    */
   quotesAsLimiters?: boolean;
   /**
@@ -28,8 +28,8 @@ const stringParseOptionsDefinition: OptionsCleanerDefinition<
   StringParseOptions,
   CleanStringParseOptions
 > = {
-  whitespaceStopper: optional(false),
-  quotesAsLimiters: optional(false),
+  whitespaceStopper: optional(true),
+  quotesAsLimiters: optional(true),
   disallowEmpty: optional(true),
 };
 
