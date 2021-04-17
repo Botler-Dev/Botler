@@ -7,10 +7,10 @@ export default class PermissionDeniedError extends SimpleErrorResponseError {
    * @param {string} action String inserted into the following: `You are not allowed to [action].` (Default `perform this action`)
    */
   constructor(
+    globalSettings: GlobalSettingsWrapper,
     channel: TextBasedChannel,
-    action = 'perform this action',
-    globalSettings?: GlobalSettingsWrapper
+    action = 'perform this action'
   ) {
-    super(channel, `You are not allowed to ${action}`, undefined, globalSettings);
+    super(globalSettings, channel, `You are not allowed to ${action}`, undefined);
   }
 }

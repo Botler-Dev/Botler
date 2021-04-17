@@ -3,12 +3,12 @@ import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrap
 import SimpleErrorResponseError from '../error/SimpleErrorResponseError';
 
 export default class WrongScopeError extends SimpleErrorResponseError {
-  constructor(channel: TextBasedChannel, globalSettings?: GlobalSettingsWrapper) {
+  constructor(globalSettings: GlobalSettingsWrapper, channel: TextBasedChannel) {
     super(
+      globalSettings,
       channel,
       `This command can only be used in ${channel instanceof DMChannel ? 'servers' : 'DMs'}.`,
-      undefined,
-      globalSettings
+      undefined
     );
   }
 }

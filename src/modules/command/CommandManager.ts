@@ -1,8 +1,9 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
-import {DependencyContainer} from 'tsyringe';
+import {injectable} from 'tsyringe';
 import Logger from '../../logger/Logger';
 import Command, {CommandName} from './command/Command';
 
+@injectable()
 export default class CommandManager {
   /**
    * All commands mapped with only their `name` properties.
@@ -24,8 +25,8 @@ export default class CommandManager {
 
   private readonly logger: Logger;
 
-  constructor(container: DependencyContainer) {
-    this.logger = container.resolve(Logger);
+  constructor(logger: Logger) {
+    this.logger = logger;
   }
 
   register(command: Command): void {

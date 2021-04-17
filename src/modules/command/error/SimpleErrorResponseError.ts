@@ -1,5 +1,4 @@
 import {MessageEmbed, TextBasedChannel} from 'discord.js';
-import {container} from 'tsyringe';
 import GlobalSettingsWrapper, {ColorType} from '../../../database/wrappers/GlobalSettingsWrapper';
 import ResponseError from './ResponseError';
 
@@ -7,13 +6,13 @@ export default class SimpleErrorResponseError extends ResponseError {
   readonly publicMessage: string;
 
   constructor(
+    globalSettings: GlobalSettingsWrapper,
     channel: TextBasedChannel,
     publicMessage: string,
     messageOrRealError:
       | Error
       | string
-      | undefined = `SimpleErrorResponseError with public message "${publicMessage}".`,
-    globalSettings = container.resolve(GlobalSettingsWrapper)
+      | undefined = `SimpleErrorResponseError with public message "${publicMessage}".`
   ) {
     const embed = new MessageEmbed()
       .setColor(globalSettings.getColor(ColorType.Bad))

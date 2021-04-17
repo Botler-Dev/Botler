@@ -30,14 +30,13 @@ export default class CommandCategory {
     return this._subcategories;
   }
 
-  private readonly container: DependencyContainer;
-
   private readonly logger: Logger;
 
   private readonly commandManager: CommandManager;
 
   constructor(
-    container: DependencyContainer,
+    logger: Logger,
+    commandManager: CommandManager,
     parent: CommandCategory | undefined,
     name: CommandCategoryName,
     description?: string
@@ -46,15 +45,14 @@ export default class CommandCategory {
     this.name = name;
     this.description = description;
     this.path = `${parent?.path ?? ''}${name}/`;
-    this.container = container;
-    this.logger = container.resolve(Logger);
-    this.commandManager = container.resolve(CommandManager);
+    this.logger = logger;
+    this.commandManager = commandManager;
   }
 
   createSubcategory(name: CommandCategoryName, description?: string): CommandCategory {
     let category = this.subcategories.get(name);
     if (category) return category;
-    category = new CommandCategory(this.container, this, name, description);
+    category = new CommandCategory(this.logger, this.commandManager, this, name, description);
     this._subcategories.set(name, category);
     this.logger.info(`Created new command category "${category.path}".`);
     return category;

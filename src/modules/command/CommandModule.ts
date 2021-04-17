@@ -59,9 +59,9 @@ export default class CommandModule extends Module {
   ) {
     super(moduleContainer);
 
-    this.commands = new CommandManager(this.container);
-    this.container.registerInstance(CommandManager, this.commands);
-    this.rootCategory = new CommandCategory(this.container, undefined, '');
+    this.container.registerSingleton(CommandManager);
+    this.commands = this.container.resolve(CommandManager);
+    this.rootCategory = new CommandCategory(this.logger, this.commands, undefined, '');
 
     this.container.registerSingleton(ResponseListenerManager);
     this.container.registerSingleton(ReactionListenerManager);
@@ -187,9 +187,13 @@ export default class CommandModule extends Module {
       if (error instanceof CommandError) {
         commandError = error;
       } else if (context instanceof MessageExecutionContext) {
-        commandError = new UnexpectedError(context.message.channel, error);
+        commandError = new UnexpectedError(this.globalSettings, context.message.channel, error);
       } else if (context instanceof ReactionExecutionContext) {
-        commandError = new UnexpectedError(context.reaction.message.channel, error);
+        commandError = new UnexpectedError(
+          this.globalSettings,
+          context.reaction.message.channel,
+          error
+        );
       }
 
       if (commandError?.realError)
