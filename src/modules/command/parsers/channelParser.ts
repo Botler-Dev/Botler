@@ -117,7 +117,11 @@ export default function channelParser<TChannel extends GuildChannel>(
     let highestSimilarity = 0;
     let bestMatchChannel = channels.first();
     channels.forEach(potentialChannel => {
-      if (cleaned.similarNameTypeFilter?.some(type => potentialChannel instanceof type)) return;
+      if (
+        cleaned.similarNameTypeFilter &&
+        !cleaned.similarNameTypeFilter.some(type => potentialChannel instanceof type)
+      )
+        return;
       const similarity = compareTwoStrings(queryName, potentialChannel.name);
       if (highestSimilarity >= similarity) return;
       highestSimilarity = similarity;
