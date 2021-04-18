@@ -9,7 +9,7 @@ export default abstract class BaseExecutionContext<
 > {
   readonly command: TCommand;
 
-  readonly guild?: TGuildContext;
+  readonly guild: TGuildContext;
 
   private _cache: TCacheState;
 
