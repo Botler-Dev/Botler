@@ -28,7 +28,7 @@ export interface ChannelParseOptions {
    */
   searchId?: boolean;
   /**
-   * If same/similar channel id should be searched for. (default `true`)
+   * If same/similar channel name should be searched for. (default `true`)
    */
   searchName?: boolean;
   /**
@@ -40,9 +40,9 @@ export interface ChannelParseOptions {
    */
   allowSimilar?: boolean;
   /**
-   * Channel types which should be included in similarity search. (default all channel types)
+   * Channel types which should be included in name search. (default all channel types)
    */
-  similarNameTypeFilter?: GuildChannelType[];
+  nameTypeFilter?: GuildChannelType[];
   /**
    * Threshold for when a similarity search result can be considered valid. (default `0.2`)
    */
@@ -65,7 +65,7 @@ const channelParseOptionsDefinition: OptionsCleanerDefinition<
   searchName: optional(true),
   nameParseOptions: optional({}),
   allowSimilar: optional(true),
-  similarNameTypeFilter: unchecked(),
+  nameTypeFilter: unchecked(),
   similarityThreshold: optional(0.2),
 };
 
@@ -106,8 +106,11 @@ export default function channelParser<TChannel extends GuildChannel>(
       value: channel,
       length: nameResult.length,
     });
+    const nameSearchChannels = !cleaned.nameTypeFilter
+      ? channels
+      : channels.filter(channel => !!cleaned.nameTypeFilter?.some(type => channel instanceof type));
 
-    const exactMatchChannel = channels.find(channel => channel.name === nameResult.value);
+    const exactMatchChannel = nameSearchChannels.find(channel => channel.name === nameResult.value);
     if (exactMatchChannel) return generateResult(exactMatchChannel);
 
     if (!cleaned.allowSimilar) return undefined;
@@ -115,13 +118,8 @@ export default function channelParser<TChannel extends GuildChannel>(
       .slice(0, DISCORD_CHANNEL_NAME_MAX_LENGTH)
       .toLocaleLowerCase();
     let highestSimilarity = 0;
-    let bestMatchChannel = channels.first();
-    channels.forEach(potentialChannel => {
-      if (
-        cleaned.similarNameTypeFilter &&
-        !cleaned.similarNameTypeFilter.some(type => potentialChannel instanceof type)
-      )
-        return;
+    let bestMatchChannel = nameSearchChannels.first();
+    nameSearchChannels.forEach(potentialChannel => {
       const similarity = compareTwoStrings(queryName, potentialChannel.name);
       if (highestSimilarity >= similarity) return;
       highestSimilarity = similarity;
