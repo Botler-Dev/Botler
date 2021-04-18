@@ -64,6 +64,13 @@ export default class ParserEngine<TExistingResults extends ParseResults = EmptyP
     return result;
   }
 
+  async nextValue<TResult extends ParseResult>(
+    parser: Parser<TResult>,
+    name?: string
+  ): Promise<TResult['value'] | undefined> {
+    return (await this.next(parser, name))?.value;
+  }
+
   protected addParseResult<TName extends keyof TExistingResults>(
     name: TName,
     result: Exclude<TExistingResults[TName], undefined>
