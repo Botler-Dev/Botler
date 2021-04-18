@@ -150,11 +150,13 @@ export default class ModuleLoader {
     this.logger.info(`Finished loading modules.`);
   }
 
-  getModuleUnchecked<TModule extends Module>(module: ModuleResolvable): TModule | undefined {
+  getModuleUnchecked<TModule extends Module>(
+    module: ModuleResolvable<TModule>
+  ): TModule | undefined {
     return this.modules.get(resolveModuleName(module)) as TModule | undefined;
   }
 
-  getModule<TModule extends Module>(module: ModuleResolvable): TModule {
+  getModule<TModule extends Module>(module: ModuleResolvable<TModule>): TModule {
     const name = resolveModuleName(module);
     const instance = this.modules.get(name) as TModule | undefined;
     if (!instance) throw new Error(`No instance of module "${name}" was found.`);
