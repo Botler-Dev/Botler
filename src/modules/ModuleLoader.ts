@@ -144,7 +144,7 @@ export default class ModuleLoader {
       .map(constructor => new constructor(this.globalContainer.createChildContainer()))
       .forEach(module => this._modules.set(module.name, module));
     await Promise.all(this.modules.map(module => module.preInitialize?.()));
-    await Promise.all(this.modules.map(module => module.initialize?.()));
+    await Promise.all(this.modules.map(module => module.initialize?.(this)));
     await Promise.all(this.modules.map(module => module.postInitialize?.()));
 
     this.logger.info(`Finished loading modules.`);

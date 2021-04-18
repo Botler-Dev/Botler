@@ -62,7 +62,7 @@ export default abstract class Module {
 
   preInitialize?(): Promise<void>;
 
-  initialize?(): Promise<void>;
+  initialize?(moduleLoader: ModuleLoader): Promise<void>;
 
   postInitialize?(): Promise<void>;
 }
