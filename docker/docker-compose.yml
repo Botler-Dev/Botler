@@ -6,7 +6,7 @@ services:
     container_name: botler-database
     restart: unless-stopped
     ports:
-      - 5432:${DATABASE_PORT:-5432}
+      - ${DATABASE_PORT:-5432}:5432
     environment:
       - POSTGRES_USER=${DATABASE_USERNAME}
       - POSTGRES_DB=${DATABASE_DATABASE}
