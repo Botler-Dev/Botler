@@ -12,8 +12,9 @@ export enum ReactionAction {
 
 export default class ReactionExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
-  TCommand extends Command = Command<TCache>
-> extends UserExecutionContext<TCommand, TCache> {
+  TCommand extends Command = Command<TCache>,
+  TGuildContext extends GuildMemberContext | undefined = GuildMemberContext | undefined
+> extends UserExecutionContext<TCommand, TGuildContext, TCache> {
   readonly reaction: MessageReaction;
 
   readonly action: ReactionAction;
@@ -24,7 +25,7 @@ export default class ReactionExecutionContext<
     reaction: MessageReaction,
     action: ReactionAction,
     user: User,
-    guild: GuildMemberContext | undefined
+    guild: TGuildContext
   ) {
     super(command, cache, user, guild);
     this.reaction = reaction;

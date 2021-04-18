@@ -20,9 +20,11 @@ export type InitialParsedValues = {
 export default class InitialExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
   TExistingParseResults extends ParseResults = EmptyParseResults,
-  TCommand extends Command<TCache, TExistingParseResults> = Command<TCache, TExistingParseResults>
+  TCommand extends Command<TCache, TExistingParseResults> = Command<TCache, TExistingParseResults>,
+  TGuildContext extends GuildMemberContext | undefined = GuildMemberContext | undefined
 > extends MessageExecutionContext<
   TCommand,
+  TGuildContext,
   TCache | undefined,
   InitialParsedValues & TExistingParseResults
 > {
@@ -33,7 +35,7 @@ export default class InitialExecutionContext<
     cacheManager: CommandCacheManager,
     message: Message,
     parser: ParserEngine<InitialParsedValues & TExistingParseResults>,
-    guild: GuildMemberContext | undefined
+    guild: TGuildContext
   ) {
     super(command, undefined, message, parser, guild);
     this.cacheManager = cacheManager;

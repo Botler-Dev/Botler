@@ -8,14 +8,10 @@ import MessageExecutionContext from './MessageExecutionContext';
 export default class ResponseExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
   TExistingParseResults extends ParseResults = Record<string, never>,
-  TCommand extends Command<TCache, TExistingParseResults> = Command<TCache, TExistingParseResults>
-> extends MessageExecutionContext<TCommand, TCache, TExistingParseResults> {
-  constructor(
-    command: TCommand,
-    cache: TCache,
-    message: Message,
-    guild: GuildMemberContext | undefined
-  ) {
+  TCommand extends Command<TCache, TExistingParseResults> = Command<TCache, TExistingParseResults>,
+  TGuildContext extends GuildMemberContext | undefined = GuildMemberContext | undefined
+> extends MessageExecutionContext<TCommand, TGuildContext, TCache, TExistingParseResults> {
+  constructor(command: TCommand, cache: TCache, message: Message, guild: TGuildContext) {
     super(
       command,
       cache,

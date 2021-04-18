@@ -6,16 +6,12 @@ import GuildMemberContext from './guild/GuildMemberContext';
 
 export default class UserExecutionContext<
   TCommand extends Command,
+  TGuildContext extends GuildMemberContext | undefined,
   TCacheState extends ConcreteCommandCacheWrapper | undefined
-> extends BaseExecutionContext<TCommand, TCacheState> {
+> extends BaseExecutionContext<TCommand, TGuildContext, TCacheState> {
   user: User;
 
-  constructor(
-    command: TCommand,
-    cache: TCacheState,
-    user: User,
-    guild: GuildMemberContext | undefined
-  ) {
+  constructor(command: TCommand, cache: TCacheState, user: User, guild: TGuildContext) {
     super(command, cache, guild);
     this.user = user;
   }

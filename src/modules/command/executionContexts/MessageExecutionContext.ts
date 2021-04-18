@@ -8,9 +8,10 @@ import UserExecutionContext from './UserExecutionContext';
 
 export default abstract class MessageExecutionContext<
   TCommand extends Command<CommandCacheWrapper, TExistingParseResults>,
+  TGuildContext extends GuildMemberContext | undefined,
   TCacheState extends ConcreteCommandCacheWrapper | undefined,
   TExistingParseResults extends ParseResults
-> extends UserExecutionContext<TCommand, TCacheState> {
+> extends UserExecutionContext<TCommand, TGuildContext, TCacheState> {
   readonly message: Message;
 
   readonly parser: ParserEngine<TExistingParseResults>;
@@ -20,7 +21,7 @@ export default abstract class MessageExecutionContext<
     cache: TCacheState,
     message: Message,
     parser: ParserEngine<TExistingParseResults>,
-    guild: GuildMemberContext | undefined
+    guild: TGuildContext
   ) {
     super(command, cache, message.author, guild);
     this.message = message;

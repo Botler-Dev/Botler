@@ -4,11 +4,12 @@ import GuildContext from './guild/GuildContext';
 
 export default abstract class BaseExecutionContext<
   TCommand extends Command,
+  TGuildContext extends GuildContext | undefined,
   TCacheState extends ConcreteCommandCacheWrapper | undefined
 > {
   readonly command: TCommand;
 
-  readonly guild?: GuildContext;
+  readonly guild?: TGuildContext;
 
   private _cache: TCacheState;
 
@@ -16,7 +17,7 @@ export default abstract class BaseExecutionContext<
     return this._cache;
   }
 
-  constructor(command: TCommand, cache: TCacheState, guild: GuildContext | undefined) {
+  constructor(command: TCommand, cache: TCacheState, guild: TGuildContext) {
     this.command = command;
     this._cache = cache;
     this.guild = guild;
@@ -24,5 +25,9 @@ export default abstract class BaseExecutionContext<
 
   protected setCache(cache: TCacheState): void {
     this._cache = cache;
+  }
+
+  hasGuildContext(): this is this & {guild: Exclude<TGuildContext, undefined>} {
+    return !!this.guild;
   }
 }
