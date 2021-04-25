@@ -1,5 +1,6 @@
 import {Dayjs} from 'dayjs';
-import {Message} from 'discord.js';
+import {GuildEmojiManager, Message} from 'discord.js';
+import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import type CommandCacheManager from '../cache/CommandCacheManager';
 import type CommandCacheWrapper from '../cache/CommandCacheWrapper';
 import type {
@@ -31,13 +32,15 @@ export default class InitialExecutionContext<
   private readonly cacheManager: CommandCacheManager;
 
   constructor(
-    command: TCommand,
+    globalSettings: GlobalSettingsWrapper,
+    emojiManager: GuildEmojiManager,
     cacheManager: CommandCacheManager,
+    command: TCommand,
     message: Message,
     parser: ParserEngine<InitialParsedValues & TExistingParseResults>,
     guild: TGuildContext
   ) {
-    super(command, undefined, message, parser, guild);
+    super(globalSettings, emojiManager, command, undefined, message, parser, guild);
     this.cacheManager = cacheManager;
   }
 

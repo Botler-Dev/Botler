@@ -1,5 +1,8 @@
+import {GuildEmojiManager, TextBasedChannel} from 'discord.js';
+import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import type Command from '../command/Command';
+import MessageSender from '../message/MessageSender';
 import GuildContext from './guild/GuildContext';
 
 export default abstract class BaseExecutionContext<
@@ -17,7 +20,19 @@ export default abstract class BaseExecutionContext<
     return this._cache;
   }
 
-  constructor(command: TCommand, cache: TCacheState, guild: TGuildContext) {
+  private readonly globalSettings: GlobalSettingsWrapper;
+
+  private readonly emojiManager: GuildEmojiManager;
+
+  constructor(
+    globalSettings: GlobalSettingsWrapper,
+    emojiManager: GuildEmojiManager,
+    command: TCommand,
+    cache: TCacheState,
+    guild: TGuildContext
+  ) {
+    this.globalSettings = globalSettings;
+    this.emojiManager = emojiManager;
     this.command = command;
     this._cache = cache;
     this.guild = guild;
@@ -25,6 +40,10 @@ export default abstract class BaseExecutionContext<
 
   protected setCache(cache: TCacheState): void {
     this._cache = cache;
+  }
+
+  createSender(channel: TextBasedChannel): MessageSender {
+    return new MessageSender(this.globalSettings, this.emojiManager, channel);
   }
 
   hasGuildContext(): this is this & {guild: Exclude<TGuildContext, undefined>} {

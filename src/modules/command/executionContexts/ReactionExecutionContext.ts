@@ -1,7 +1,9 @@
-import {MessageReaction, User} from 'discord.js';
+import {GuildEmojiManager, MessageReaction, User} from 'discord.js';
+import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import type CommandCacheWrapper from '../cache/CommandCacheWrapper';
 import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import Command from '../command/Command';
+import MessageSender from '../message/MessageSender';
 import GuildMemberContext from './guild/GuildMemberContext';
 import UserExecutionContext from './UserExecutionContext';
 
@@ -19,7 +21,11 @@ export default class ReactionExecutionContext<
 
   readonly action: ReactionAction;
 
+  readonly sender: MessageSender;
+
   constructor(
+    globalSettings: GlobalSettingsWrapper,
+    emojiManager: GuildEmojiManager,
     command: TCommand,
     cache: TCache,
     reaction: MessageReaction,
@@ -27,8 +33,9 @@ export default class ReactionExecutionContext<
     user: User,
     guild: TGuildContext
   ) {
-    super(command, cache, user, guild);
+    super(globalSettings, emojiManager, command, cache, user, guild);
     this.reaction = reaction;
     this.action = action;
+    this.sender = this.createSender(reaction.message.channel);
   }
 }

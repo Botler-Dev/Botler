@@ -1,4 +1,5 @@
-import {Message} from 'discord.js';
+import {GuildEmojiManager, Message} from 'discord.js';
+import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import CommandCacheWrapper, {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import Command from '../command/Command';
 import ParserEngine, {ParseResults} from '../parser/ParserEngine';
@@ -11,8 +12,17 @@ export default class ResponseExecutionContext<
   TCommand extends Command<TCache, TExistingParseResults> = Command<TCache, TExistingParseResults>,
   TGuildContext extends GuildMemberContext | undefined = GuildMemberContext | undefined
 > extends MessageExecutionContext<TCommand, TGuildContext, TCache, TExistingParseResults> {
-  constructor(command: TCommand, cache: TCache, message: Message, guild: TGuildContext) {
+  constructor(
+    globalSettings: GlobalSettingsWrapper,
+    emojiManager: GuildEmojiManager,
+    command: TCommand,
+    cache: TCache,
+    message: Message,
+    guild: TGuildContext
+  ) {
     super(
+      globalSettings,
+      emojiManager,
       command,
       cache,
       message,

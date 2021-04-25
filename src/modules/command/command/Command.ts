@@ -8,12 +8,12 @@ import type {
 import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import type {GenericCommandCommandCache} from '../cache/CommandCacheWrapper';
 import type CommandCategory from '../CommandCategory';
-import CommandError from '../error/CommandError';
 import WrongScopeError from '../errors/WrongScopeError';
 import type ExecutionContext from '../executionContexts/ExecutionContext';
 import InitialExecutionContext from '../executionContexts/InitialExecutionContext';
 import UserExecutionContext from '../executionContexts/UserExecutionContext';
 import {EmptyParseResults, ParseResults} from '../parser/ParserEngine';
+import SilentError from '../errors/SilentError';
 
 export type CommandName = string;
 
@@ -64,14 +64,14 @@ export default abstract class Command<
       this.isBotMasterOnly &&
       !this.globalSettings.isBotMaster(context.user)
     )
-      throw new CommandError(
+      throw new SilentError(
         'Silent permission denied error. Execution requestor is not bot master.'
       );
     if (
       context instanceof InitialExecutionContext &&
       ((context.guild && !this.isGuildCapable) || (!context.guild && !this.isDmCapable))
     )
-      throw new WrongScopeError(this.globalSettings, context.message.channel);
+      throw new WrongScopeError(context.sender);
   }
 
   abstract execute(context: ExecutionContext<TCache, TAlreadyParsedResults, this>): Promise<void>;

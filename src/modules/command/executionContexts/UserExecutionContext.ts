@@ -1,4 +1,5 @@
-import {User} from 'discord.js';
+import {GuildEmojiManager, User} from 'discord.js';
+import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import type Command from '../command/Command';
 import BaseExecutionContext from './BaseExecutionContext';
@@ -11,8 +12,15 @@ export default class UserExecutionContext<
 > extends BaseExecutionContext<TCommand, TGuildContext, TCacheState> {
   user: User;
 
-  constructor(command: TCommand, cache: TCacheState, user: User, guild: TGuildContext) {
-    super(command, cache, guild);
+  constructor(
+    globalSettings: GlobalSettingsWrapper,
+    emojiManager: GuildEmojiManager,
+    command: TCommand,
+    cache: TCacheState,
+    user: User,
+    guild: TGuildContext
+  ) {
+    super(globalSettings, emojiManager, command, cache, guild);
     this.user = user;
   }
 }

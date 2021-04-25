@@ -1,12 +1,16 @@
 import {Message} from 'discord.js';
 
-export default class CommandError extends Error {
+export default abstract class CommandError extends Error {
   readonly realError?: Error;
 
-  constructor(messageOrError?: Error | string) {
-    super(messageOrError instanceof Error ? messageOrError.message : messageOrError);
-    if (messageOrError instanceof Error) this.realError = messageOrError;
+  constructor(privateMessageOrRealError: Error | string) {
+    super(
+      typeof privateMessageOrRealError === 'string'
+        ? privateMessageOrRealError
+        : `CommandError with real error: ${privateMessageOrRealError.message}`
+    );
+    if (privateMessageOrRealError instanceof Error) this.realError = privateMessageOrRealError;
   }
 
-  send?(): Promise<Message | Message[]>;
+  abstract send(): Promise<void | Message | Message[]>;
 }

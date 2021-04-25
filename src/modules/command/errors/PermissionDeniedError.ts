@@ -1,16 +1,14 @@
-import {TextBasedChannel} from 'discord.js';
-import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
-import SimpleErrorResponseError from '../error/SimpleErrorResponseError';
+import MessageSender from '../message/MessageSender';
+import SimpleResponseError from '../error/SimpleResponseError';
 
-export default class PermissionDeniedError extends SimpleErrorResponseError {
+export default class PermissionDeniedError extends SimpleResponseError {
+  readonly action: string;
+
   /**
    * @param {string} action String inserted into the following: `You are not allowed to [action].` (Default `perform this action`)
    */
-  constructor(
-    globalSettings: GlobalSettingsWrapper,
-    channel: TextBasedChannel,
-    action = 'perform this action'
-  ) {
-    super(globalSettings, channel, `You are not allowed to ${action}`, undefined);
+  constructor(sender: MessageSender, action = 'perform this action') {
+    super(sender, `You are not allowed to ${action}.`);
+    this.action = action;
   }
 }

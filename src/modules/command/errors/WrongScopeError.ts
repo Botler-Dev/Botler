@@ -1,14 +1,12 @@
-import {DMChannel, TextBasedChannel} from 'discord.js';
-import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
-import SimpleErrorResponseError from '../error/SimpleErrorResponseError';
+import {DMChannel} from 'discord.js';
+import SimpleResponseError from '../error/SimpleResponseError';
+import MessageSender from '../message/MessageSender';
 
-export default class WrongScopeError extends SimpleErrorResponseError {
-  constructor(globalSettings: GlobalSettingsWrapper, channel: TextBasedChannel) {
+export default class WrongScopeError extends SimpleResponseError {
+  constructor(sender: MessageSender) {
     super(
-      globalSettings,
-      channel,
-      `This command can only be used in ${channel instanceof DMChannel ? 'servers' : 'DMs'}.`,
-      undefined
+      sender,
+      `This command can only be used in ${sender.channel instanceof DMChannel ? 'servers' : 'DMs'}.`
     );
   }
 }

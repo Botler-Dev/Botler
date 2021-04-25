@@ -1,4 +1,12 @@
-import {Client, GuildMember, Message, MessageReaction, PartialUser, User} from 'discord.js';
+import {
+  Client,
+  GuildEmojiManager,
+  GuildMember,
+  Message,
+  MessageReaction,
+  PartialUser,
+  User,
+} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 
 import GlobalSettingsWrapper from '../../database/wrappers/GlobalSettingsWrapper';
@@ -52,12 +60,18 @@ export default class CommandModule extends Module {
 
   private readonly globalSettings: GlobalSettingsWrapper;
 
+  private readonly emojiManager: GuildEmojiManager;
+
   constructor(
     moduleContainer: DependencyContainer,
     client = moduleContainer.resolve(Client),
-    globalSettings = moduleContainer.resolve(GlobalSettingsWrapper)
+    globalSettings = moduleContainer.resolve(GlobalSettingsWrapper),
+    emojiManager = moduleContainer.resolve(GuildEmojiManager)
   ) {
     super(moduleContainer);
+    this.client = client;
+    this.globalSettings = globalSettings;
+    this.emojiManager = emojiManager;
 
     this.container.registerSingleton(CommandManager);
     this.commands = this.container.resolve(CommandManager);
@@ -72,9 +86,6 @@ export default class CommandModule extends Module {
 
     this.container.registerSingleton(CommandGuildSettingsManager);
     this.guildSettings = this.container.resolve(CommandGuildSettingsManager);
-
-    this.client = client;
-    this.globalSettings = globalSettings;
   }
 
   async preInitialize(): Promise<void> {
@@ -98,7 +109,14 @@ export default class CommandModule extends Module {
           caches.map(cache =>
             this.executeCommand(
               cache.command,
-              new ResponseExecutionContext(cache.command, cache, message, guildContext)
+              new ResponseExecutionContext(
+                this.globalSettings,
+                this.emojiManager,
+                cache.command,
+                cache,
+                message,
+                guildContext
+              )
             )
           )
         );
@@ -116,8 +134,10 @@ export default class CommandModule extends Module {
       if (!command) return;
 
       const context = new InitialExecutionContext(
-        command,
+        this.globalSettings,
+        this.emojiManager,
         this.commandCaches,
+        command,
         message,
         parser as ParserEngine<InitialParsedValues>,
         guildContext
@@ -156,6 +176,8 @@ export default class CommandModule extends Module {
         this.executeCommand(
           cache.command,
           new ReactionExecutionContext(
+            this.globalSettings,
+            this.emojiManager,
             cache.command,
             cache,
             reaction,
@@ -186,20 +208,17 @@ export default class CommandModule extends Module {
       let commandError: CommandError | undefined;
       if (error instanceof CommandError) {
         commandError = error;
-      } else if (context instanceof MessageExecutionContext) {
-        commandError = new UnexpectedError(this.globalSettings, context.message.channel, error);
-      } else if (context instanceof ReactionExecutionContext) {
-        commandError = new UnexpectedError(
-          this.globalSettings,
-          context.reaction.message.channel,
-          error
-        );
+      } else if (
+        context instanceof MessageExecutionContext ||
+        context instanceof ReactionExecutionContext
+      ) {
+        commandError = new UnexpectedError(context.sender, error);
       }
 
-      if (commandError?.realError)
+      if (!commandError || commandError.realError)
         this.logger.error(
           `Encountered real error while executing command "${command.name}".`,
-          commandError.realError
+          commandError?.realError ?? error
         );
       await commandError?.send?.();
     }

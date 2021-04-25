@@ -1,12 +1,10 @@
-import {TextBasedChannel} from 'discord.js';
-import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
-import DetailedErrorResponseError from '../error/DetailedErrorReponseError';
+import MessageSender from '../message/MessageSender';
+import DetailedResponseError from '../error/DetailedResponseError';
 
-export default class UnexpectedError extends DetailedErrorResponseError {
-  constructor(globalSettings: GlobalSettingsWrapper, channel: TextBasedChannel, error: Error) {
+export default class UnexpectedError extends DetailedResponseError {
+  constructor(sender: MessageSender, error: Error) {
     super(
-      globalSettings,
-      channel,
+      sender,
       'Something went wrong',
       'An unexpected error occurred while executing the command.\nContact the administrators if this happens again.',
       error

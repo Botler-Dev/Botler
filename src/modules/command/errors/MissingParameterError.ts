@@ -1,14 +1,14 @@
-import {TextBasedChannel} from 'discord.js';
-import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
-import SimpleErrorResponseError from '../error/SimpleErrorResponseError';
+import MessageSender from '../message/MessageSender';
+import SimpleResponseError from '../error/SimpleResponseError';
 
-export default class MissingParameterError extends SimpleErrorResponseError {
-  constructor(globalSettings: GlobalSettingsWrapper, channel: TextBasedChannel, name?: string) {
+export default class MissingParameterError extends SimpleResponseError {
+  readonly parameterName?: string;
+
+  constructor(sender: MessageSender, name?: string) {
     super(
-      globalSettings,
-      channel,
-      `Parameter ${name ? `\`${name}\` ` : ''}was either not provided or could not be parsed.`,
-      undefined
+      sender,
+      `Parameter ${name ? `\`${name}\` ` : ''}was either not provided or could not be parsed.`
     );
+    this.parameterName = name;
   }
 }
