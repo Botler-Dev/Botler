@@ -42,11 +42,15 @@
   "engines": {
     "node": ">=15"
   },
+  "_moduleAliases": {
+    "@": "dist"
+  },
   "dependencies": {
     "@prisma/client": "^2.21.0",
     "chalk": "^4.1.0",
     "dayjs": "^1.10.4",
     "discord.js": "^12.5.3",
+    "module-alias": "^2.2.2",
     "pg": "^8.6.0",
     "pg-listen": "^1.7.0",
     "reflect-metadata": "^0.1.13",
