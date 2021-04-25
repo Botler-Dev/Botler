@@ -1,6 +1,6 @@
 import {Snowflake} from 'discord.js';
-import {notEmpty, optional, stack} from '../../../utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
+import {notEmpty, optional, stack} from '@/utils/optionCleaners';
+import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
 import {Parser, ParseResult} from '../parser/parser';
 
 export enum SnowflakeType {

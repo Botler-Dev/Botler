@@ -1,8 +1,8 @@
+import Logger from '@/logger/Logger';
+import MasterLogger from '@/logger/MasterLogger';
+import {isRunningInProduction} from '@/utils/environment';
+import {ExitCode, exitWithError} from '@/utils/process';
 import {GlobalSettings, Prisma, PrismaClient} from '@prisma/client';
-import Logger from '../../logger/Logger';
-import MasterLogger from '../../logger/MasterLogger';
-import {isRunningInProduction} from '../../utils/environment';
-import {ExitCode, exitWithError} from '../../utils/process';
 import DatabaseEventHub from '../DatabaseEventHub';
 import CacheManager from '../manager/CacheManager';
 import GlobalSettingsSynchronizer from '../synchronizers/GlobalSettingsSynchronizer';

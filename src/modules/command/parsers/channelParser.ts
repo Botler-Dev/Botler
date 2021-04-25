@@ -9,8 +9,8 @@ import {
   VoiceChannel,
 } from 'discord.js';
 import {compareTwoStrings} from 'string-similarity';
-import {optional, unchecked} from '../../../utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
+import {optional, unchecked} from '@/utils/optionCleaners';
+import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
 import {Parser, ParseResult} from '../parser/parser';
 import snowflakeParser, {SnowflakeType} from './snowflakeParser';
 import stringParser, {StringParseOptions} from './stringParser';

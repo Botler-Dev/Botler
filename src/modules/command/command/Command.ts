@@ -1,3 +1,4 @@
+import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
 import type CommandCacheManager from '../cache/CommandCacheManager';
 import type ReactionListenerManager from '../cache/listeners/ReactionListenerManager';
 import type ResponseListenerManager from '../cache/listeners/ResponseListenerManager';
@@ -5,7 +6,6 @@ import type {
   CacheFromCommandCacheWrapper,
   ConcreteCommandCacheWrapper,
 } from '../cache/CommandCacheWrapper';
-import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
 import type {GenericCommandCommandCache} from '../cache/CommandCacheWrapper';
 import type CommandCategory from '../CommandCategory';
 import WrongScopeError from '../errors/WrongScopeError';

@@ -1,4 +1,4 @@
-import {ColorType} from '../../../database/wrappers/GlobalSettingsWrapper';
+import {ColorType} from '@/database/wrappers/GlobalSettingsWrapper';
 
 enum MessageType {
   Neutral,

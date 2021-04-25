@@ -1,6 +1,6 @@
 import {Dayjs} from 'dayjs';
 import {GuildEmojiManager, Message} from 'discord.js';
-import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
+import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
 import type CommandCacheManager from '../cache/CommandCacheManager';
 import type CommandCacheWrapper from '../cache/CommandCacheWrapper';
 import type {

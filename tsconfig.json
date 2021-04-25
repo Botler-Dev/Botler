@@ -5,6 +5,9 @@
     "moduleResolution": "Node",
     "outDir": "dist",
     "rootDir": "src",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,

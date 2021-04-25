@@ -1,6 +1,6 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
-import Logger from '../../logger/Logger';
+import Logger from '@/logger/Logger';
 import type Command from './command/Command';
 import type {CommandName} from './command/Command';
 import CommandManager from './CommandManager';

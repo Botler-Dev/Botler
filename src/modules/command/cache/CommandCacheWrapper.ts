@@ -6,7 +6,7 @@ import {
   TextBasedChannelResolvable,
   UserResolvable,
 } from 'discord.js';
-import CachedEntityWrapper from '../../../database/wrapper/CachedEntityWrapper';
+import CachedEntityWrapper from '@/database/wrapper/CachedEntityWrapper';
 import Command from '../command/Command';
 import {ReactionAction} from '../executionContexts/ReactionExecutionContext';
 import type CommandCacheManager from './CommandCacheManager';

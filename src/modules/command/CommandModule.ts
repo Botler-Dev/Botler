@@ -9,8 +9,8 @@ import {
 } from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 
-import GlobalSettingsWrapper from '../../database/wrappers/GlobalSettingsWrapper';
-import StaticImplements from '../../utils/StaticImplements';
+import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
+import StaticImplements from '@/utils/StaticImplements';
 import Module from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
 import CommandCategory from './CommandCategory';

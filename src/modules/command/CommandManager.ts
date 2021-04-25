@@ -1,6 +1,6 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {injectable} from 'tsyringe';
-import Logger from '../../logger/Logger';
+import Logger from '@/logger/Logger';
 import Command, {CommandName} from './command/Command';
 
 @injectable()

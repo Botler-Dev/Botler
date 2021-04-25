@@ -1,9 +1,9 @@
 import {PrismaClient} from '@prisma/client';
 import dayjs, {Dayjs} from 'dayjs';
 import {injectable} from 'tsyringe';
-import DatabaseCleaner from '../../../database/DatabaseCleaner';
-import CacheManager from '../../../database/manager/CacheManager';
-import Logger from '../../../logger/Logger';
+import DatabaseCleaner from '@/database/DatabaseCleaner';
+import CacheManager from '@/database/manager/CacheManager';
+import Logger from '@/logger/Logger';
 import Command from '../command/Command';
 import CommandManager from '../CommandManager';
 import CommandCacheWrapper, {

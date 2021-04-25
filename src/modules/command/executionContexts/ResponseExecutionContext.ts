@@ -1,5 +1,5 @@
 import {GuildEmojiManager, Message} from 'discord.js';
-import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
+import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
 import CommandCacheWrapper, {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import Command from '../command/Command';
 import ParserEngine, {ParseResults} from '../parser/ParserEngine';

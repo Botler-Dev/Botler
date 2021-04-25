@@ -1,5 +1,5 @@
-import {optional} from '../../../utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
+import {optional} from '@/utils/optionCleaners';
+import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
 import {Parser, ParseResult} from '../parser/parser';
 
 export interface StringParseOptions {

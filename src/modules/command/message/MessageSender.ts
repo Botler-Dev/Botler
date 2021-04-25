@@ -1,9 +1,9 @@
 import {EmojiIdentifierResolvable, MessageReaction} from 'discord.js';
 import {GuildEmojiManager} from 'discord.js';
 import {Message, MessageEmbed, TextBasedChannel} from 'discord.js';
-import GlobalSettingsWrapper from '../../../database/wrappers/GlobalSettingsWrapper';
-import {optional, unchecked} from '../../../utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
+import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
+import {optional, unchecked} from '@/utils/optionCleaners';
+import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
 import DetailedResponseError from '../error/DetailedResponseError';
 import SimpleResponseError from '../error/SimpleResponseError';
 import MessageType, {messageEmojis, messageToColorType} from './MessageType';

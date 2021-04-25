@@ -1,6 +1,6 @@
 import {findBestMatch} from 'string-similarity';
-import {optional} from '../../../utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '../../../utils/optionsCleaner';
+import {optional} from '@/utils/optionCleaners';
+import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
 import Command from '../command/Command';
 import CommandManager from '../CommandManager';
 import {Parser, ParseResult} from '../parser/parser';
