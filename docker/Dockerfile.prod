@@ -17,6 +17,8 @@ FROM mhart/alpine-node:slim-15
 WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+# Needed for module-alias config
+COPY --from=builder /app/package.json ./package.json
 
 # Do not use Yarn here because the slim version does not have it installed
 CMD ["node","./dist/main.js"]
