@@ -1,9 +1,9 @@
-import {EmojiIdentifierResolvable, MessageReaction} from 'discord.js';
-import {GuildEmojiManager} from 'discord.js';
+import {Client, EmojiResolvable, MessageReaction} from 'discord.js';
 import {Message, MessageEmbed, TextBasedChannel} from 'discord.js';
 import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
 import {optional, unchecked} from '@/utils/optionCleaners';
 import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
+import {resolveAnyEmoji} from '@/utils/resolve';
 import DetailedResponseError from '../error/DetailedResponseError';
 import SimpleResponseError from '../error/SimpleResponseError';
 import MessageType, {messageEmojis, messageToColorType} from './MessageType';
@@ -23,7 +23,7 @@ const messageOptionsDefinition: OptionsCleanerDefinition<MessageOptions, CleanMe
 };
 
 export interface ReactionOption {
-  emoji: EmojiIdentifierResolvable;
+  emoji: EmojiResolvable | string;
   description: string;
 }
 
@@ -32,15 +32,11 @@ export default class MessageSender {
 
   private readonly globalSettings: GlobalSettingsWrapper;
 
-  private readonly emojiManager: GuildEmojiManager;
+  private readonly client: Client;
 
-  constructor(
-    globalSettings: GlobalSettingsWrapper,
-    emojiManager: GuildEmojiManager,
-    channel: TextBasedChannel
-  ) {
+  constructor(globalSettings: GlobalSettingsWrapper, client: Client, channel: TextBasedChannel) {
     this.globalSettings = globalSettings;
-    this.emojiManager = emojiManager;
+    this.client = client;
     this.channel = channel;
   }
 
@@ -95,7 +91,7 @@ export default class MessageSender {
   private reactionOptionsToString(options: ReactionOption[]): string {
     return options
       .map(
-        ({emoji, description}) => `${this.emojiManager.resolveIdentifier(emoji)}: ${description}`
+        ({emoji, description}) => `${resolveAnyEmoji(this.client.emojis, emoji)}: ${description}`
       )
       .join('\n');
   }

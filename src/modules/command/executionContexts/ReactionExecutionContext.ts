@@ -1,4 +1,4 @@
-import {GuildEmojiManager, MessageReaction, User} from 'discord.js';
+import {Client, MessageReaction, User} from 'discord.js';
 import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
 import type CommandCacheWrapper from '../cache/CommandCacheWrapper';
 import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
@@ -25,7 +25,7 @@ export default class ReactionExecutionContext<
 
   constructor(
     globalSettings: GlobalSettingsWrapper,
-    emojiManager: GuildEmojiManager,
+    client: Client,
     command: TCommand,
     cache: TCache,
     reaction: MessageReaction,
@@ -33,7 +33,7 @@ export default class ReactionExecutionContext<
     user: User,
     guild: TGuildContext
   ) {
-    super(globalSettings, emojiManager, command, cache, user, guild);
+    super(globalSettings, client, command, cache, user, guild);
     this.reaction = reaction;
     this.action = action;
     this.sender = this.createSender(reaction.message.channel);

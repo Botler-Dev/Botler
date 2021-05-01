@@ -1,5 +1,5 @@
 import {PrismaClient} from '@prisma/client';
-import {ChannelManager, Client, GuildEmojiManager, GuildManager, UserManager} from 'discord.js';
+import {ChannelManager, Client, GuildManager, UserManager} from 'discord.js';
 import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {container} from 'tsyringe';
 
@@ -67,7 +67,6 @@ export default class Bot {
     container.registerInstance(UserManager, this.client.users);
     container.registerInstance(GuildManager, this.client.guilds);
     container.registerInstance(ChannelManager, this.client.channels);
-    container.registerInstance(GuildEmojiManager, this.client.emojis);
 
     this.moduleLoader = new ModuleLoader(container, this.masterLogger, [CommandModule]);
     container.registerInstance(ModuleLoader, this.moduleLoader);

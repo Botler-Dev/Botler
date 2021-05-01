@@ -1,12 +1,4 @@
-import {
-  Client,
-  GuildEmojiManager,
-  GuildMember,
-  Message,
-  MessageReaction,
-  PartialUser,
-  User,
-} from 'discord.js';
+import {Client, GuildMember, Message, MessageReaction, PartialUser, User} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 
 import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
@@ -60,18 +52,14 @@ export default class CommandModule extends Module {
 
   private readonly globalSettings: GlobalSettingsWrapper;
 
-  private readonly emojiManager: GuildEmojiManager;
-
   constructor(
     moduleContainer: DependencyContainer,
     client = moduleContainer.resolve(Client),
-    globalSettings = moduleContainer.resolve(GlobalSettingsWrapper),
-    emojiManager = moduleContainer.resolve(GuildEmojiManager)
+    globalSettings = moduleContainer.resolve(GlobalSettingsWrapper)
   ) {
     super(moduleContainer);
     this.client = client;
     this.globalSettings = globalSettings;
-    this.emojiManager = emojiManager;
 
     this.container.registerSingleton(CommandManager);
     this.commands = this.container.resolve(CommandManager);
@@ -111,7 +99,7 @@ export default class CommandModule extends Module {
               cache.command,
               new ResponseExecutionContext(
                 this.globalSettings,
-                this.emojiManager,
+                this.client,
                 cache.command,
                 cache,
                 message,
@@ -135,7 +123,7 @@ export default class CommandModule extends Module {
 
       const context = new InitialExecutionContext(
         this.globalSettings,
-        this.emojiManager,
+        this.client,
         this.commandCaches,
         command,
         message,
@@ -177,7 +165,7 @@ export default class CommandModule extends Module {
           cache.command,
           new ReactionExecutionContext(
             this.globalSettings,
-            this.emojiManager,
+            this.client,
             cache.command,
             cache,
             reaction,

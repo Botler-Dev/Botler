@@ -27,6 +27,8 @@ declare module 'discord.js' {
   type TextBasedChannel = TextChannel | DMChannel | NewsChannel;
 
   type TextBasedChannelResolvable = Snowflake | TextBasedChannel;
+
+  type AnyEmojiResolvable = EmojiResolvable | string;
 }
 
 declare namespace NodeJS {

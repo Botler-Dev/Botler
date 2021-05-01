@@ -1,4 +1,4 @@
-import {GuildEmojiManager, Message} from 'discord.js';
+import {Client, Message} from 'discord.js';
 import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
 import type CommandCacheWrapper from '../cache/CommandCacheWrapper';
 import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
@@ -22,14 +22,14 @@ export default abstract class MessageExecutionContext<
 
   constructor(
     globalSettings: GlobalSettingsWrapper,
-    emojiManager: GuildEmojiManager,
+    client: Client,
     command: TCommand,
     cache: TCacheState,
     message: Message,
     parser: ParserEngine<TExistingParseResults>,
     guild: TGuildContext
   ) {
-    super(globalSettings, emojiManager, command, cache, message.author, guild);
+    super(globalSettings, client, command, cache, message.author, guild);
     this.message = message;
     this.parser = parser;
     this.sender = this.createSender(message.channel);
