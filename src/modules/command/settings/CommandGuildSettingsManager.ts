@@ -4,7 +4,7 @@ import {injectable} from 'tsyringe';
 import {DatabaseEventHub} from '@/database/DatabaseEventHub';
 import {CacheManager} from '@/database/manager/CacheManager';
 import {CacheSynchronizer} from '@/database/synchronizer/CacheSynchronizer';
-import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/settings/GlobalSettingsWrapper';
 import {resolveIdChecked} from '@/utils/resolve';
 import {CommandGuildSettingsWrapper} from './CommandGuildSettingsWrapper';
 

@@ -1,5 +1,5 @@
 import {Client, User} from 'discord.js';
-import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/settings/GlobalSettingsWrapper';
 import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import type {Command} from '../command/Command';
 import {BaseExecutionContext} from './BaseExecutionContext';

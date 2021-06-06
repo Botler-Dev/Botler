@@ -4,9 +4,9 @@ import {filter, tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
 import {Logger} from '@/logger/Logger';
 import {resolveIdChecked} from '@/utils/resolve';
-import type {GlobalSettingsManager} from '../managers/GlobalSettingsManager';
-import {SyncStream} from '../synchronizer/CacheSynchronizer';
-import {SynchronizedEntityWrapper} from '../wrapper/SynchronizedEntityWrapper';
+import type {GlobalSettingsManager} from './GlobalSettingsManager';
+import {SyncStream} from '../database/synchronizer/CacheSynchronizer';
+import {SynchronizedEntityWrapper} from '../database/wrapper/SynchronizedEntityWrapper';
 
 export enum ColorType {
   Default,

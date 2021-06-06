@@ -5,8 +5,8 @@ import {container} from 'tsyringe';
 
 import {DatabaseCleaner} from './database/DatabaseCleaner';
 import {DatabaseEventHub} from './database/DatabaseEventHub';
-import {GlobalSettingsManager} from './database/managers/GlobalSettingsManager';
-import {GlobalSettingsWrapper} from './database/wrappers/GlobalSettingsWrapper';
+import {GlobalSettingsManager} from './settings/GlobalSettingsManager';
+import {GlobalSettingsWrapper} from './settings/GlobalSettingsWrapper';
 import {proxyNativeConsole, Logger} from './logger/Logger';
 import {MasterLogger} from './logger/MasterLogger';
 import {CommandModule} from './modules/command/CommandModule';

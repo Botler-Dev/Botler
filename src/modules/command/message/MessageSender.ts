@@ -1,6 +1,6 @@
 import {Client, EmojiResolvable, MessageReaction} from 'discord.js';
 import {Message, MessageEmbed, TextBasedChannel} from 'discord.js';
-import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/settings/GlobalSettingsWrapper';
 import {optional, unchecked} from '@/utils/optionCleaners';
 import {OptionsCleanerDefinition, cleanOptions} from '@/utils/optionsCleaner';
 import {resolveAnyEmoji} from '@/utils/resolve';

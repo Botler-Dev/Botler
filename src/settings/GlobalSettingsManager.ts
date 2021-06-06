@@ -3,10 +3,10 @@ import {MasterLogger} from '@/logger/MasterLogger';
 import {isRunningInProduction} from '@/utils/environment';
 import {ExitCode, exitWithError} from '@/utils/process';
 import {GlobalSettings, Prisma, PrismaClient} from '@prisma/client';
-import {DatabaseEventHub} from '../DatabaseEventHub';
-import {CacheManager} from '../manager/CacheManager';
-import {GlobalSettingsSynchronizer} from '../synchronizers/GlobalSettingsSynchronizer';
-import {GlobalSettingsWrapper} from '../wrappers/GlobalSettingsWrapper';
+import {DatabaseEventHub} from '../database/DatabaseEventHub';
+import {CacheManager} from '../database/manager/CacheManager';
+import {GlobalSettingsSynchronizer} from './GlobalSettingsSynchronizer';
+import {GlobalSettingsWrapper} from './GlobalSettingsWrapper';
 
 export const GlobalSettingsCacheKey = 0 as const;
 

@@ -2,7 +2,7 @@ import {CommandGuildSettings} from '@prisma/client';
 import {Guild} from 'discord.js';
 import {SyncStream} from '@/database/synchronizer/CacheSynchronizer';
 import {SynchronizedEntityWrapper} from '@/database/wrapper/SynchronizedEntityWrapper';
-import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/settings/GlobalSettingsWrapper';
 import type {CommandGuildSettingsManager} from './CommandGuildSettingsManager';
 
 export class CommandGuildSettingsWrapper extends SynchronizedEntityWrapper<
