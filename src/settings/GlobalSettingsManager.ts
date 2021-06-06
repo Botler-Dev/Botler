@@ -1,4 +1,4 @@
-import {Logger} from '@/logger/Logger';
+import {Logger} from '@/logger';
 import {MasterLogger} from '@/logger/MasterLogger';
 import {isRunningInProduction} from '@/utils/environment';
 import {ExitCode, exitWithError} from '@/utils/process';

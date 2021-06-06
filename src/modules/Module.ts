@@ -1,7 +1,6 @@
 import {DependencyContainer} from 'tsyringe';
 
-import {Logger} from '../logger/Logger';
-import {MasterLogger} from '../logger/MasterLogger';
+import {MasterLogger, Logger} from '@/logger';
 import {ModuleConstructor, ModuleResolvable, resolveModuleName} from './ModuleConstructor';
 import {ModuleLoader} from './ModuleLoader';
 

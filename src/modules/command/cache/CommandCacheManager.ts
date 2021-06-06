@@ -2,7 +2,7 @@ import {PrismaClient} from '@prisma/client';
 import dayjs, {Dayjs} from 'dayjs';
 import {injectable} from 'tsyringe';
 import {DatabaseCleaner, CacheManager} from '@/database';
-import {Logger} from '@/logger/Logger';
+import {Logger} from '@/logger';
 import {Command} from '../command/Command';
 import {CommandManager} from '../CommandManager';
 import {

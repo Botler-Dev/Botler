@@ -1,7 +1,6 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
-import {Logger} from '../logger/Logger';
-import {MasterLogger} from '../logger/MasterLogger';
+import {MasterLogger, Logger} from '@/logger';
 import type {Module} from './Module';
 import {ModuleConstructor, ModuleResolvable, resolveModuleName} from './ModuleConstructor';
 

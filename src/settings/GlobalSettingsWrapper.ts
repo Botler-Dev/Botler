@@ -2,7 +2,7 @@ import {GlobalSettings} from '@prisma/client';
 import {Snowflake, UserManager, UserResolvable} from 'discord.js';
 import {filter, tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
-import {Logger} from '@/logger/Logger';
+import {Logger} from '@/logger';
 import {resolveIdChecked} from '@/utils/resolve';
 import type {GlobalSettingsManager} from './GlobalSettingsManager';
 import {SyncStream, SynchronizedEntityWrapper} from '../database';

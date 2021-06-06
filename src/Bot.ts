@@ -5,8 +5,7 @@ import {container} from 'tsyringe';
 
 import {DatabaseCleaner, DatabaseEventHub} from './database';
 import {GlobalSettingsManager, GlobalSettingsWrapper} from './settings';
-import {proxyNativeConsole, Logger} from './logger/Logger';
-import {MasterLogger} from './logger/MasterLogger';
+import {proxyNativeConsole, Logger, MasterLogger} from './logger';
 import {CommandModule} from './modules/command/CommandModule';
 import {ModuleLoader} from './modules/ModuleLoader';
 import {ExitCode, exitWithMessage} from './utils/process';
