@@ -17,8 +17,7 @@ import {
 import {from} from 'rxjs';
 import {mergeAll} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
-import {DatabaseEventHub} from '@/database/DatabaseEventHub';
-import {EntityManager} from '@/database/manager/EntityManager';
+import {DatabaseEventHub, EntityManager} from '@/database';
 import {resolveIdChecked} from '@/utils/resolve';
 import {ReactionAction} from '../../executionContexts/ReactionExecutionContext';
 import {ListenerCriterionCache} from './ListenerCriterionCache';

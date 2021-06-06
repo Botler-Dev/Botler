@@ -5,8 +5,7 @@ import {container} from 'tsyringe';
 import {Logger} from '@/logger/Logger';
 import {resolveIdChecked} from '@/utils/resolve';
 import type {GlobalSettingsManager} from './GlobalSettingsManager';
-import {SyncStream} from '../database/synchronizer/CacheSynchronizer';
-import {SynchronizedEntityWrapper} from '../database/wrapper/SynchronizedEntityWrapper';
+import {SyncStream, SynchronizedEntityWrapper} from '../database';
 
 export enum ColorType {
   Default,

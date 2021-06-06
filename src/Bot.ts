@@ -3,8 +3,7 @@ import {ChannelManager, Client, GuildManager, UserManager} from 'discord.js';
 import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {container} from 'tsyringe';
 
-import {DatabaseCleaner} from './database/DatabaseCleaner';
-import {DatabaseEventHub} from './database/DatabaseEventHub';
+import {DatabaseCleaner, DatabaseEventHub} from './database';
 import {GlobalSettingsManager} from './settings/GlobalSettingsManager';
 import {GlobalSettingsWrapper} from './settings/GlobalSettingsWrapper';
 import {proxyNativeConsole, Logger} from './logger/Logger';

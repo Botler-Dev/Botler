@@ -3,8 +3,7 @@ import {MasterLogger} from '@/logger/MasterLogger';
 import {isRunningInProduction} from '@/utils/environment';
 import {ExitCode, exitWithError} from '@/utils/process';
 import {GlobalSettings, Prisma, PrismaClient} from '@prisma/client';
-import {DatabaseEventHub} from '../database/DatabaseEventHub';
-import {CacheManager} from '../database/manager/CacheManager';
+import {DatabaseEventHub, CacheManager} from '../database';
 import {GlobalSettingsSynchronizer} from './GlobalSettingsSynchronizer';
 import {GlobalSettingsWrapper} from './GlobalSettingsWrapper';
 

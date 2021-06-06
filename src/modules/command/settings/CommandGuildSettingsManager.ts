@@ -1,9 +1,7 @@
 import {CommandGuildSettings, Prisma, PrismaClient} from '@prisma/client';
 import {GuildManager, GuildResolvable, Snowflake} from 'discord.js';
 import {injectable} from 'tsyringe';
-import {DatabaseEventHub} from '@/database/DatabaseEventHub';
-import {CacheManager} from '@/database/manager/CacheManager';
-import {CacheSynchronizer} from '@/database/synchronizer/CacheSynchronizer';
+import {DatabaseEventHub, CacheManager, CacheSynchronizer} from '@/database';
 import {GlobalSettingsWrapper} from '@/settings/GlobalSettingsWrapper';
 import {resolveIdChecked} from '@/utils/resolve';
 import {CommandGuildSettingsWrapper} from './CommandGuildSettingsWrapper';

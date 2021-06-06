@@ -9,8 +9,7 @@ import {
 import {from} from 'rxjs';
 import {mergeAll} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
-import {DatabaseEventHub} from '@/database/DatabaseEventHub';
-import {EntityManager} from '@/database/manager/EntityManager';
+import {DatabaseEventHub, EntityManager} from '@/database';
 import {resolveIdChecked, resolveTextBasedChannelId} from '@/utils/resolve';
 import {ListenerCriterionCache} from './ListenerCriterionCache';
 

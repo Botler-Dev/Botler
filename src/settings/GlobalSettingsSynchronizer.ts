@@ -1,8 +1,7 @@
 import {GlobalSettings, Prisma} from '@prisma/client';
-import {CacheSynchronizer} from '../database/synchronizer/CacheSynchronizer';
+import {CacheSynchronizer, DatabaseEventHub} from '../database';
 import {GlobalSettingsWrapper} from './GlobalSettingsWrapper';
 import type {GlobalSettingsCacheKey} from './GlobalSettingsManager';
-import {DatabaseEventHub} from '../database/DatabaseEventHub';
 
 export class GlobalSettingsSynchronizer extends CacheSynchronizer<
   GlobalSettings,
