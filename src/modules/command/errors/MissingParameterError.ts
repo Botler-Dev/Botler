@@ -1,7 +1,7 @@
-import MessageSender from '../message/MessageSender';
-import SimpleResponseError from '../error/SimpleResponseError';
+import {MessageSender} from '../message/MessageSender';
+import {SimpleResponseError} from '../error/SimpleResponseError';
 
-export default class MissingParameterError extends SimpleResponseError {
+export class MissingParameterError extends SimpleResponseError {
   readonly parameterName?: string;
 
   constructor(sender: MessageSender, name?: string) {

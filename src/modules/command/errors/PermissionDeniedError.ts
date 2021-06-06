@@ -1,7 +1,7 @@
-import MessageSender from '../message/MessageSender';
-import SimpleResponseError from '../error/SimpleResponseError';
+import {MessageSender} from '../message/MessageSender';
+import {SimpleResponseError} from '../error/SimpleResponseError';
 
-export default class PermissionDeniedError extends SimpleResponseError {
+export class PermissionDeniedError extends SimpleResponseError {
   readonly action: string;
 
   /**

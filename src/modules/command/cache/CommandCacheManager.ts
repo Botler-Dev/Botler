@@ -1,21 +1,22 @@
 import {PrismaClient} from '@prisma/client';
 import dayjs, {Dayjs} from 'dayjs';
 import {injectable} from 'tsyringe';
-import DatabaseCleaner from '@/database/DatabaseCleaner';
-import CacheManager from '@/database/manager/CacheManager';
-import Logger from '@/logger/Logger';
-import Command from '../command/Command';
-import CommandManager from '../CommandManager';
-import CommandCacheWrapper, {
+import {DatabaseCleaner} from '@/database/DatabaseCleaner';
+import {CacheManager} from '@/database/manager/CacheManager';
+import {Logger} from '@/logger/Logger';
+import {Command} from '../command/Command';
+import {CommandManager} from '../CommandManager';
+import {
   CacheFromCommandCacheWrapper,
   ConcreteCommandCacheWrapper,
   GenericCommandCommandCache,
+  CommandCacheWrapper,
 } from './CommandCacheWrapper';
-import ReactionListenerManager from './listeners/ReactionListenerManager';
-import ResponseListenerManager from './listeners/ResponseListenerManager';
+import {ReactionListenerManager} from './listeners/ReactionListenerManager';
+import {ResponseListenerManager} from './listeners/ResponseListenerManager';
 
 @injectable()
-export default class CommandCacheManager extends CacheManager<
+export class CommandCacheManager extends CacheManager<
   PrismaClient['commandCommandCache'],
   number,
   ConcreteCommandCacheWrapper

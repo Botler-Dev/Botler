@@ -1,11 +1,11 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
-import Logger from '../logger/Logger';
-import MasterLogger from '../logger/MasterLogger';
-import type Module from './Module';
+import {Logger} from '../logger/Logger';
+import {MasterLogger} from '../logger/MasterLogger';
+import type {Module} from './Module';
 import {ModuleConstructor, ModuleResolvable, resolveModuleName} from './ModuleConstructor';
 
-export default class ModuleLoader {
+export class ModuleLoader {
   protected readonly moduleConstructors: Collection<string, ModuleConstructor>;
 
   private readonly _modules: Collection<string, Module> = new Collection<string, Module>();

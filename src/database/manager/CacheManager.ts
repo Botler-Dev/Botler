@@ -1,8 +1,8 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
-import CachedEntityWrapper from '../wrapper/CachedEntityWrapper';
-import EntityManager from './EntityManager';
+import {CachedEntityWrapper} from '../wrapper/CachedEntityWrapper';
+import {EntityManager} from './EntityManager';
 
-export default abstract class CacheManager<
+export abstract class CacheManager<
   TModel = unknown,
   TCacheKey = unknown,
   TWrapper extends CachedEntityWrapper<

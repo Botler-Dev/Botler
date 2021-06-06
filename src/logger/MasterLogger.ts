@@ -3,9 +3,9 @@ import chalk from 'chalk';
 import dayjs from 'dayjs';
 
 import {optional, stringToBoolean, toNumber, unchecked} from '../utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
-import Logger from './Logger';
-import LogLevel, {LOG_LEVEL_STRINGS} from './LogLevel';
+import {OptionsCleanerDefinition, cleanOptions} from '../utils/optionsCleaner';
+import {Logger} from './Logger';
+import {LogLevel, LOG_LEVEL_STRINGS} from './LogLevel';
 
 interface CleanedMasterLoggerConfig {
   stampLabel: boolean;
@@ -38,7 +38,7 @@ export type LogMetadata = Readonly<{
 
 export type LogLevelMetadata = Omit<LogMetadata, 'level'>;
 
-export default class MasterLogger {
+export class MasterLogger {
   private readonly config: CleanedMasterLoggerConfig;
 
   private maxScopeLength = 0;

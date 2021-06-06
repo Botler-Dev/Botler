@@ -29,7 +29,7 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(utc);
 dayjs.extend(duration);
 
-import Bot from './Bot';
+import {Bot} from './Bot';
 import {preprocessEnvironmentVariables} from './utils/environment';
 import {ExitCode, exitWithError} from './utils/process';
 

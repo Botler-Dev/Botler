@@ -1,3 +1,3 @@
-export default interface DiscordWrapper<TDiscordObject> {
+export interface DiscordWrapper<TDiscordObject> {
   readonly discord: TDiscordObject;
 }

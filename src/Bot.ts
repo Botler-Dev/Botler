@@ -3,17 +3,17 @@ import {ChannelManager, Client, GuildManager, UserManager} from 'discord.js';
 import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {container} from 'tsyringe';
 
-import DatabaseCleaner from './database/DatabaseCleaner';
-import DatabaseEventHub from './database/DatabaseEventHub';
-import GlobalSettingsManager from './database/managers/GlobalSettingsManager';
-import GlobalSettingsWrapper from './database/wrappers/GlobalSettingsWrapper';
-import Logger, {proxyNativeConsole} from './logger/Logger';
-import MasterLogger from './logger/MasterLogger';
-import CommandModule from './modules/command/CommandModule';
-import ModuleLoader from './modules/ModuleLoader';
+import {DatabaseCleaner} from './database/DatabaseCleaner';
+import {DatabaseEventHub} from './database/DatabaseEventHub';
+import {GlobalSettingsManager} from './database/managers/GlobalSettingsManager';
+import {GlobalSettingsWrapper} from './database/wrappers/GlobalSettingsWrapper';
+import {proxyNativeConsole, Logger} from './logger/Logger';
+import {MasterLogger} from './logger/MasterLogger';
+import {CommandModule} from './modules/command/CommandModule';
+import {ModuleLoader} from './modules/ModuleLoader';
 import {ExitCode, exitWithMessage} from './utils/process';
 
-export default class Bot {
+export class Bot {
   private masterLogger!: MasterLogger;
 
   private globalLogger!: Logger;

@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable no-console */
-import type MasterLogger from './MasterLogger';
+import type {MasterLogger} from './MasterLogger';
 import type {LogLevelMetadata} from './MasterLogger';
 
-export default class Logger {
+export class Logger {
   readonly metadata: LogLevelMetadata;
 
   private readonly masterLogger: MasterLogger;

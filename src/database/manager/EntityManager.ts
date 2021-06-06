@@ -1,4 +1,4 @@
-export default abstract class EntityManager<TModel = unknown> {
+export abstract class EntityManager<TModel = unknown> {
   readonly model: TModel;
 
   constructor(model: TModel) {

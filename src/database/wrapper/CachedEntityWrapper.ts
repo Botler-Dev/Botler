@@ -1,9 +1,9 @@
 import {BehaviorSubject, Observable} from 'rxjs';
 import {filter, first, map, skip} from 'rxjs/operators';
-import type CacheManager from '../manager/CacheManager';
-import EntityWrapper, {Entity} from './EntityWrapper';
+import type {CacheManager} from '../manager/CacheManager';
+import {Entity, EntityWrapper} from './EntityWrapper';
 
-export default abstract class CachedEntityWrapper<
+export abstract class CachedEntityWrapper<
   TEntityState extends Entity | undefined,
   TManager extends CacheManager
 > extends EntityWrapper<TEntityState, TManager> {

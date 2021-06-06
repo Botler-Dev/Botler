@@ -2,10 +2,10 @@ import {ClientConfig} from 'pg';
 import createPostgresSubscriber, {Subscriber} from 'pg-listen';
 import {fromEvent, Observable} from 'rxjs';
 import {singleton} from 'tsyringe';
-import Logger from '../logger/Logger';
-import MasterLogger from '../logger/MasterLogger';
+import {Logger} from '../logger/Logger';
+import {MasterLogger} from '../logger/MasterLogger';
 import {required, stack, toNumber} from '../utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '../utils/optionsCleaner';
+import {OptionsCleanerDefinition, cleanOptions} from '../utils/optionsCleaner';
 import {exit, ExitCode} from '../utils/process';
 
 export interface RawClientConfig {
@@ -17,7 +17,7 @@ export interface RawClientConfig {
 }
 
 @singleton()
-export default class DatabaseEventHub {
+export class DatabaseEventHub {
   private readonly subscriber: Subscriber;
 
   private readonly logger: Logger;

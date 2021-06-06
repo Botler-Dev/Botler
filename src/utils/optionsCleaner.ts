@@ -23,7 +23,7 @@ export type OptionsCleanerDefinition<
   [Key in keyof TOutputOptions]: OptionValueCleaner<TInputOptions, TOutputOptions, Key>;
 };
 
-export default function cleanOptions<
+export function cleanOptions<
   TInputOptions extends Partial<Record<keyof TOutputOptions, OptionValue>>,
   TOutputOptions extends Options
 >(

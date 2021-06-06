@@ -1,35 +1,37 @@
 import {Client, GuildMember, Message, MessageReaction, PartialUser, User} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 
-import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
-import StaticImplements from '@/utils/StaticImplements';
-import Module from '../Module';
+import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
+import {StaticImplements} from '@/utils/StaticImplements';
+import {Module} from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
-import CommandCategory from './CommandCategory';
-import CommandManager from './CommandManager';
-import CommandCacheManager from './cache/CommandCacheManager';
-import CommandError from './error/CommandError';
-import UnexpectedError from './errors/UnexpectedError';
-import GuildMemberContext from './executionContexts/guild/GuildMemberContext';
-import InitialExecutionContext, {
+import {CommandCategory} from './CommandCategory';
+import {CommandManager} from './CommandManager';
+import {CommandCacheManager} from './cache/CommandCacheManager';
+import {CommandError} from './error/CommandError';
+import {UnexpectedError} from './errors/UnexpectedError';
+import {GuildMemberContext} from './executionContexts/guild/GuildMemberContext';
+import {
   InitialParsedValues,
+  InitialExecutionContext,
 } from './executionContexts/InitialExecutionContext';
-import ReactionListenerManager from './cache/listeners/ReactionListenerManager';
-import ResponseListenerManager from './cache/listeners/ResponseListenerManager';
-import Command from './command/Command';
+import {ReactionListenerManager} from './cache/listeners/ReactionListenerManager';
+import {ResponseListenerManager} from './cache/listeners/ResponseListenerManager';
+import {Command} from './command/Command';
 import {ConcreteCommandCacheWrapper} from './cache/CommandCacheWrapper';
-import MessageExecutionContext from './executionContexts/MessageExecutionContext';
-import ExecutionContext from './executionContexts/ExecutionContext';
-import ResponseExecutionContext from './executionContexts/ResponseExecutionContext';
-import ReactionExecutionContext, {
+import {MessageExecutionContext} from './executionContexts/MessageExecutionContext';
+import {ExecutionContext} from './executionContexts/ExecutionContext';
+import {ResponseExecutionContext} from './executionContexts/ResponseExecutionContext';
+import {
   ReactionAction,
+  ReactionExecutionContext,
 } from './executionContexts/ReactionExecutionContext';
-import ParserEngine, {ParseResults} from './parser/ParserEngine';
+import {ParseResults, ParserEngine} from './parser/ParserEngine';
 import {commandParser} from './parsers/commandParser';
-import CommandGuildSettingsManager from './settings/CommandGuildSettingsManager';
+import {CommandGuildSettingsManager} from './settings/CommandGuildSettingsManager';
 
 @StaticImplements<ModuleConstructor>()
-export default class CommandModule extends Module {
+export class CommandModule extends Module {
   static readonly moduleName = 'command';
 
   static readonly requiredDependencies = [];

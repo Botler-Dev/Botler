@@ -1,8 +1,8 @@
-import type EntityManager from '../manager/EntityManager';
+import type {EntityManager} from '../manager/EntityManager';
 
 export type Entity = Record<never, never>;
 
-export default abstract class EntityWrapper<
+export abstract class EntityWrapper<
   TEntityState extends Entity | undefined,
   TManager extends EntityManager
 > {

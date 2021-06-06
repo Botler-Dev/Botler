@@ -2,7 +2,7 @@ import {Collection, ReadonlyCollection} from 'discord.js';
 import {merge, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Entity} from '../wrapper/EntityWrapper';
-import DatabaseEventHub from '../DatabaseEventHub';
+import {DatabaseEventHub} from '../DatabaseEventHub';
 
 export type SyncStream<TEntity> = Subject<TEntity | undefined>;
 
@@ -15,7 +15,7 @@ export type CacheKeyResolver<TMinimalPayload, TCacheKey = unknown> = (
   payload: TMinimalPayload
 ) => TCacheKey | undefined;
 
-export default class CacheSynchronizer<
+export class CacheSynchronizer<
   TEntity extends Entity,
   TMinimalPayloadKeys extends keyof TEntity = keyof TEntity,
   TCacheKey = unknown

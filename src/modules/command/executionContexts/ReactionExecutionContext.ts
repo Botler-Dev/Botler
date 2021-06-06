@@ -1,18 +1,18 @@
 import {Client, MessageReaction, User} from 'discord.js';
-import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
-import type CommandCacheWrapper from '../cache/CommandCacheWrapper';
+import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
+import type {CommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
-import Command from '../command/Command';
-import MessageSender from '../message/MessageSender';
-import GuildMemberContext from './guild/GuildMemberContext';
-import UserExecutionContext from './UserExecutionContext';
+import {Command} from '../command/Command';
+import {MessageSender} from '../message/MessageSender';
+import {GuildMemberContext} from './guild/GuildMemberContext';
+import {UserExecutionContext} from './UserExecutionContext';
 
 export enum ReactionAction {
   Add,
   Remove,
 }
 
-export default class ReactionExecutionContext<
+export class ReactionExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
   TCommand extends Command = Command<TCache>,
   TGuildContext extends GuildMemberContext | undefined = GuildMemberContext | undefined

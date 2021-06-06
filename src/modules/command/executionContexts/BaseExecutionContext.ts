@@ -1,11 +1,11 @@
 import {Client, TextBasedChannel} from 'discord.js';
-import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
 import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
-import type Command from '../command/Command';
-import MessageSender from '../message/MessageSender';
-import GuildContext from './guild/GuildContext';
+import type {Command} from '../command/Command';
+import {MessageSender} from '../message/MessageSender';
+import {GuildContext} from './guild/GuildContext';
 
-export default abstract class BaseExecutionContext<
+export abstract class BaseExecutionContext<
   TCommand extends Command,
   TGuildContext extends GuildContext | undefined,
   TCacheState extends ConcreteCommandCacheWrapper | undefined

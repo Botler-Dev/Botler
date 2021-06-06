@@ -1,12 +1,12 @@
 import {Client, Message} from 'discord.js';
-import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
-import CommandCacheWrapper, {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
-import Command from '../command/Command';
-import ParserEngine, {ParseResults} from '../parser/ParserEngine';
-import GuildMemberContext from './guild/GuildMemberContext';
-import MessageExecutionContext from './MessageExecutionContext';
+import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
+import {ConcreteCommandCacheWrapper, CommandCacheWrapper} from '../cache/CommandCacheWrapper';
+import {Command} from '../command/Command';
+import {ParseResults, ParserEngine} from '../parser/ParserEngine';
+import {GuildMemberContext} from './guild/GuildMemberContext';
+import {MessageExecutionContext} from './MessageExecutionContext';
 
-export default class ResponseExecutionContext<
+export class ResponseExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
   TExistingParseResults extends ParseResults = Record<string, never>,
   TCommand extends Command<TCache, TExistingParseResults> = Command<TCache, TExistingParseResults>,

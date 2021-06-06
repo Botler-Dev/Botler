@@ -17,7 +17,7 @@ export interface ParseHistoryEntry {
   readonly result: ParseResult;
 }
 
-export default class ParserEngine<TExistingResults extends ParseResults = EmptyParseResults> {
+export class ParserEngine<TExistingResults extends ParseResults = EmptyParseResults> {
   readonly raw: string;
 
   private readonly _results = {} as RealParseResults<TExistingResults>;

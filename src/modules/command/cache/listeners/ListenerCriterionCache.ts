@@ -2,7 +2,7 @@ type RemoveFirst<TTuple extends unknown[]> = TTuple extends [unknown, ...infer T
   ? TRest
   : never;
 
-export default class ListenerCriterionCache<TCriteria extends unknown[] = unknown[]> {
+export class ListenerCriterionCache<TCriteria extends unknown[] = unknown[]> {
   private readonly commandCaches = new Set<number>();
 
   private readonly nextCriterion = new Map<

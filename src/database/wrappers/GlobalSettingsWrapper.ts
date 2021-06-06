@@ -2,11 +2,11 @@ import {GlobalSettings} from '@prisma/client';
 import {Snowflake, UserManager, UserResolvable} from 'discord.js';
 import {filter, tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
-import Logger from '@/logger/Logger';
+import {Logger} from '@/logger/Logger';
 import {resolveIdChecked} from '@/utils/resolve';
-import type GlobalSettingsManager from '../managers/GlobalSettingsManager';
+import type {GlobalSettingsManager} from '../managers/GlobalSettingsManager';
 import {SyncStream} from '../synchronizer/CacheSynchronizer';
-import SynchronizedEntityWrapper from '../wrapper/SynchronizedEntityWrapper';
+import {SynchronizedEntityWrapper} from '../wrapper/SynchronizedEntityWrapper';
 
 export enum ColorType {
   Default,
@@ -15,7 +15,7 @@ export enum ColorType {
   Warn,
 }
 
-export default class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
+export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
   GlobalSettings,
   GlobalSettingsManager
 > {

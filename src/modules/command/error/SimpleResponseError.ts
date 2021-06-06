@@ -1,9 +1,9 @@
 import {Message} from 'discord.js';
-import type MessageSender from '../message/MessageSender';
-import MessageType from '../message/MessageType';
-import CommandError from './CommandError';
+import type {MessageSender} from '../message/MessageSender';
+import {MessageType} from '../message/MessageType';
+import {CommandError} from './CommandError';
 
-export default class SimpleResponseError extends CommandError {
+export class SimpleResponseError extends CommandError {
   readonly publicMessage: string;
 
   private readonly sender: MessageSender;

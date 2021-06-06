@@ -1,7 +1,7 @@
-import MessageSender from '../message/MessageSender';
-import DetailedResponseError from '../error/DetailedResponseError';
+import {MessageSender} from '../message/MessageSender';
+import {DetailedResponseError} from '../error/DetailedResponseError';
 
-export default class UnexpectedError extends DetailedResponseError {
+export class UnexpectedError extends DetailedResponseError {
   constructor(sender: MessageSender, error: Error) {
     super(
       sender,

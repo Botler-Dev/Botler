@@ -1,5 +1,5 @@
 import {optional} from '@/utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
+import {OptionsCleanerDefinition, cleanOptions} from '@/utils/optionsCleaner';
 import {Parser, ParseResult} from '../parser/parser';
 
 export interface StringParseOptions {
@@ -57,7 +57,7 @@ function parseValue(raw: string, options: CleanStringParseOptions): StringParseR
   };
 }
 
-export default function stringParser(options?: StringParseOptions): Parser<StringParseResult> {
+export function stringParser(options?: StringParseOptions): Parser<StringParseResult> {
   const cleaned = cleanOptions(stringParseOptionsDefinition, options ?? {});
   return async (raw: string): Promise<StringParseResult | undefined> => {
     const result = parseValue(raw, cleaned);

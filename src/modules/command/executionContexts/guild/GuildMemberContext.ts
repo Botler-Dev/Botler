@@ -1,8 +1,8 @@
 import {GuildMember} from 'discord.js';
-import CommandGuildSettingsWrapper from '../../settings/CommandGuildSettingsWrapper';
-import GuildContext from './GuildContext';
+import {CommandGuildSettingsWrapper} from '../../settings/CommandGuildSettingsWrapper';
+import {GuildContext} from './GuildContext';
 
-export default class GuildMemberContext extends GuildContext {
+export class GuildMemberContext extends GuildContext {
   readonly member: GuildMember;
 
   constructor(guildSettings: CommandGuildSettingsWrapper, member: GuildMember) {

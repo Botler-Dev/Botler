@@ -1,9 +1,9 @@
 import {GuildMemberManager, User, UserManager} from 'discord.js';
 import {unchecked} from '@/utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
+import {OptionsCleanerDefinition, cleanOptions} from '@/utils/optionsCleaner';
 import {Parser, ParseResult} from '../parser/parser';
 import {guildMemberParser, GuildMemberParserOptions} from './guildMemberParser';
-import snowflakeParser, {SnowflakeType} from './snowflakeParser';
+import {SnowflakeType, snowflakeParser} from './snowflakeParser';
 
 export interface UserParseOptions
   extends Pick<

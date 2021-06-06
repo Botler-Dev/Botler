@@ -1,11 +1,11 @@
 import {DependencyContainer} from 'tsyringe';
 
-import Logger from '../logger/Logger';
-import MasterLogger from '../logger/MasterLogger';
+import {Logger} from '../logger/Logger';
+import {MasterLogger} from '../logger/MasterLogger';
 import {ModuleConstructor, ModuleResolvable, resolveModuleName} from './ModuleConstructor';
-import ModuleLoader from './ModuleLoader';
+import {ModuleLoader} from './ModuleLoader';
 
-export default abstract class Module {
+export abstract class Module {
   get moduleConstructor(): ModuleConstructor {
     return this.constructor as ModuleConstructor;
   }

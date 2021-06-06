@@ -10,10 +10,10 @@ import {
 } from 'discord.js';
 import {compareTwoStrings} from 'string-similarity';
 import {optional, unchecked} from '@/utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
+import {OptionsCleanerDefinition, cleanOptions} from '@/utils/optionsCleaner';
 import {Parser, ParseResult} from '../parser/parser';
-import snowflakeParser, {SnowflakeType} from './snowflakeParser';
-import stringParser, {StringParseOptions} from './stringParser';
+import {SnowflakeType, snowflakeParser} from './snowflakeParser';
+import {StringParseOptions, stringParser} from './stringParser';
 
 export type GuildChannelType =
   | typeof CategoryChannel
@@ -88,7 +88,7 @@ async function snowflakeParse<TChannel extends GuildChannel>(
   return {value: channel, length: snowflakeResult.length};
 }
 
-export default function channelParser<TChannel extends GuildChannel>(
+export function channelParser<TChannel extends GuildChannel>(
   channels: Collection<Snowflake, TChannel>,
   options?: ChannelParseOptions
 ): Parser<ChannelParseResult<TChannel>> {

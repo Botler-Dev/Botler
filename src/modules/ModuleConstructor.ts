@@ -1,5 +1,5 @@
 import type {DependencyContainer} from 'tsyringe';
-import type Module from './Module';
+import type {Module} from './Module';
 
 export type ModuleResolvable<TModule extends Module = Module> = string | ModuleConstructor<TModule>;
 

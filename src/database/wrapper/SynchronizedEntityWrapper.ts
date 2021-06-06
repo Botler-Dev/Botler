@@ -1,11 +1,11 @@
 import {BehaviorSubject, Observable} from 'rxjs';
 import {filter, skip} from 'rxjs/operators';
 import {isDeepStrictEqual} from 'util';
-import CacheManager from '../manager/CacheManager';
-import CachedEntityWrapper from './CachedEntityWrapper';
+import {CacheManager} from '../manager/CacheManager';
+import {CachedEntityWrapper} from './CachedEntityWrapper';
 import {Entity} from './EntityWrapper';
 
-export default abstract class SynchronizedEntityWrapper<
+export abstract class SynchronizedEntityWrapper<
   TEntityState extends Entity | undefined,
   TManager extends CacheManager
 > extends CachedEntityWrapper<TEntityState, TManager> {

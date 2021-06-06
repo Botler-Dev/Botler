@@ -1,6 +1,6 @@
 import {Message} from 'discord.js';
 
-export default abstract class CommandError extends Error {
+export abstract class CommandError extends Error {
   readonly realError?: Error;
 
   constructor(privateMessageOrRealError: Error | string) {

@@ -1,12 +1,12 @@
 import {Client, EmojiResolvable, MessageReaction} from 'discord.js';
 import {Message, MessageEmbed, TextBasedChannel} from 'discord.js';
-import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
 import {optional, unchecked} from '@/utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
+import {OptionsCleanerDefinition, cleanOptions} from '@/utils/optionsCleaner';
 import {resolveAnyEmoji} from '@/utils/resolve';
-import DetailedResponseError from '../error/DetailedResponseError';
-import SimpleResponseError from '../error/SimpleResponseError';
-import MessageType, {messageEmojis, messageToColorType} from './MessageType';
+import {DetailedResponseError} from '../error/DetailedResponseError';
+import {SimpleResponseError} from '../error/SimpleResponseError';
+import {MessageType, messageEmojis, messageToColorType} from './MessageType';
 
 export interface MessageOptions {
   type?: MessageType;
@@ -27,7 +27,7 @@ export interface ReactionOption {
   description: string;
 }
 
-export default class MessageSender {
+export class MessageSender {
   readonly channel: TextBasedChannel;
 
   private readonly globalSettings: GlobalSettingsWrapper;

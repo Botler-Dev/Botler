@@ -1,6 +1,6 @@
 import {Snowflake} from 'discord.js';
 import {notEmpty, optional, stack} from '@/utils/optionCleaners';
-import cleanOptions, {OptionsCleanerDefinition} from '@/utils/optionsCleaner';
+import {OptionsCleanerDefinition, cleanOptions} from '@/utils/optionsCleaner';
 import {Parser, ParseResult} from '../parser/parser';
 
 export enum SnowflakeType {
@@ -40,9 +40,7 @@ const REGEXP_PATTERNS = {
   [SnowflakeType.Role]: /^<@&(\d{17,19})>(?:\s+|$)/,
 } as const;
 
-export default function snowflakeParser(
-  options?: SnowflakeParseOptions
-): Parser<SnowflakeParseResult> {
+export function snowflakeParser(options?: SnowflakeParseOptions): Parser<SnowflakeParseResult> {
   const cleaned = cleanOptions(snowflakeParseOptionsDefinition, options ?? {});
   return async (raw: string): Promise<SnowflakeParseResult | undefined> => {
     let result: ParseResult<string> | undefined;

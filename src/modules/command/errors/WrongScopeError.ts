@@ -1,8 +1,8 @@
 import {DMChannel} from 'discord.js';
-import SimpleResponseError from '../error/SimpleResponseError';
-import MessageSender from '../message/MessageSender';
+import {SimpleResponseError} from '../error/SimpleResponseError';
+import {MessageSender} from '../message/MessageSender';
 
-export default class WrongScopeError extends SimpleResponseError {
+export class WrongScopeError extends SimpleResponseError {
   constructor(sender: MessageSender) {
     super(
       sender,

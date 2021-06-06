@@ -1,15 +1,15 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
-import Logger from '@/logger/Logger';
-import type Command from './command/Command';
+import {Logger} from '@/logger/Logger';
+import type {Command} from './command/Command';
 import type {CommandName} from './command/Command';
-import CommandManager from './CommandManager';
+import {CommandManager} from './CommandManager';
 
 export type CommandCategoryGenerator = (container: DependencyContainer) => CommandCategory;
 
 export type CommandCategoryName = string;
 
-export default class CommandCategory {
+export class CommandCategory {
   readonly parent?: CommandCategory;
 
   readonly name: CommandCategoryName;

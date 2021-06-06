@@ -6,12 +6,12 @@ import {
   TextBasedChannelResolvable,
   UserResolvable,
 } from 'discord.js';
-import CachedEntityWrapper from '@/database/wrapper/CachedEntityWrapper';
-import Command from '../command/Command';
+import {CachedEntityWrapper} from '@/database/wrapper/CachedEntityWrapper';
+import {Command} from '../command/Command';
 import {ReactionAction} from '../executionContexts/ReactionExecutionContext';
-import type CommandCacheManager from './CommandCacheManager';
-import ReactionListenerManager from './listeners/ReactionListenerManager';
-import ResponseListenerManager from './listeners/ResponseListenerManager';
+import type {CommandCacheManager} from './CommandCacheManager';
+import {ReactionListenerManager} from './listeners/ReactionListenerManager';
+import {ResponseListenerManager} from './listeners/ResponseListenerManager';
 
 export interface GenericCommandCommandCache<TCache> extends CommandCommandCache {
   cache: TCache;
@@ -24,7 +24,7 @@ export type CacheFromCommandCacheWrapper<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ConcreteCommandCacheWrapper = CommandCacheWrapper<any>;
 
-export default abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntityWrapper<
+export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntityWrapper<
   GenericCommandCommandCache<TCache>,
   CommandCacheManager
 > {

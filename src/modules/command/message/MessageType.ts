@@ -1,13 +1,12 @@
 import {ColorType} from '@/database/wrappers/GlobalSettingsWrapper';
 
-enum MessageType {
+export enum MessageType {
   Neutral,
   Question,
   Success,
   Error,
   Warning,
 }
-export default MessageType;
 
 export const messageEmojis = {
   [MessageType.Neutral]: '',

@@ -1,23 +1,23 @@
-import GlobalSettingsWrapper from '@/database/wrappers/GlobalSettingsWrapper';
-import type CommandCacheManager from '../cache/CommandCacheManager';
-import type ReactionListenerManager from '../cache/listeners/ReactionListenerManager';
-import type ResponseListenerManager from '../cache/listeners/ResponseListenerManager';
+import {GlobalSettingsWrapper} from '@/database/wrappers/GlobalSettingsWrapper';
+import type {CommandCacheManager} from '../cache/CommandCacheManager';
+import type {ReactionListenerManager} from '../cache/listeners/ReactionListenerManager';
+import type {ResponseListenerManager} from '../cache/listeners/ResponseListenerManager';
 import type {
   CacheFromCommandCacheWrapper,
   ConcreteCommandCacheWrapper,
 } from '../cache/CommandCacheWrapper';
 import type {GenericCommandCommandCache} from '../cache/CommandCacheWrapper';
-import type CommandCategory from '../CommandCategory';
-import WrongScopeError from '../errors/WrongScopeError';
-import type ExecutionContext from '../executionContexts/ExecutionContext';
-import InitialExecutionContext from '../executionContexts/InitialExecutionContext';
-import UserExecutionContext from '../executionContexts/UserExecutionContext';
+import type {CommandCategory} from '../CommandCategory';
+import {WrongScopeError} from '../errors/WrongScopeError';
+import type {ExecutionContext} from '../executionContexts/ExecutionContext';
+import {InitialExecutionContext} from '../executionContexts/InitialExecutionContext';
+import {UserExecutionContext} from '../executionContexts/UserExecutionContext';
 import {EmptyParseResults, ParseResults} from '../parser/ParserEngine';
-import SilentError from '../errors/SilentError';
+import {SilentError} from '../errors/SilentError';
 
 export type CommandName = string;
 
-export default abstract class Command<
+export abstract class Command<
   TCache extends ConcreteCommandCacheWrapper = ConcreteCommandCacheWrapper,
   TAlreadyParsedResults extends ParseResults = EmptyParseResults
 > {

@@ -1,13 +1,13 @@
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
-import MasterLogger from '../logger/MasterLogger';
-import Logger from '../logger/Logger';
-import GlobalSettingsWrapper from './wrappers/GlobalSettingsWrapper';
+import {MasterLogger} from '../logger/MasterLogger';
+import {Logger} from '../logger/Logger';
+import {GlobalSettingsWrapper} from './wrappers/GlobalSettingsWrapper';
 
 export type Cleaner = () => Promise<void>;
 
 @injectable()
-export default class DatabaseCleaner {
+export class DatabaseCleaner {
   private readonly cleaners = new Set<Cleaner>();
 
   private interval!: NodeJS.Timeout;
