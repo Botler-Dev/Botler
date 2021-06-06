@@ -1,4 +1,4 @@
-import {ColorType} from '@/settings/GlobalSettingsWrapper';
+import {ColorType} from '@/settings';
 
 export enum MessageType {
   Neutral,

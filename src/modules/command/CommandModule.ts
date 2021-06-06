@@ -1,7 +1,7 @@
 import {Client, GuildMember, Message, MessageReaction, PartialUser, User} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 
-import {GlobalSettingsWrapper} from '@/settings/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/settings';
 import {StaticImplements} from '@/utils/StaticImplements';
 import {Module} from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';

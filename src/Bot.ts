@@ -4,8 +4,7 @@ import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {container} from 'tsyringe';
 
 import {DatabaseCleaner, DatabaseEventHub} from './database';
-import {GlobalSettingsManager} from './settings/GlobalSettingsManager';
-import {GlobalSettingsWrapper} from './settings/GlobalSettingsWrapper';
+import {GlobalSettingsManager, GlobalSettingsWrapper} from './settings';
 import {proxyNativeConsole, Logger} from './logger/Logger';
 import {MasterLogger} from './logger/MasterLogger';
 import {CommandModule} from './modules/command/CommandModule';

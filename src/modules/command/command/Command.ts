@@ -1,4 +1,4 @@
-import {GlobalSettingsWrapper} from '@/settings/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/settings';
 import type {CommandCacheManager} from '../cache/CommandCacheManager';
 import type {ReactionListenerManager} from '../cache/listeners/ReactionListenerManager';
 import type {ResponseListenerManager} from '../cache/listeners/ResponseListenerManager';

@@ -1,8 +1,8 @@
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
-import {MasterLogger} from '../logger/MasterLogger';
-import {Logger} from '../logger/Logger';
-import type {GlobalSettingsWrapper} from '../settings/GlobalSettingsWrapper';
+import {MasterLogger} from '@/logger/MasterLogger';
+import {Logger} from '@/logger/Logger';
+import type {GlobalSettingsWrapper} from '@/settings';
 
 export type Cleaner = () => Promise<void>;
 

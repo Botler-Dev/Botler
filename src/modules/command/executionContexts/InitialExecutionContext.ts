@@ -1,6 +1,6 @@
 import {Dayjs} from 'dayjs';
 import {Client, Message} from 'discord.js';
-import {GlobalSettingsWrapper} from '@/settings/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/settings';
 import type {CommandCacheManager} from '../cache/CommandCacheManager';
 import type {CommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import type {

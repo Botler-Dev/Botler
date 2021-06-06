@@ -1,5 +1,5 @@
 import {Client, Message} from 'discord.js';
-import {GlobalSettingsWrapper} from '@/settings/GlobalSettingsWrapper';
+import {GlobalSettingsWrapper} from '@/settings';
 import {ConcreteCommandCacheWrapper, CommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import {Command} from '../command/Command';
 import {ParseResults, ParserEngine} from '../parser/ParserEngine';
