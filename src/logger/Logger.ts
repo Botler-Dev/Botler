@@ -31,8 +31,8 @@ export class Logger {
 }
 
 export function proxyNativeConsole(logger: Logger): void {
-  console.log = logger.log.bind(logger);
-  console.info = logger.info.bind(logger);
-  console.warn = logger.warn.bind(logger);
-  console.error = logger.error.bind(logger);
+  console.log = Logger.prototype.log.bind(logger);
+  console.info = Logger.prototype.info.bind(logger);
+  console.warn = Logger.prototype.warn.bind(logger);
+  console.error = Logger.prototype.error.bind(logger);
 }

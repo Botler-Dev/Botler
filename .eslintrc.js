@@ -50,6 +50,8 @@ module.exports = {
     'unicorn/no-null': 'warn',
     // For loops are not allowed by the Airbnb style guide
     'unicorn/no-array-for-each': 'off',
+    // TypeScript no longer finds the types when using the protocol
+    'unicorn/prefer-node-protocol': 'off',
 
     // Copied from https://github.com/airbnb/javascript/issues/1536#issuecomment-547416680
     'unicorn/import-index': 'off',
