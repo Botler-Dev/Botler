@@ -53,3 +53,10 @@ To apply all migrations to a database first [configure the database URL](#config
 ```shell
 yarn prisma migrate deploy
 ```
+
+## Naming conventions
+
+- Object (table, enum, enum member etc.) names should be PascalCase.
+- Property names should be camelCase.
+- Property names should state what part they store from what they represent. (So `userId` not just `user`)
+- Objects from modules should have their names prefixed with the module name.

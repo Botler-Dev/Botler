@@ -1,9 +1,6 @@
 # Module System
 
-Botler contains a module system with which all its features are implemented. Each module encapsulates a single feature which either directly interacts with Discord, other external services, or with other modules. To maximize code modularity and development parallelizability, the modules only expose a limited API to each other. This API can be accessed via the public properties and methods of a module class instance and should have code documentation and be viewed as public API.
-
-!!! attention
-    The types referenced in a module's public API should be bundled into a barrel file in the module directory root to prevent reliance on module internal file placement.
+Botler contains a module system with which all its features are implemented. Each module encapsulates a single feature which either directly interacts with Discord, other external services, or with other modules. To maximize code modularity and development parallelizability, the modules only expose a limited API to each other. This API can be accessed via the public properties and methods of a module class instance and should have code documentation and be viewed as public API. The module types referenced in these APIs should be bundled into a [barrel file](https://basarat.gitbook.io/typescript/main-1/barrel) in the module directory root to prevent reliance on module internal file placement.
 
 ## Dependencies
 
