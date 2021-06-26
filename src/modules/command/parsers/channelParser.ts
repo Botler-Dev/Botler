@@ -69,9 +69,8 @@ const channelParseOptionsDefinition: OptionsCleanerDefinition<
   similarityThreshold: optional(0.2),
 };
 
-export type ChannelParseResult<
-  TChannel extends GuildChannel = GuildChannel
-> = ParseResult<TChannel>;
+export type ChannelParseResult<TChannel extends GuildChannel = GuildChannel> =
+  ParseResult<TChannel>;
 
 const DISCORD_CHANNEL_NAME_MAX_LENGTH = 100;
 

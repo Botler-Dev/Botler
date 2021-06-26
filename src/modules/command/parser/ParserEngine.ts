@@ -91,9 +91,8 @@ export class ParserEngine<TExistingResults extends ParseResults = EmptyParseResu
     this._values[name as keyof TExistingResults] = result.value as ValueFromParseResult<
       TExistingResults[keyof TExistingResults]
     >;
-    this._results[
-      name as keyof TExistingResults
-    ] = result as TExistingResults[keyof TExistingResults];
+    this._results[name as keyof TExistingResults] =
+      result as TExistingResults[keyof TExistingResults];
   }
 
   rollback(stepCount = 1): ParseHistoryEntry[] {

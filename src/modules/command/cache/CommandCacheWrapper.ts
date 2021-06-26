@@ -17,9 +17,8 @@ export interface GenericCommandCommandCache<TCache> extends CommandCommandCache 
   cache: TCache;
 }
 
-export type CacheFromCommandCacheWrapper<
-  TWrapper extends ConcreteCommandCacheWrapper
-> = TWrapper extends CommandCacheWrapper<infer TCache> ? TCache : never;
+export type CacheFromCommandCacheWrapper<TWrapper extends ConcreteCommandCacheWrapper> =
+  TWrapper extends CommandCacheWrapper<infer TCache> ? TCache : never;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ConcreteCommandCacheWrapper = CommandCacheWrapper<any>;
