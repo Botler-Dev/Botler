@@ -58,6 +58,7 @@ nav:
           - Prisma: Development/Database/Prisma.md
           - Entity System: Development/Database/Entity-System.md
           - Sync Triggers: Development/Database/Sync-Triggers.md
+      - Module System: Development/Module-System.md
       - Modules:
           - Command:
               - Overview: Development/Modules/Command/Overview.md
