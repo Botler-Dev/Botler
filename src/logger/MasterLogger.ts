@@ -7,24 +7,69 @@ import {OptionsCleanerDefinition, cleanOptions} from '../utils/optionsCleaner';
 import {Logger} from './Logger';
 import {LogLevel, LOG_LEVEL_STRINGS} from './LogLevel';
 
+/**
+ * Color of a metadata label.
+ * Can be either a [css keyword](https://www.w3.org/wiki/CSS/Properties/color/keywords) or a hex value prefixed with `#`.
+ */
+export type LogColor = string;
+
 interface CleanedMasterLoggerConfig {
+  /**
+   * If the timestamp label should be printed. (default `true`)
+   */
   stampLabel: boolean;
+  /**
+   * If the scope label should be printed. (default `true`)
+   */
   scopeLabel: boolean;
+  /**
+   * If the {@link LogLevel} label should be printed. (default `true`)
+   */
   levelLabel: boolean;
 
-  stampColor: string;
-  scopeColor: string;
-  levelColor: string;
+  /**
+   * Color to be used for timestamp label. (default `gray`)
+   */
+  stampColor: LogColor;
+  /**
+   * Color to be used for scope label. (default `yellow`)
+   */
+  scopeColor: LogColor;
+  /**
+   * Color to be used for {@link LogLevel} label. (default `cyan`)
+   */
+  levelColor: LogColor;
 
+  /**
+   * Prefix of all metadata labels. (default `[`)
+   */
   labelPrefix: string;
+  /**
+   * Suffix of all metadata labels. (default `]`)
+   */
   labelSuffix: string;
 
+  /**
+   * Total character with the timestamp label should be padded to. (default `0`)
+   */
   stampPad: number;
+  /**
+   * Total character with the scope label should be padded to.
+   * `undefined` makes the {@link MasterLogger} use the max known scope name length.
+   * (default `undefined`)
+   */
   scopePad?: number;
 
+  /**
+   * In what [format](https://day.js.org/docs/en/display/format) the timestamp should be printed.
+   * (default `YYYY/MM/DD HH:mm:ss.SSS`)
+   */
   stampFormat: string;
 }
 
+/**
+ * Config for {@link MasterLogger}.
+ */
 export type MasterLoggerConfig = Partial<CleanedMasterLoggerConfig>;
 
 type EnvMasterLoggerConfig = {
@@ -38,6 +83,10 @@ export type LogMetadata = Readonly<{
 
 export type LogLevelMetadata = Omit<LogMetadata, 'level'>;
 
+/**
+ * Main logger that prints metadata and payload using the provided {@link MasterLoggerConfig}.
+ * By default uses environment variables.
+ */
 export class MasterLogger {
   private readonly config: CleanedMasterLoggerConfig;
 
@@ -81,7 +130,7 @@ export class MasterLogger {
 
   /**
    * This is required so when the native console is overwritten
-   * with a ScopedLogger there is no infinite recursion
+   * with a {@link Logger} there is no infinite recursion.
    */
   private static originalConsole = {
     log: console.log,
@@ -110,6 +159,10 @@ export class MasterLogger {
     });
   }
 
+  /**
+   * Gives a {@link Logger} with the provided scope.
+   * If {@link MasterLoggerConfig.scopePad} is not specified it will also automatically adjust the scope padding.
+   */
   getScope(scope: string): Logger {
     let logger = this.scopes.get(scope);
     if (logger) return logger;
