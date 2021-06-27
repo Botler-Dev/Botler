@@ -12,6 +12,10 @@ export function resolveTextBasedChannelId(resolvable: TextBasedChannelResolvable
   return resolvable.id;
 }
 
+/**
+ * Uses the `resolveID` of the provided manager but
+ * only returns the ID if it's valid else throws an error.
+ */
 export function resolveIdChecked<
   TManager extends BaseManager<Snowflake, unknown, TResolvable>,
   TResolvable
@@ -21,6 +25,9 @@ export function resolveIdChecked<
   return result;
 }
 
+/**
+ * Resolves {@link AnyEmojiResolvable} to an UTF-8 emoji or a {@link GuildEmoji}.
+ */
 export function resolveAnyEmoji(
   manager: GuildEmojiManager,
   resolvable: AnyEmojiResolvable

@@ -14,6 +14,9 @@ export enum ColorType {
   Warn,
 }
 
+/**
+ * Represents the global settings in the database and automatically updates when there are database changes.
+ */
 export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
   GlobalSettings,
   GlobalSettingsManager
