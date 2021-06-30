@@ -4,6 +4,11 @@ import {MasterLogger, Logger} from '@/logger';
 import type {Module} from './Module';
 import {ModuleConstructor, ModuleResolvable, resolveModuleName} from './ModuleConstructor';
 
+// TODO: extract module load resolution into another file
+
+/**
+ * Takes care of initializing and providing {@link Module}s based on the provided configuration.
+ */
 export class ModuleLoader {
   protected readonly moduleConstructors: Collection<string, ModuleConstructor>;
 
@@ -59,6 +64,9 @@ export class ModuleLoader {
     return constructor;
   }
 
+  /**
+   * Return a list of modules to start based on the current configuration.
+   */
   private resolveModulesToStart(): ModuleConstructor[] {
     const checkedModules = new Collection<ModuleConstructor, boolean>();
     if (!this.enabledModules) {
@@ -79,6 +87,9 @@ export class ModuleLoader {
     return [...modulesToLoad.values()];
   }
 
+  /**
+   * Check if the specified module should be loaded.
+   */
   private checkModule(
     checkedModules: Map<ModuleConstructor, boolean>,
     module: ModuleConstructor
@@ -88,8 +99,8 @@ export class ModuleLoader {
     if (this.disabledModules.has(module)) loadable = false;
 
     if (loadable === undefined) {
-      // Incase there's a cycle dependency, it is assumed that the parent module is loadable
-      // This will always be overwritten once the module loadability is determined
+      // Incase there's a cycle dependency, it is assumed that the parent module is loadable.
+      // This will always be overwritten once the module loadability is determined.
       checkedModules.set(module, true);
 
       loadable =
@@ -115,6 +126,11 @@ export class ModuleLoader {
     return loadable;
   }
 
+  /**
+   * Add all loadable modules to {@link accumulatedModules}.
+   *
+   * @param checkedModules Map of {@link ModuleConstructor} to that module's loadability.
+   */
   private unwrapModule(
     checkedModules: Map<ModuleConstructor, boolean>,
     accumulatedModules: Set<ModuleConstructor>,

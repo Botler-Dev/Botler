@@ -1,9 +1,15 @@
 import {MessageSender} from '../message/MessageSender';
 import {SimpleResponseError} from '../error/SimpleResponseError';
 
+/**
+ * {@link CommandError} for a missing parameter.
+ */
 export class MissingParameterError extends SimpleResponseError {
   readonly parameterName?: string;
 
+  /**
+   * @param name The parameter name.
+   */
   constructor(sender: MessageSender, name?: string) {
     super(
       sender,

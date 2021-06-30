@@ -3,6 +3,9 @@ import {filter, first, map, skip} from 'rxjs/operators';
 import type {CacheManager} from '../manager/CacheManager';
 import {Entity, EntityWrapper} from './EntityWrapper';
 
+/**
+ * A {@link EntityWrapper} with additional cache control logic.
+ */
 export abstract class CachedEntityWrapper<
   TEntityState extends Entity | undefined,
   TManager extends CacheManager

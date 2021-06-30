@@ -3,6 +3,9 @@
 import type {MasterLogger} from './MasterLogger';
 import type {LogLevelMetadata} from './MasterLogger';
 
+/**
+ * Logger that proxies all calls with the provided {@link LogLevelMetadata} to the {@link MasterLogger}.
+ */
 export class Logger {
   readonly metadata: LogLevelMetadata;
 
@@ -30,6 +33,9 @@ export class Logger {
   }
 }
 
+/**
+ * Overwrites the native console to use the provided logger.
+ */
 export function proxyNativeConsole(logger: Logger): void {
   console.log = Logger.prototype.log.bind(logger);
   console.info = Logger.prototype.info.bind(logger);

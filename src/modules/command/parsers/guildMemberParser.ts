@@ -20,7 +20,7 @@ export interface GuildMemberParserOptions {
    */
   searchNickname?: boolean;
   /**
-   * StringParseOptions for parsing name. (default `{}`)
+   * StringParseOptions for parsing the name. (default `{}`)
    */
   nameParseOptions?: StringParseOptions;
   /**
@@ -28,7 +28,7 @@ export interface GuildMemberParserOptions {
    */
   allowSimilar?: boolean;
   /**
-   * Threshold for when a similarity search result can be considered valid. (default `0.2`)
+   * Similarity threshold for when a similar search result can be considered valid. (default `0.2`)
    */
   similarityThreshold?: number;
 }
@@ -59,10 +59,10 @@ export type GuildMemberParseResult = ParseResult<GuildMember>;
 const DISCORD_NAME_MAX_LENGTH = 32;
 
 /**
- * Tries to parse a string to a GuildMemberWrapper.
+ * Tries to parse a string into a {@link GuildMember}.
  *
- * Searches in following order (some may be omitted through the options):
- *  1. User id
+ * Searches for the member in following order (some may be omitted through the options):
+ *  1. Member ID
  *  2. Same username
  *  3. Same nickname
  *  4. Most similar user- or nickname (case-insensitive)

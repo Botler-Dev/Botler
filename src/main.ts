@@ -25,7 +25,7 @@ import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
 
 // Needs to be done before the rest is imported to be able
-// to use those features in static properties and global variables
+// to use those features in static properties and global variables.
 dayjs.extend(utc);
 dayjs.extend(duration);
 

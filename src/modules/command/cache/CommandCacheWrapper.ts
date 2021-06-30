@@ -23,14 +23,26 @@ export type CacheFromCommandCacheWrapper<TWrapper extends ConcreteCommandCacheWr
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ConcreteCommandCacheWrapper = CommandCacheWrapper<any>;
 
+/**
+ * Cache for command state between command executions.
+ *
+ * {@link CommandCacheWrapper.entity} is persistent across restarts and instance properties are persistent until restart.
+ */
 export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntityWrapper<
   GenericCommandCommandCache<TCache>,
   CommandCacheManager
 > {
-  static DELETE_DELAY = dayjs.duration(5, 'minutes');
+  /**
+   * Delay before deleting a command cache.
+   * Exists so caches don't get deleted while commands are executing.
+   */
+  static readonly DELETE_DELAY = dayjs.duration(5, 'minutes');
 
   private _entity: GenericCommandCommandCache<TCache>;
 
+  /**
+   * Cache data persistent across restarts.
+   */
   get entity(): Readonly<GenericCommandCommandCache<TCache>> {
     return this._entity;
   }
@@ -39,8 +51,16 @@ export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntity
     return this.entity.id;
   }
 
+  /**
+   * Command this cache is for.
+   */
   readonly command: Command;
 
+  /**
+   * When the cache expires to never be used again and eventually be deleted after {@link CommandCacheWrapper.DELETE_DELAY}.
+   *
+   * Can be updated to a new value which will take effect locally (not in the database) immediately.
+   */
   get expirationDateTime(): Dayjs {
     return dayjs(this.entity.expirationDateTime);
   }
@@ -85,10 +105,16 @@ export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntity
     );
   }
 
+  /**
+   * Sets the cache data of the entity.
+   */
   protected setCache(cache: TCache): void {
     this._entity.cache = cache;
   }
 
+  /**
+   * Adds a response listener as trigger and removes any listener with an overlapping scope.
+   */
   async addResponseListener(
     channel: TextBasedChannelResolvable,
     user?: UserResolvable
@@ -96,6 +122,9 @@ export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntity
     this.responseListenerManager.addListener(this.id, channel, user);
   }
 
+  /**
+   * Removes any response listener in the defined scope.
+   */
   async removeResponseListener(
     channel?: TextBasedChannelResolvable,
     user?: UserResolvable
@@ -103,6 +132,9 @@ export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntity
     this.responseListenerManager.removeListener(this.id, channel, user);
   }
 
+  /**
+   * Adds a reaction listener as trigger and removes any listener with an overlapping scope.
+   */
   async addReactionListener(
     message: MessageResolvable,
     user?: UserResolvable,
@@ -112,6 +144,9 @@ export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntity
     this.reactionListenerManager.addListener(this.id, message, user, emoji, action);
   }
 
+  /**
+   * Removes any reaction listener in the defined scope.
+   */
   async removeReactionListener(
     message?: MessageResolvable,
     user?: UserResolvable,
@@ -121,6 +156,9 @@ export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntity
     this.reactionListenerManager.removeListener(this.id, message, user, emoji, action);
   }
 
+  /**
+   * If this cache has expired.
+   */
   isExpired(now = dayjs()): boolean {
     return now.isAfter(this.expirationDateTime);
   }

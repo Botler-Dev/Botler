@@ -1,6 +1,9 @@
 import {MessageSender} from '../message/MessageSender';
 import {DetailedResponseError} from '../error/DetailedResponseError';
 
+/**
+ * {@link CommandError} for an unexpectedly encountered error.
+ */
 export class UnexpectedError extends DetailedResponseError {
   constructor(sender: MessageSender, error: Error) {
     super(

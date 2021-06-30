@@ -6,6 +6,9 @@ import {ParseResults, ParserEngine} from '../parser/ParserEngine';
 import {GuildMemberContext} from './guild/GuildMemberContext';
 import {MessageExecutionContext} from './MessageExecutionContext';
 
+/**
+ * {@link ExecutionContext} for when a response listener is triggered.
+ */
 export class ResponseExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
   TExistingParseResults extends ParseResults = Record<string, never>,

@@ -1,5 +1,8 @@
 import {ColorType} from '@/settings';
 
+/**
+ * Type of standardized messages a command can send.
+ */
 export enum MessageType {
   Neutral,
   Question,

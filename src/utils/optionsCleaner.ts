@@ -3,6 +3,12 @@ export type OptionValue = unknown;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Options = Record<Key, any>;
 
+/**
+ * @param rawValue Value of the property from the {@link TInputOptions}.
+ * @param key Key of the property.
+ * @param inputOptions The entire provided {@link TInputOptions}.
+ * @returns The cleaned value for the output options.
+ */
 export type SimpleOptionValueCleaner<
   TInputValue extends OptionValue,
   TOutputValue extends OptionValue,
@@ -16,6 +22,10 @@ export type OptionValueCleaner<
   TKey extends keyof TOutputOptions
 > = SimpleOptionValueCleaner<TInputOptions[TKey], TOutputOptions[TKey], TKey, TInputOptions>;
 
+/**
+ * Definition for {@link cleanOptions} where each key has a {@link OptionValueCleaner} as value
+ * that processes the value of the same key in the provided {@link TInputOptions}.
+ */
 export type OptionsCleanerDefinition<
   TInputOptions extends Partial<Record<keyof TOutputOptions, OptionValue>>,
   TOutputOptions extends Options
@@ -23,6 +33,9 @@ export type OptionsCleanerDefinition<
   [Key in keyof TOutputOptions]: OptionValueCleaner<TInputOptions, TOutputOptions, Key>;
 };
 
+/**
+ * Cleans the provided {@link TInputOptions} using the provided cleaner definition.
+ */
 export function cleanOptions<
   TInputOptions extends Partial<Record<keyof TOutputOptions, OptionValue>>,
   TOutputOptions extends Options

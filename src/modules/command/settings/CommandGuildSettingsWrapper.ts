@@ -4,12 +4,20 @@ import {SyncStream, SynchronizedEntityWrapper} from '@/database';
 import {GlobalSettingsWrapper} from '@/settings';
 import type {CommandGuildSettingsManager} from './CommandGuildSettingsManager';
 
+/**
+ * Holds the current settings of the command module for a specific guild.
+ */
 export class CommandGuildSettingsWrapper extends SynchronizedEntityWrapper<
   CommandGuildSettings | undefined,
   CommandGuildSettingsManager
 > {
   readonly guild: Guild;
 
+  /**
+   * The actual guild prefix if one is set.
+   *
+   * Setting it to the default prefix or `undefined` will make the guild use the global settings default.
+   */
   get rawPrefix(): string | undefined {
     return this.entity?.prefix ?? undefined;
   }
@@ -18,6 +26,11 @@ export class CommandGuildSettingsWrapper extends SynchronizedEntityWrapper<
     this.prefix = value ?? this.globalSettings.defaultPrefix;
   }
 
+  /**
+   * The guild prefix or the default.
+   *
+   * Setting it to the default prefix will make the guild use the global settings default.
+   */
   get prefix(): string {
     return this.rawPrefix ?? this.globalSettings.defaultPrefix;
   }

@@ -17,6 +17,9 @@ import {SilentError} from '../errors/SilentError';
 
 export type CommandName = string;
 
+/**
+ * A Discord command that lets users interface with the bot.
+ */
 export abstract class Command<
   TCache extends ConcreteCommandCacheWrapper = ConcreteCommandCacheWrapper,
   TAlreadyParsedResults extends ParseResults = EmptyParseResults
@@ -27,14 +30,26 @@ export abstract class Command<
 
   private _category?: CommandCategory;
 
+  /**
+   * {@link CommandCategory} this command is registered in.
+   */
   get category(): CommandCategory | undefined {
     return this._category;
   }
 
+  /**
+   * If the command can be used in DMs.
+   */
   abstract readonly isDmCapable: boolean;
 
+  /**
+   * If the command can be used in guilds.
+   */
   abstract readonly isGuildCapable: boolean;
 
+  /**
+   * If the command can only be used by bot masters.
+   */
   abstract readonly isBotMasterOnly: boolean;
 
   protected readonly globalSettings: GlobalSettingsWrapper;
@@ -49,6 +64,11 @@ export abstract class Command<
     this._category = category;
   }
 
+  /**
+   * Wraps the provided entity in a {@link CommandCacheWrapper}.
+   *
+   * Gets called when a saved cache gets loaded from the database.
+   */
   async wrapCacheEntity?(
     manager: CommandCacheManager,
     entity: GenericCommandCommandCache<CacheFromCommandCacheWrapper<TCache>>,
@@ -56,6 +76,9 @@ export abstract class Command<
     reactionListenerManager: ReactionListenerManager
   ): Promise<TCache>;
 
+  /**
+   * Checks if the provided context is valid based on the command properties like {@link Command.isDmCapable}.
+   */
   protected async checkContextValidity(
     context: ExecutionContext<TCache, TAlreadyParsedResults, this>
   ): Promise<void> {
@@ -74,5 +97,8 @@ export abstract class Command<
       throw new WrongScopeError(context.sender);
   }
 
+  /**
+   * Executes the command with the provided context.
+   */
   abstract execute(context: ExecutionContext<TCache, TAlreadyParsedResults, this>): Promise<void>;
 }

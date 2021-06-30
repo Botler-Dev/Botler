@@ -1,9 +1,11 @@
 import {Message} from 'discord.js';
 import type {MessageSender} from '../message/MessageSender';
 import {MessageType} from '../message/MessageType';
-
 import {CommandError} from './CommandError';
 
+/**
+ * {@link CommandError} with a detailed error message.
+ */
 export class DetailedResponseError extends CommandError {
   readonly publicTitle: string;
 
@@ -11,6 +13,9 @@ export class DetailedResponseError extends CommandError {
 
   private readonly sender: MessageSender;
 
+  /**
+   * @param privateMessageOrRealError The error message if it is a string else it is the actual error to log.
+   */
   constructor(
     sender: MessageSender,
     publicTitle: string,

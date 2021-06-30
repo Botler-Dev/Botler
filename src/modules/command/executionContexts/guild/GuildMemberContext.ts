@@ -2,6 +2,9 @@ import {GuildMember} from 'discord.js';
 import {CommandGuildSettingsWrapper} from '../../settings/CommandGuildSettingsWrapper';
 import {GuildContext} from './GuildContext';
 
+/**
+ * {@link GuildContext} for all {@link UserExecutionContext}s.
+ */
 export class GuildMemberContext extends GuildContext {
   readonly member: GuildMember;
 

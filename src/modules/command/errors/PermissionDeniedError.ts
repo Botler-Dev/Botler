@@ -1,6 +1,9 @@
 import {MessageSender} from '../message/MessageSender';
 import {SimpleResponseError} from '../error/SimpleResponseError';
 
+/**
+ * {@link CommandError} for lack of permission to perform a certain action.
+ */
 export class PermissionDeniedError extends SimpleResponseError {
   readonly action: string;
 

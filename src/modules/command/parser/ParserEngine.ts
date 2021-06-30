@@ -17,33 +17,51 @@ export interface ParseHistoryEntry {
   readonly result: ParseResult;
 }
 
+/**
+ * Handles the entire parsing of a message.
+ */
 export class ParserEngine<TExistingResults extends ParseResults = EmptyParseResults> {
   readonly raw: string;
 
   private readonly _results = {} as RealParseResults<TExistingResults>;
 
+  /**
+   * Parse results mapped using the provided `name`.
+   */
   get results(): Readonly<RealParseResults<TExistingResults>> {
     return this._results;
   }
 
   private readonly _values = {} as ParsedValues<RealParseResults<TExistingResults>>;
 
+  /**
+   * Parse result values mapped using the provided `name`.
+   */
   get values(): Readonly<ParsedValues<RealParseResults<TExistingResults>>> {
     return this._values;
   }
 
   private readonly _history: ParseHistoryEntry[] = [];
 
+  /**
+   * History of the previous parse operations.
+   */
   get history(): ReadonlyArray<ParseHistoryEntry> {
     return this._history;
   }
 
   private _index = 0;
 
+  /**
+   * Current char index of {@link this.raw} the next parser will start at.
+   */
   get index(): number {
     return this._index;
   }
 
+  /**
+   * Remaining unparsed section of {@link this.raw}.
+   */
   get remain(): string {
     return this.raw.slice(this.index);
   }
@@ -55,6 +73,12 @@ export class ParserEngine<TExistingResults extends ParseResults = EmptyParseResu
     Object.entries(existingResults).forEach(([name, result]) => this.addParseResult(name, result));
   }
 
+  /**
+   * Executes the provided parser.
+   *
+   * @param name Name to use for the {@link this.results} and {@link this.values} mapping.
+   * @returns The result if the parsing was successful.
+   */
   async next<TResult extends ParseResult>(
     parser: Parser<TResult>,
     name?: string
@@ -64,6 +88,12 @@ export class ParserEngine<TExistingResults extends ParseResults = EmptyParseResu
     return result;
   }
 
+  /**
+   * Executes the provided parser.
+   *
+   * @param name Name to use for the {@link this.results} and {@link this.values} mapping.
+   * @returns The result value if the parsing was successful.
+   */
   async nextValue<TResult extends ParseResult>(
     parser: Parser<TResult>,
     name?: string
@@ -95,6 +125,11 @@ export class ParserEngine<TExistingResults extends ParseResults = EmptyParseResu
       result as TExistingResults[keyof TExistingResults];
   }
 
+  /**
+   * Reverts parse operations to return the engine to its previous state.
+   *
+   * @param stepCount How many operations to revert. (default `1`)
+   */
   rollback(stepCount = 1): ParseHistoryEntry[] {
     const rollbackHistory = this._history.splice(-Math.min(this.history.length, stepCount));
     rollbackHistory.reverse().forEach(entry => {
@@ -110,6 +145,10 @@ export class ParserEngine<TExistingResults extends ParseResults = EmptyParseResu
     return rollbackHistory;
   }
 
+  /**
+   * Delete all history.
+   * Will not reverse any operations but will make them irreversible.
+   */
   clearHistory(): void {
     this._history.splice(0);
   }

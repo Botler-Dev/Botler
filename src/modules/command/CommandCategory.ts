@@ -9,6 +9,11 @@ export type CommandCategoryGenerator = (container: DependencyContainer) => Comma
 
 export type CommandCategoryName = string;
 
+// TODO: figure out a way to categories commands would module needing to know from each other.
+
+/**
+ * Branch of the command category tree which holds commands and other categories.
+ */
 export class CommandCategory {
   readonly parent?: CommandCategory;
 
@@ -49,6 +54,10 @@ export class CommandCategory {
     this.commandManager = commandManager;
   }
 
+  /**
+   * Creates a {@link CommandCategory} and registers it in this instance.
+   * @returns The created {@link CommandCategory}.
+   */
   createSubcategory(name: CommandCategoryName, description?: string): CommandCategory {
     let category = this.subcategories.get(name);
     if (category) return category;
@@ -58,6 +67,11 @@ export class CommandCategory {
     return category;
   }
 
+  /**
+   * Gets the {@link category} at the provided path (category names split by `/`).
+   *
+   * @returns The CommandCategory if it exists.
+   */
   getCategoryAtPath(path: string): CommandCategory | undefined {
     return (
       path
@@ -70,6 +84,9 @@ export class CommandCategory {
     );
   }
 
+  /**
+   * Registers a command in this category and in the central {@link CommandManager}.
+   */
   registerCommand(command: Command): void {
     command.registerCategory(this);
     this.commandManager.register(command);

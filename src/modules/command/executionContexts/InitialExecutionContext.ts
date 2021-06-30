@@ -18,6 +18,9 @@ export type InitialParsedValues = {
   command: ParseResult<Command>;
 };
 
+/**
+ * {@link ExecutionContext} for the initial user-generated command execution request.
+ */
 export class InitialExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
   TExistingParseResults extends ParseResults = EmptyParseResults,
@@ -44,6 +47,9 @@ export class InitialExecutionContext<
     this.cacheManager = cacheManager;
   }
 
+  /**
+   * Creates a command cache to enable response or reaction listening.
+   */
   async createCache(
     expirationDateTime: Dayjs,
     cache: CacheFromCommandCacheWrapper<TCache>

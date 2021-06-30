@@ -8,6 +8,9 @@ export class SimpleResponseError extends CommandError {
 
   private readonly sender: MessageSender;
 
+  /**
+   * @param privateMessageOrRealError The error message if it is a string else it is the actual error to log.
+   */
   constructor(
     sender: MessageSender,
     publicMessage: string,

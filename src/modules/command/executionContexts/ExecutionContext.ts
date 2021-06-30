@@ -6,6 +6,10 @@ import {InitialExecutionContext} from './InitialExecutionContext';
 import {ReactionExecutionContext} from './ReactionExecutionContext';
 import {ResponseExecutionContext} from './ResponseExecutionContext';
 
+/**
+ * Command execution context that is passed to the {@link Command}s and
+ * which contains all data related to the execution.
+ */
 export type ExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
   TExistingParseResults extends ParseResults = EmptyParseResults,

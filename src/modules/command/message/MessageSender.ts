@@ -9,7 +9,15 @@ import {SimpleResponseError} from '../error/SimpleResponseError';
 import {MessageType, messageEmojis, messageToColorType} from './MessageType';
 
 export interface MessageOptions {
+  /**
+   * Type of message which changes the appearance of the generated message. (default {@link MessageType.Neutral})
+   */
   type?: MessageType;
+  /**
+   * Reactions that should be automatically added to the created message with
+   * the descriptions being automatically added to the message.
+   * (default none)
+   */
   reactionOptions?: ReactionOption[];
 }
 
@@ -27,6 +35,9 @@ export interface ReactionOption {
   description: string;
 }
 
+/**
+ * Sender for command of a specific channel to send responses in a standardized format.
+ */
 export class MessageSender {
   readonly channel: TextBasedChannel;
 
@@ -40,9 +51,15 @@ export class MessageSender {
     this.channel = channel;
   }
 
+  /**
+   * Send a custom message.
+   */
   sendRaw = ((...args: Parameters<TextBasedChannel['send']>) =>
     this.channel.send(...args)) as TextBasedChannel['send'];
 
+  /**
+   * Send a simple message.
+   */
   async send(content: string, options?: MessageOptions): Promise<Message> {
     const cleaned = cleanOptions(messageOptionsDefinition, options ?? {});
     let description = `${messageEmojis[cleaned.type]} ${content}`;
@@ -65,6 +82,9 @@ export class MessageSender {
     return Promise.all(options.map(({emoji}) => message.react(emoji)));
   }
 
+  /**
+   * Send a detailed message.
+   */
   async sendDetailed(
     title: string,
     description: string,
@@ -96,10 +116,20 @@ export class MessageSender {
       .join('\n');
   }
 
+  /**
+   * Throw an error and send a simple error message.
+   *
+   * @param privateMessageOrRealError The error message if it is a string else it is the actual error to log.
+   */
   throwError(publicMessage: string, privateMessageOrRealError?: Error | string): never {
     throw new SimpleResponseError(this, publicMessage, privateMessageOrRealError);
   }
 
+  /**
+   * Throw an error and send a detailed error message.
+   *
+   * @param privateMessageOrRealError The error message if it is a string else it is the actual error to log.
+   */
   throwDetailedError(
     publicTitle: string,
     publicDescription: string,
