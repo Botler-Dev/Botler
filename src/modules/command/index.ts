@@ -38,5 +38,6 @@ export * from './parsers/userParser';
 
 export * from './settings/CommandGuildSettingsWrapper';
 
+export * from './CommandManager';
 export * from './CommandCategory';
 export * from './CommandModule';

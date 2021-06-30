@@ -12,6 +12,9 @@ export enum ReactionAction {
   Remove,
 }
 
+/**
+ * {@link UserExecutionContext} for when a reaction listener is triggered.
+ */
 export class ReactionExecutionContext<
   TCache extends ConcreteCommandCacheWrapper = CommandCacheWrapper,
   TCommand extends Command = Command<TCache>,
@@ -19,8 +22,14 @@ export class ReactionExecutionContext<
 > extends UserExecutionContext<TCommand, TGuildContext, TCache> {
   readonly reaction: MessageReaction;
 
+  /**
+   * Wether the reaction got removed or added.
+   */
   readonly action: ReactionAction;
 
+  /**
+   * Sender for the channel the reaction was changed in.
+   */
   readonly sender: MessageSender;
 
   constructor(

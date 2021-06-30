@@ -30,6 +30,9 @@ import {ParseResults, ParserEngine} from './parser/ParserEngine';
 import {commandParser} from './parsers/commandParser';
 import {CommandGuildSettingsManager} from './settings/CommandGuildSettingsManager';
 
+/**
+ * Module that manages and executes Discord commands and provides a framework to create these commands.
+ */
 @StaticImplements<ModuleConstructor>()
 export class CommandModule extends Module {
   static readonly moduleName = 'command';
@@ -38,8 +41,16 @@ export class CommandModule extends Module {
 
   static readonly optionalDependencies = [];
 
+  /**
+   * {@link CommandManager} with all the registered commands.
+   *
+   * Register your command here if it should not be categorized.
+   */
   readonly commands: CommandManager;
 
+  /**
+   * Root of the command category tree.
+   */
   readonly rootCategory: CommandCategory;
 
   private readonly responseListeners: ResponseListenerManager;
@@ -184,6 +195,9 @@ export class CommandModule extends Module {
     return new GuildMemberContext(await this.guildSettings.fetch(member), member);
   }
 
+  /**
+   * Execute the provided command with error handling.
+   */
   private async executeCommand<
     TCache extends ConcreteCommandCacheWrapper,
     TExistingParseResults extends ParseResults,

@@ -8,7 +8,7 @@ import {stringParser} from './stringParser';
 
 export interface CommandParseOptions {
   /**
-   * If aliases should also be taken into the search. (default `true`)
+   * If aliases should also be searched through. (default `true`)
    */
   searchAliases?: boolean;
   /**
@@ -16,7 +16,7 @@ export interface CommandParseOptions {
    */
   allowSimilar?: boolean;
   /**
-   * Threshold for when a similarity search result can be considered valid. (default `0.8`)
+   * Similarity threshold for when a similar search result can be considered valid. (default `0.8`)
    */
   similarityThreshold?: number;
 }
@@ -34,6 +34,13 @@ const commandParseOptionsDefinition: OptionsCleanerDefinition<
 
 export type CommandParseResult = ParseResult<Command>;
 
+/**
+ * Tries to parse a string into a {@link Command}.
+ *
+ * Searches for the command in following order (some may be omitted through the options):
+ *  1. Exact command name/alias
+ *  2. Similar command name/alias
+ */
 export function commandParser(
   commandManager: CommandManager,
   options?: CommandParseOptions

@@ -3,6 +3,9 @@ import {injectable} from 'tsyringe';
 import {Logger} from '@/logger';
 import {CommandName, Command} from './command/Command';
 
+/**
+ * Central manager of all registered commands.
+ */
 @injectable()
 export class CommandManager {
   /**

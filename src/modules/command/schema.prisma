@@ -13,7 +13,8 @@ model CommandCommandCache {
   responseListeners CommandResponseListener[]
 }
 
-// All listeners need to have cacheId be optional because Prisma currently does not support cascading deletes
+// All listeners have cacheId as optional because Prisma didn't have support for cascading deletes
+// TODO: change to required as cascading deletes is now a feature (in preview)
 
 model CommandReactionListener {
   id        Int                                 @id @default(autoincrement())

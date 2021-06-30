@@ -26,5 +26,8 @@ export abstract class EntityWrapper<
     return this.createDefaultEntity();
   }
 
+  /**
+   * Make changes persistent.
+   */
   abstract save(): Promise<void>;
 }
