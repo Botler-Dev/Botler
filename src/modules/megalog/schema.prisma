@@ -1,0 +1,15 @@
+model MegalogLogChannel {
+  eventName String
+  guildId   String @db.VarChar(20)
+  channelId String @db.VarChar(20)
+
+  @@id([eventName, guildId])
+}
+
+model MegalogSettings {
+  version                     Int @id @default(autoincrement())
+  auditLogMatchTryInterval    Int @default(1000)
+  auditLogFetchSize           Int @default(50)
+  maxAuditLogMatchQueueLength Int @default(100)
+  maxAuditLogMatchTries       Int @default(10)
+}
