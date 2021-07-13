@@ -5,26 +5,28 @@ export type MegalogEventTypeName = string;
 
 export type MegalogEventCategoryName = string;
 
-export type MegalogEventTypeAuditLogMatchCallback = (entry: GuildAuditLogsEntry) => Promise<void>;
+export type MegalogAuditLogEntryProcessor = (entry: GuildAuditLogsEntry) => Promise<void>;
 
-export abstract class MegalogEventType<
+export type MegalogEventTypeResolvable = MegalogEventTypeName | MegalogEventType;
+
+export interface MegalogEventType<
   TClientEventName extends MegalogSupportedClientEvent = MegalogSupportedClientEvent
 > {
-  abstract readonly name: MegalogEventTypeName;
+  readonly name: MegalogEventTypeName;
 
-  abstract readonly description: string;
+  readonly description: string;
 
-  abstract readonly category: MegalogEventCategoryName;
+  readonly category: MegalogEventCategoryName;
 
-  abstract readonly clientEventName: TClientEventName;
+  readonly clientEventName: TClientEventName;
 
-  abstract processClientEvent(
+  readonly processClientEvent: (
     channel: TextChannel,
     ...args: ExportProxyClientEvents[TClientEventName]
-  ): Promise<
+  ) => Promise<
     | void
     | (TClientEventName extends AuditLogSupportedClientEvent
-        ? MegalogEventTypeAuditLogMatchCallback
+        ? MegalogAuditLogEntryProcessor
         : never)
   >;
 }

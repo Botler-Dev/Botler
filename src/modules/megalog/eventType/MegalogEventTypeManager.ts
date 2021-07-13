@@ -1,8 +1,12 @@
+import {Logger} from '@/logger';
 import {injectable} from 'tsyringe';
 import type {MegalogSupportedClientEvent} from '../clientEvents';
-import {MegalogEventType, MegalogEventTypeName} from './MegalogEventType';
-
-export type MegalogEventCategoryName = string;
+import {
+  MegalogEventCategoryName,
+  MegalogEventType,
+  MegalogEventTypeName,
+  MegalogEventTypeResolvable,
+} from './MegalogEventType';
 
 @injectable()
 export class MegalogEventTypeManager {
@@ -20,12 +24,17 @@ export class MegalogEventTypeManager {
 
   private readonly clientListeners = new Map<MegalogSupportedClientEvent, MegalogEventType[]>();
 
+  private readonly logger: Logger;
+
+  constructor(logger: Logger) {
+    this.logger = logger;
+  }
+
   registerEventType(event: MegalogEventType): void {
     if (this._eventTypes.has(event.name))
       throw new Error(
         `Tried to register a MegalogEventType with an already existing name "${event.name}".`
       );
-    // TODO: add logging
     this._eventTypes.set(event.name, event);
 
     const category = this._eventCategories.get(event.category) ?? [];
@@ -35,6 +44,14 @@ export class MegalogEventTypeManager {
     const events = this.clientListeners.get(event.clientEventName) ?? [];
     events.push(event);
     if (events.length === 1) this.clientListeners.set(event.clientEventName, events);
+
+    this.logger.info(`Registered event type "${event.name}".`);
+  }
+
+  getClientListeners<TEventName extends MegalogSupportedClientEvent>(
+    clientEventName: TEventName
+  ): ReadonlyArray<MegalogEventType<TEventName>> {
+    return (this.clientListeners.get(clientEventName) as MegalogEventType<TEventName>[]) ?? [];
   }
 
   checkEventTypeName(name: MegalogEventTypeName): void {
@@ -42,9 +59,17 @@ export class MegalogEventTypeManager {
       throw new Error(`No MegalogEventType has been registered with the name "${name}".`);
   }
 
-  getClientListeners<TEventName extends MegalogSupportedClientEvent>(
-    clientEventName: TEventName
-  ): ReadonlyArray<MegalogEventType<TEventName>> {
-    return (this.clientListeners.get(clientEventName) as MegalogEventType<TEventName>[]) ?? [];
+  static resolveName(resolvable: MegalogEventTypeResolvable): MegalogEventTypeName {
+    return typeof resolvable === 'string' ? resolvable : resolvable.name;
+  }
+
+  resolveCheckedName(resolvable: MegalogEventTypeResolvable): MegalogEventTypeName {
+    const eventName = MegalogEventTypeManager.resolveName(resolvable);
+    this.checkEventTypeName(eventName);
+    return eventName;
+  }
+
+  resolve(resolvable: MegalogEventTypeResolvable): MegalogEventType | undefined {
+    return typeof resolvable === 'string' ? this.eventTypes.get(resolvable) : resolvable;
   }
 }

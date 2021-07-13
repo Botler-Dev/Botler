@@ -8,7 +8,7 @@ import {
   AuditLogMatchFilter,
   AuditLogMatchListener,
 } from '../auditLog/AuditLogMatcher';
-import {MegalogEventTypeAuditLogMatchCallback} from '../eventType/MegalogEventType';
+import {MegalogAuditLogEntryProcessor} from '../eventType/MegalogEventType';
 import {MegalogEventTypeManager} from '../eventType/MegalogEventTypeManager';
 import {MegalogChannelManager} from '../MegalogChannelManager';
 import {fromClientEvent} from './fromClientEvent';
@@ -72,7 +72,7 @@ export type PayloadToAuditLogMatchFilterResolver<TEventName extends MegalogSuppo
 
 function wrapToAuditLogListener(
   logger: Logger
-): OperatorFunction<MegalogEventTypeAuditLogMatchCallback[], AuditLogMatchListener> {
+): OperatorFunction<MegalogAuditLogEntryProcessor[], AuditLogMatchListener> {
   return source =>
     source.pipe(
       map(

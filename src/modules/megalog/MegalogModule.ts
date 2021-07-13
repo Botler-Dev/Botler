@@ -1,27 +1,16 @@
 import {StaticImplements} from '@/utils/StaticImplements';
-import {Client, ExportProxyClientEvents, Message, TextChannel} from 'discord.js';
+import {Client} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 import {CommandModule} from '../command';
 import {Module} from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
 import {AuditLogMatcher} from './auditLog/AuditLogMatcher';
 import {registerClientEventListeners} from './clientEvents';
-import {MessageDeleteEvent} from './events/MessageDeleteEvent';
 import {MegalogEventTypeManager} from './eventType/MegalogEventTypeManager';
+import {messageDeleteEventType} from './eventTypes/messageDeleteEventType';
 import {MegalogChannelManager} from './MegalogChannelManager';
 import {MegalogSettingsManager} from './settings/MegalogSettingsManager';
 import {MegalogSettingsWrapper} from './settings/MegalogSettingsWrapper';
-
-export type MegalogClientEventNames = never;
-
-export type MegalogEventListener<TClientEventName extends MegalogClientEventNames = never> = (
-  channel: TextChannel,
-  ...args: ExportProxyClientEvents[TClientEventName]
-) => Promise<Message | undefined>;
-
-export type MegalogEventCategoryName = string;
-
-export type MegalogEventName = string;
 
 @StaticImplements<ModuleConstructor>()
 export class MegalogModule extends Module {
@@ -76,7 +65,7 @@ export class MegalogModule extends Module {
   }
 
   async initialize(): Promise<void> {
-    this.eventTypeManager.registerEventType(new MessageDeleteEvent());
+    this.eventTypeManager.registerEventType(messageDeleteEventType);
   }
 
   async postInitialize(): Promise<void> {
