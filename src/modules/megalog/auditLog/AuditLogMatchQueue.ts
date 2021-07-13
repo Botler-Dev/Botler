@@ -1,4 +1,10 @@
-import {Guild, GuildAuditLogsAction, GuildAuditLogsEntry, Snowflake} from 'discord.js';
+import {
+  Guild,
+  GuildAuditLogsAction,
+  GuildAuditLogsActions,
+  GuildAuditLogsEntry,
+  Snowflake,
+} from 'discord.js';
 import {MegalogSettingsWrapper} from '../settings/MegalogSettingsWrapper';
 import type {AuditLogMatchFilter, AuditLogMatchListener} from './AuditLogMatcher';
 
@@ -6,6 +12,11 @@ interface QueueEntry {
   listener: AuditLogMatchListener;
   tryAge: number;
   filter: AuditLogMatchFilter;
+}
+
+interface CumulativeQueryCache {
+  user?: string;
+  type?: keyof GuildAuditLogsActions;
 }
 
 export class AuditLogMatchQueue {
@@ -16,6 +27,8 @@ export class AuditLogMatchQueue {
   private readonly megalogSettings: MegalogSettingsWrapper;
 
   private lastFetchedEntryTimestamp = 0;
+
+  private cumulativeQueryCache?: CumulativeQueryCache;
 
   get length(): number {
     return this.entires.length;
@@ -37,9 +50,12 @@ export class AuditLogMatchQueue {
       tryAge: 0,
       filter,
     });
+    this.cumulativeQueryCache = undefined;
   }
 
   private getCumulativeQuery() {
+    if (this.cumulativeQueryCache) return this.cumulativeQueryCache;
+
     const lastEntry = this.entires[this.entires.length - 1];
     const allExecutorsSame = this.entires.every(
       entry => entry.filter.executor === lastEntry.filter.executor
@@ -47,10 +63,13 @@ export class AuditLogMatchQueue {
     const allTypesSame = this.entires.every(
       entry => entry.filter.action === lastEntry.filter.action
     );
-    return {
+    const cumulativeQuery = {
       user: allExecutorsSame ? lastEntry.filter.executor : undefined,
       type: allTypesSame ? lastEntry.filter.action : undefined,
     };
+
+    this.cumulativeQueryCache = cumulativeQuery;
+    return cumulativeQuery;
   }
 
   private async fetchNewAuditLogEntries(user?: Snowflake, type?: GuildAuditLogsAction) {
@@ -71,6 +90,7 @@ export class AuditLogMatchQueue {
     const firstNewEntryIndex = entires
       .reverse()
       .findIndex(entry => entry.createdTimestamp > this.lastFetchedEntryTimestamp);
+    // Add a 1 second buffer to account for when the audit log entry is added before the client event arrives.
     this.lastFetchedEntryTimestamp = entires[0].createdTimestamp - 1000;
     return entires.slice(entires.length - firstNewEntryIndex - 1);
   }
@@ -91,6 +111,7 @@ export class AuditLogMatchQueue {
     const query = this.getCumulativeQuery();
     const auditLogEntries = await this.fetchNewAuditLogEntries(query.user, query.type);
     if (auditLogEntries === undefined) return undefined;
+    if (auditLogEntries.length === 0) return 0;
 
     const queueLengthBefore = this.entires.length;
     this.entires.forEach((queueEntry, queueIndex) => {

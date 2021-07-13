@@ -1,6 +1,6 @@
 import {Logger, MasterLogger} from '@/logger';
 import {Duration} from 'dayjs/plugin/duration';
-import {Collection, Guild, GuildAuditLogsAction, GuildAuditLogsEntry, Snowflake} from 'discord.js';
+import {Guild, GuildAuditLogsAction, GuildAuditLogsEntry, Snowflake} from 'discord.js';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
 import {MegalogSettingsWrapper} from '../settings/MegalogSettingsWrapper';
@@ -16,7 +16,7 @@ export interface AuditLogMatchFilter {
 
 @injectable()
 export class AuditLogMatcher {
-  private readonly guildQueues = new Collection<Snowflake, AuditLogMatchQueue>();
+  private readonly guildQueues = new Map<Snowflake, AuditLogMatchQueue>();
 
   private interval!: NodeJS.Timeout;
 
@@ -57,31 +57,16 @@ export class AuditLogMatcher {
   ): boolean {
     if (!guild.me?.hasPermission('VIEW_AUDIT_LOG')) return false;
     this.getGuildQueue(guild).addEntry(listener, filter);
-    return false;
+    return true;
   }
 
   async tryMatching(): Promise<void> {
-    const totalGuildsBefore = this.guildQueues.size;
-    const totalQueueLengthBefore = this.guildQueues
-      .map(queue => queue.length)
-      // eslint-disable-next-line unicorn/no-array-reduce
-      .reduce((acc, value) => value + acc, 0);
-
+    if (this.guildQueues.size === 0) return;
     const guilds = [...this.guildQueues.values()];
     const results = await Promise.all(guilds.map(queue => queue.tryMatch()));
-
-    const failedCount = results
-      .map((result, index) => (result === undefined ? index : undefined))
-      .filter((index): index is NonNullable<typeof index> => index !== undefined)
-      .map(index => this.guildQueues.delete(guilds[index].guild.id)).length;
-
-    // eslint-disable-next-line unicorn/no-array-reduce
-    const matchCount = results.reduce<number>((acc, value = 0) => value + acc, 0);
-
-    this.logger.log(
-      `Executed and matched ${matchCount}/${totalQueueLengthBefore} entries. ${failedCount}/${totalGuildsBefore} guild queue${
-        failedCount !== 1 ? 's' : ''
-      } failed.`
-    );
+    results.forEach((count, index) => {
+      if (count !== undefined) return;
+      this.guildQueues.delete(guilds[index].guild.id);
+    });
   }
 }
