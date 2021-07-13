@@ -17,10 +17,7 @@ export enum ColorType {
 /**
  * Represents the global settings in the database and automatically updates when there are database changes.
  */
-export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
-  GlobalSettings,
-  GlobalSettingsManager
-> {
+export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSettings> {
   get version(): number {
     return this.entity.version;
   }
@@ -46,6 +43,8 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
     return this.entity.cleanInterval;
   }
 
+  private readonly manager: GlobalSettingsManager;
+
   private readonly logger: Logger;
 
   // Cannot get the UserManager on object creation, because then it does not exist yet.
@@ -63,20 +62,20 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<
     logger: Logger
   ) {
     super(
-      manager,
       syncStream.pipe(
         tap(newEntity => {
           if (newEntity) {
-            this.logger.info(`Current GlobalSettings entry was updated.`);
+            logger.info(`Current GlobalSettings entry was updated.`);
             return;
           }
-          this.logger.info(`Current GlobalSettings entry was deleted.`);
-          this.manager.refetch();
+          logger.info(`Current GlobalSettings entry was deleted.`);
+          manager.refetch();
         }),
         filter((newEntity): newEntity is GlobalSettings => !!newEntity)
       ),
       entity
     );
+    this.manager = manager;
     this.logger = logger;
   }
 

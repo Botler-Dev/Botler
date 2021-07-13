@@ -29,8 +29,7 @@ export type ConcreteCommandCacheWrapper = CommandCacheWrapper<any>;
  * {@link CommandCacheWrapper.entity} is persistent across restarts and instance properties are persistent until restart.
  */
 export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntityWrapper<
-  GenericCommandCommandCache<TCache>,
-  CommandCacheManager
+  GenericCommandCommandCache<TCache>
 > {
   /**
    * Delay before deleting a command cache.
@@ -78,20 +77,23 @@ export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntity
 
   private deleteTimeout!: NodeJS.Timeout;
 
+  private readonly manager: CommandCacheManager;
+
   private readonly responseListenerManager: ResponseListenerManager;
 
   private readonly reactionListenerManager: ReactionListenerManager;
 
   constructor(
+    responseListenerManager: ResponseListenerManager,
+    reactionListenerManager: ReactionListenerManager,
     manager: CommandCacheManager,
     entity: GenericCommandCommandCache<TCache>,
-    command: Command,
-    responseListenerManager: ResponseListenerManager,
-    reactionListenerManager: ReactionListenerManager
+    command: Command
   ) {
-    super(manager);
+    super();
     this._entity = entity;
     this.command = command;
+    this.manager = manager;
     this.responseListenerManager = responseListenerManager;
     this.reactionListenerManager = reactionListenerManager;
 
@@ -173,7 +175,7 @@ export abstract class CommandCacheWrapper<TCache = unknown> extends CachedEntity
   }
 
   async delete(): Promise<void> {
-    this.uncache();
+    this.decache();
     clearTimeout(this.deleteTimeout);
     await this.manager.model.delete({
       where: {

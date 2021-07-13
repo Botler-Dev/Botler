@@ -3,6 +3,7 @@ import {merge, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Entity} from '../wrapper/EntityWrapper';
 import {DatabaseEventHub} from '../DatabaseEventHub';
+import {getTableDeleteStream, getTableNonDeleteStream} from './changeStreams';
 
 /**
  * Stream of the entity's state in the database.
@@ -69,9 +70,8 @@ export class CacheSynchronizer<
   }
 
   async initialize(): Promise<void> {
-    const entityStream = merge(
-      await this.eventHub.listenTo<TEntity>(`sync_${this.tableName}_UPDATE`),
-      await this.eventHub.listenTo<TEntity>(`sync_${this.tableName}_INSERT`)
+    const entityStream = (
+      await getTableNonDeleteStream<TEntity>(this.eventHub, this.tableName)
     ).pipe(
       map(entity => ({
         key: this.cacheKeyResolver(entity),
@@ -79,9 +79,7 @@ export class CacheSynchronizer<
       }))
     );
     const deleteStream = (
-      await this.eventHub.listenTo<Pick<TEntity, TMinimalPayloadKeys>>(
-        `sync_${this.tableName}_DELETE`
-      )
+      await getTableDeleteStream<Pick<TEntity, TMinimalPayloadKeys>>(this.eventHub, this.tableName)
     ).pipe(map(payload => ({key: this.cacheKeyResolver(payload), entity: undefined})));
 
     merge(entityStream, deleteStream).subscribe(({key, entity}) => {

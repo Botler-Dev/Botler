@@ -8,8 +8,7 @@ import type {CommandGuildSettingsManager} from './CommandGuildSettingsManager';
  * Holds the current settings of the command module for a specific guild.
  */
 export class CommandGuildSettingsWrapper extends SynchronizedEntityWrapper<
-  CommandGuildSettings | undefined,
-  CommandGuildSettingsManager
+  CommandGuildSettings | undefined
 > {
   readonly guild: Guild;
 
@@ -43,16 +42,19 @@ export class CommandGuildSettingsWrapper extends SynchronizedEntityWrapper<
 
   private readonly globalSettings: GlobalSettingsWrapper;
 
+  private readonly manager: CommandGuildSettingsManager;
+
   constructor(
+    globalSettings: GlobalSettingsWrapper,
     manager: CommandGuildSettingsManager,
     syncStream: SyncStream<CommandGuildSettings>,
     entity: CommandGuildSettings | undefined,
-    guild: Guild,
-    globalSettings: GlobalSettingsWrapper
+    guild: Guild
   ) {
-    super(manager, syncStream, entity);
+    super(syncStream, entity);
     this.guild = guild;
     this.globalSettings = globalSettings;
+    this.manager = manager;
   }
 
   protected createDefaultEntity(): CommandGuildSettings {
