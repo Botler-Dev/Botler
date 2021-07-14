@@ -7,7 +7,6 @@ import {ModuleConstructor} from '../ModuleConstructor';
 import {AuditLogMatcher} from './auditLog/AuditLogMatcher';
 import {registerClientEventListeners} from './clientEvents';
 import {MegalogEventTypeManager} from './eventType/MegalogEventTypeManager';
-import {messageDeleteEventType} from './eventTypes/messageDeleteEventType';
 import {MegalogChannelManager} from './MegalogChannelManager';
 import {MegalogSettingsManager} from './settings/MegalogSettingsManager';
 import {MegalogSettingsWrapper} from './settings/MegalogSettingsWrapper';
@@ -62,10 +61,6 @@ export class MegalogModule extends Module {
     this._auditLogMatcher = this.container.resolve(AuditLogMatcher);
     this._channelManager = this.container.resolve(MegalogChannelManager);
     await this._channelManager.initialize();
-  }
-
-  async initialize(): Promise<void> {
-    this.eventTypeManager.registerEventType(messageDeleteEventType);
   }
 
   async postInitialize(): Promise<void> {

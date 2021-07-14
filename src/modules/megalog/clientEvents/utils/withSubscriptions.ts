@@ -1,9 +1,9 @@
 import {Guild, TextChannel} from 'discord.js';
 import {from, of, OperatorFunction} from 'rxjs';
 import {concatMap, filter, map, mergeMap, toArray} from 'rxjs/operators';
-import type {MegalogSupportedClientEvent} from '.';
-import {MegalogEventType} from '../eventType/MegalogEventType';
-import {MegalogChannelManager} from '../MegalogChannelManager';
+import type {MegalogSupportedClientEvent} from '..';
+import {MegalogEventType} from '../../eventType/MegalogEventType';
+import {MegalogChannelManager} from '../../MegalogChannelManager';
 
 export interface MegalogGuildSubscriptions<TEventName extends MegalogSupportedClientEvent> {
   guild: Guild;

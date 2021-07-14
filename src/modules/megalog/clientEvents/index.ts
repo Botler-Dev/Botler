@@ -1,13 +1,18 @@
 import {Logger} from '@/logger';
-import {Client, ExportProxyClientEvents} from 'discord.js';
+import {Client} from 'discord.js';
 import {AuditLogMatcher} from '../auditLog/AuditLogMatcher';
 import type {MegalogEventTypeManager} from '../eventType/MegalogEventTypeManager';
 import type {MegalogChannelManager} from '../MegalogChannelManager';
-import {listenToGuildEventWithAuditLog} from './listenToGuildEvent';
+import {
+  AuditLogSupportedMessageClientEvent,
+  MegalogSupportedMessageClientEvent,
+  registerMessageClientEventListeners,
+} from './message';
+import {getMegalogClientEventUtils} from './utils';
 
-export type MegalogSupportedClientEvent = Extract<keyof ExportProxyClientEvents, 'messageDelete'>;
+export type MegalogSupportedClientEvent = MegalogSupportedMessageClientEvent;
 
-export type AuditLogSupportedClientEvent = Extract<MegalogSupportedClientEvent, 'messageDelete'>;
+export type AuditLogSupportedClientEvent = AuditLogSupportedMessageClientEvent;
 
 export function registerClientEventListeners(
   client: Client,
@@ -16,26 +21,12 @@ export function registerClientEventListeners(
   eventTypeManager: MegalogEventTypeManager,
   auditLogMatcher: AuditLogMatcher
 ): void {
-  listenToGuildEventWithAuditLog(
+  const utils = getMegalogClientEventUtils(
     client,
     logger,
     channelManager,
     eventTypeManager,
-    auditLogMatcher,
-    'messageDelete',
-    async message => message.guild?.fetch(),
-    async message => {
-      const {author, channel} = message;
-      if (!author) return undefined;
-      return {
-        action: 'MESSAGE_DELETE',
-        checker: entry =>
-          !!entry.target &&
-          'id' in entry.target &&
-          entry.target.id === author.id &&
-          // @ts-expect-error Discord.js' bad typings don't properly define the extra property
-          entry.extra?.channel?.id === channel.id,
-      };
-    }
+    auditLogMatcher
   );
+  registerMessageClientEventListeners(utils);
 }

@@ -10,7 +10,8 @@ export type MegalogAuditLogEntryProcessor = (entry: GuildAuditLogsEntry) => Prom
 export type MegalogEventTypeResolvable = MegalogEventTypeName | MegalogEventType;
 
 export interface MegalogEventType<
-  TClientEventName extends MegalogSupportedClientEvent = MegalogSupportedClientEvent
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TClientEventName extends MegalogSupportedClientEvent = any
 > {
   readonly name: MegalogEventTypeName;
 

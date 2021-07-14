@@ -1,6 +1,6 @@
 import {Client, ExportProxyClientEvents} from 'discord.js';
 import {fromEvent, Observable} from 'rxjs';
-import type {MegalogSupportedClientEvent} from '.';
+import type {MegalogSupportedClientEvent} from '..';
 
 export type ClientEventStream<TEventName extends MegalogSupportedClientEvent> = Observable<
   ExportProxyClientEvents[TEventName]

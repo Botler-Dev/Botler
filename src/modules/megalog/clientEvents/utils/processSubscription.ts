@@ -2,8 +2,8 @@ import {Logger} from '@/logger';
 import {ExportProxyClientEvents} from 'discord.js';
 import {of, OperatorFunction} from 'rxjs';
 import {catchError, concatMap, filter, mergeMap} from 'rxjs/operators';
-import type {AuditLogSupportedClientEvent, MegalogSupportedClientEvent} from '.';
-import {MegalogAuditLogEntryProcessor} from '../eventType/MegalogEventType';
+import type {AuditLogSupportedClientEvent, MegalogSupportedClientEvent} from '..';
+import {MegalogAuditLogEntryProcessor} from '../../eventType/MegalogEventType';
 import {MegalogSubscription} from './withSubscriptions';
 
 export function processSubscription<TEventName extends MegalogSupportedClientEvent>(

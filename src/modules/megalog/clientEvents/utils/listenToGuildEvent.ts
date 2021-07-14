@@ -1,19 +1,15 @@
 import {Logger} from '@/logger';
 import {Client, ExportProxyClientEvents, Guild} from 'discord.js';
-import {from, lastValueFrom, OperatorFunction} from 'rxjs';
-import {catchError, filter, map, mergeMap, toArray} from 'rxjs/operators';
-import type {AuditLogSupportedClientEvent, MegalogSupportedClientEvent} from '.';
-import {
-  AuditLogMatcher,
-  AuditLogMatchFilter,
-  AuditLogMatchListener,
-} from '../auditLog/AuditLogMatcher';
-import {MegalogAuditLogEntryProcessor} from '../eventType/MegalogEventType';
-import {MegalogEventTypeManager} from '../eventType/MegalogEventTypeManager';
-import {MegalogChannelManager} from '../MegalogChannelManager';
+import {from, OperatorFunction} from 'rxjs';
+import {filter, map, mergeMap, toArray} from 'rxjs/operators';
+import type {AuditLogSupportedClientEvent, MegalogSupportedClientEvent} from '..';
+import {AuditLogMatcher, AuditLogMatchFilter} from '../../auditLog/AuditLogMatcher';
+import {MegalogEventTypeManager} from '../../eventType/MegalogEventTypeManager';
+import {MegalogChannelManager} from '../../MegalogChannelManager';
 import {fromClientEvent} from './fromClientEvent';
 import {processSubscription} from './processSubscription';
 import {MegalogGuildSubscriptions, withSubscriptions} from './withSubscriptions';
+import {wrapToAuditLogListener} from './wrapToAuditLogListener';
 
 export type PayloadToGuildResolver<TEventName extends MegalogSupportedClientEvent> = (
   ...payload: ExportProxyClientEvents[TEventName]
@@ -69,26 +65,6 @@ export function listenToGuildEvent<TEventName extends MegalogSupportedClientEven
 export type PayloadToAuditLogMatchFilterResolver<TEventName extends MegalogSupportedClientEvent> = (
   ...payload: ExportProxyClientEvents[TEventName]
 ) => Promise<AuditLogMatchFilter | undefined>;
-
-function wrapToAuditLogListener(
-  logger: Logger
-): OperatorFunction<MegalogAuditLogEntryProcessor[], AuditLogMatchListener> {
-  return source =>
-    source.pipe(
-      map(
-        (callbacks): AuditLogMatchListener =>
-          entry =>
-            lastValueFrom(
-              from(callbacks).pipe(
-                mergeMap(callback => callback(entry)),
-                catchError(async error =>
-                  logger.error(`An audit log callback threw an error.`, error)
-                )
-              )
-            )
-      )
-    );
-}
 
 export function listenToGuildEventWithAuditLog<TEventName extends AuditLogSupportedClientEvent>(
   client: Client,

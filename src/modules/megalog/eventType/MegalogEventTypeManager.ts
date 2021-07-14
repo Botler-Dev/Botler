@@ -51,7 +51,7 @@ export class MegalogEventTypeManager {
   getClientListeners<TEventName extends MegalogSupportedClientEvent>(
     clientEventName: TEventName
   ): ReadonlyArray<MegalogEventType<TEventName>> {
-    return (this.clientListeners.get(clientEventName) as MegalogEventType<TEventName>[]) ?? [];
+    return (this.clientListeners.get(clientEventName) ?? []) as MegalogEventType<TEventName>[];
   }
 
   checkEventTypeName(name: MegalogEventTypeName): void {
