@@ -1,5 +1,5 @@
 import {ExportProxyClientEvents} from 'discord.js';
-import {MegalogClientEventUtils} from './utils';
+import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
 
 export type MegalogSupportedMessageClientEvent = Extract<
   keyof ExportProxyClientEvents,

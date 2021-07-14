@@ -8,7 +8,7 @@ import {
   MegalogSupportedMessageClientEvent,
   registerMessageClientEventListeners,
 } from './message';
-import {getMegalogClientEventUtils} from './utils';
+import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
 
 export type MegalogSupportedClientEvent = MegalogSupportedMessageClientEvent;
 
@@ -21,7 +21,7 @@ export function registerClientEventListeners(
   eventTypeManager: MegalogEventTypeManager,
   auditLogMatcher: AuditLogMatcher
 ): void {
-  const utils = getMegalogClientEventUtils(
+  const utils = new MegalogClientEventUtils(
     client,
     logger,
     channelManager,
