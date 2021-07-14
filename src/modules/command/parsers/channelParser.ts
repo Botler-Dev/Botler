@@ -24,7 +24,7 @@ export type GuildChannelType =
 
 export interface ChannelParseOptions {
   /**
-   * If same channel id should be searched for. (default `true`)
+   * If same channel ID should be searched for. (default `true`)
    */
   searchId?: boolean;
   /**
@@ -32,7 +32,7 @@ export interface ChannelParseOptions {
    */
   searchName?: boolean;
   /**
-   * StringParseOptions for parsing name. (default `{}`)
+   * StringParseOptions for parsing the name. (default `{}`)
    */
   nameParseOptions?: StringParseOptions;
   /**
@@ -40,11 +40,11 @@ export interface ChannelParseOptions {
    */
   allowSimilar?: boolean;
   /**
-   * Channel types which should be included in name search. (default all channel types)
+   * Channel types which should be included in the name search. (default all channel types)
    */
   nameTypeFilter?: GuildChannelType[];
   /**
-   * Threshold for when a similarity search result can be considered valid. (default `0.2`)
+   * Similarity threshold for when a similar search result can be considered valid. (default `0.2`)
    */
   similarityThreshold?: number;
 }
@@ -87,6 +87,14 @@ async function snowflakeParse<TChannel extends GuildChannel>(
   return {value: channel, length: snowflakeResult.length};
 }
 
+/**
+ * Tries to parses a string into a {@link GuildChannel}.
+ *
+ * Searches for the channel in following order (some may be omitted through the options):
+ *  1. Channel ID
+ *  2. Same channel name
+ *  3. Similar channel name
+ */
 export function channelParser<TChannel extends GuildChannel>(
   channels: Collection<Snowflake, TChannel>,
   options?: ChannelParseOptions

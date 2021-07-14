@@ -15,6 +15,9 @@ export interface RawClientConfig {
   host?: string;
 }
 
+/**
+ * Service that lets you listen to NOTIFY events from the PostgreSQL database.
+ */
 @singleton()
 export class DatabaseEventHub {
   private readonly subscriber: Subscriber;
@@ -27,7 +30,7 @@ export class DatabaseEventHub {
     return this._channels;
   }
 
-  // Don't use defaults here because they are defined in src/utils/environment.ts
+  // Don't apply defaults here because they are defined in src/utils/environment.ts
   private static readonly envCleanerDefinition: OptionsCleanerDefinition<
     RawClientConfig,
     ClientConfig
@@ -39,6 +42,9 @@ export class DatabaseEventHub {
     host: required(),
   };
 
+  /**
+   * Creates a {@link DatabaseEventHub} that needs to be initialized with {@link DatabaseEventHub.initialize}.
+   */
   constructor(masterLogger: MasterLogger, clientConfig = DatabaseEventHub.getEnvConfig()) {
     this.subscriber = createPostgresSubscriber(clientConfig);
     this.logger = masterLogger.getScope('event hub');
@@ -70,10 +76,11 @@ export class DatabaseEventHub {
 
   async listenTo<TPayload>(channel: string): Promise<Observable<TPayload>> {
     let eventStream = this.channels.get(channel);
-    if (eventStream) return eventStream as Observable<TPayload>;
-    await this.subscriber.listenTo(channel);
-    eventStream = fromEvent(this.subscriber.notifications, channel);
-    this._channels.set(channel, eventStream);
+    if (!eventStream) {
+      await this.subscriber.listenTo(channel);
+      eventStream = fromEvent(this.subscriber.notifications, channel);
+      this._channels.set(channel, eventStream);
+    }
     return eventStream as Observable<TPayload>;
   }
 }

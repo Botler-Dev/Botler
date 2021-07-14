@@ -5,6 +5,9 @@ import type {Command} from '../command/Command';
 import {BaseExecutionContext} from './BaseExecutionContext';
 import {GuildMemberContext} from './guild/GuildMemberContext';
 
+/**
+ * {@link BaseExecutionContext} for a specific {@link User} and, if available, the corresponding {@link GuildMember}.
+ */
 export class UserExecutionContext<
   TCommand extends Command,
   TGuildContext extends GuildMemberContext | undefined,

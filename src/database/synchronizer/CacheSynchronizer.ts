@@ -4,6 +4,9 @@ import {map} from 'rxjs/operators';
 import {Entity} from '../wrapper/EntityWrapper';
 import {DatabaseEventHub} from '../DatabaseEventHub';
 
+/**
+ * Stream of the entity's state in the database.
+ */
 export type SyncStream<TEntity> = Subject<TEntity | undefined>;
 
 export interface ExhaustStreamPayload<TEntity extends Entity, TCacheKey> {
@@ -15,6 +18,14 @@ export type CacheKeyResolver<TMinimalPayload, TCacheKey = unknown> = (
   payload: TMinimalPayload
 ) => TCacheKey | undefined;
 
+/**
+ * Uses the {@link DatabaseEventHub} to create {@link SyncStream}s for {@link SynchronizedEntityWrapper} to consume.
+ * On the PostgreSQL side the [sync triggers](https://botler.readthedocs.io/en/master/Development/Database/Sync-Triggers/) have to be manually created via migrations.
+ *
+ * @template TEntity Entity will be synchronized.
+ * @template TMinimalPayloadKeys What properties of the entity will be the database send on the delete event.
+ * @template TCacheKey Key used to index SyncStreams.
+ */
 export class CacheSynchronizer<
   TEntity extends Entity,
   TMinimalPayloadKeys extends keyof TEntity = keyof TEntity,
@@ -32,7 +43,7 @@ export class CacheSynchronizer<
   >;
 
   /**
-   * Emits change events for which no syncStream have been found.
+   * Emits change events for which no SyncStream has been found.
    */
   protected exhaustStream = new Subject<ExhaustStreamPayload<TEntity, TCacheKey>>();
 
@@ -40,6 +51,13 @@ export class CacheSynchronizer<
 
   protected readonly eventHub: DatabaseEventHub;
 
+  /**
+   * Creates a {@link CacheSynchronizer} that then has to be initialized using {@link CacheSynchronizer.initialize}().
+   *
+   * @param {string} tableName Name of the PostgreSQL table. (Can be dynamically get via `Prisma.ModelName.YourModelName`)
+   * @param {CacheKeyResolver<Pick<TEntity, TMinimalPayloadKeys>, TCacheKey>} cacheKeyResolver Convert received entities into {@link TCacheKey}
+   * @memberof CacheSynchronizer
+   */
   constructor(
     eventHub: DatabaseEventHub,
     tableName: string,

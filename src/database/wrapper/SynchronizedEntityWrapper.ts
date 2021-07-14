@@ -5,6 +5,9 @@ import {CacheManager} from '../manager/CacheManager';
 import {CachedEntityWrapper} from './CachedEntityWrapper';
 import {Entity} from './EntityWrapper';
 
+/**
+ * A {@link CachedEntityWrapper} that also consumes a {@link SyncStream} to stay in sync with the database.
+ */
 export abstract class SynchronizedEntityWrapper<
   TEntityState extends Entity | undefined,
   TManager extends CacheManager
@@ -23,6 +26,9 @@ export abstract class SynchronizedEntityWrapper<
     return this.entitySubject;
   }
 
+  /**
+   * @param {Observable<TEntityState>} syncStream {@link SyncStream} that first might to be filtered incase {@link TEntityState} does not accept undefined.
+   */
   constructor(manager: TManager, syncStream: Observable<TEntityState>, entity: TEntityState) {
     super(manager);
     this.entitySubject = new BehaviorSubject(entity);

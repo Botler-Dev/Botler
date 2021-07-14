@@ -5,6 +5,10 @@ import {GlobalSettingsWrapper} from '@/settings';
 
 export type Cleaner = () => Promise<void>;
 
+/**
+ * Service that periodically executes the registered database cleaners.
+ * The execution interval is specified by the {@link GlobalSettingsWrapper.cleanInterval}.
+ */
 @injectable()
 export class DatabaseCleaner {
   private readonly cleaners = new Set<Cleaner>();
@@ -39,6 +43,9 @@ export class DatabaseCleaner {
     this.cleaners.add(cleaner);
   }
 
+  /**
+   * Execute all cleaners
+   */
   async clean(): Promise<void> {
     await Promise.allSettled(
       [...this.cleaners.values()].map(async cleaner =>

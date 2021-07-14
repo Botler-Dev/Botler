@@ -37,6 +37,13 @@ const userParseOptionsDefinition: OptionsCleanerDefinition<
 
 export type UserParseResult = ParseResult<User>;
 
+/**
+ * Tries to parse a string into a {@link User}.
+ *
+ * Searches for the user in following order (some may be omitted through the options):
+ *  1. User ID
+ *  2. Uses {@link guildMemberParser} without member ID search
+ */
 export function userParser(
   userManager: UserManager,
   options?: UserParseOptions

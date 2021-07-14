@@ -13,7 +13,7 @@ export interface StringParseOptions {
    */
   quotesAsLimiters?: boolean;
   /**
-   * If no result should be returned when value is empty. (default `true`)
+   * If no result should be returned when the value is empty. (default `true`)
    */
   disallowEmpty?: boolean;
 }
@@ -57,6 +57,9 @@ function parseValue(raw: string, options: CleanStringParseOptions): StringParseR
   };
 }
 
+/**
+ * Extracts a string from the input based on the options.
+ */
 export function stringParser(options?: StringParseOptions): Parser<StringParseResult> {
   const cleaned = cleanOptions(stringParseOptionsDefinition, options ?? {});
   return async (raw: string): Promise<StringParseResult | undefined> => {

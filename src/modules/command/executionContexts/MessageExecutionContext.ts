@@ -8,6 +8,9 @@ import {ParseResults, ParserEngine} from '../parser/ParserEngine';
 import {GuildMemberContext} from './guild/GuildMemberContext';
 import {UserExecutionContext} from './UserExecutionContext';
 
+/**
+ * {@link UserExecutionContext} that contains a {@link Message} and the corresponding {@link ParserEngine}.
+ */
 export abstract class MessageExecutionContext<
   TCommand extends Command<CommandCacheWrapper, TExistingParseResults>,
   TGuildContext extends GuildMemberContext | undefined,
@@ -16,8 +19,14 @@ export abstract class MessageExecutionContext<
 > extends UserExecutionContext<TCommand, TGuildContext, TCacheState> {
   readonly message: Message;
 
+  /**
+   * {@link ParserEngine} for the {@link MessageExecutionContext.message} content.
+   */
   readonly parser: ParserEngine<TExistingParseResults>;
 
+  /**
+   * {@link MessageSender} for the channel where {@link MessageExecutionContext.message} originated from.
+   */
   readonly sender: MessageSender;
 
   constructor(

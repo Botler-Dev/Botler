@@ -13,6 +13,9 @@ export enum SnowflakeType {
 export interface SnowflakeParseOptions {
   /**
    * What snowflake definition types should be parsed. (default all)
+   *
+   * The order in this array also determines the order in which
+   * the different patterns are tried on the input string.
    */
   types?: SnowflakeType[];
 }
@@ -40,6 +43,9 @@ const REGEXP_PATTERNS = {
   [SnowflakeType.Role]: /^<@&(\d{17,19})>(?:\s+|$)/,
 } as const;
 
+/**
+ * Tries to parse a string into a {@link Snowflake}.
+ */
 export function snowflakeParser(options?: SnowflakeParseOptions): Parser<SnowflakeParseResult> {
   const cleaned = cleanOptions(snowflakeParseOptionsDefinition, options ?? {});
   return async (raw: string): Promise<SnowflakeParseResult | undefined> => {
