@@ -9,6 +9,11 @@ import {
   registerChannelClientEventListeners,
 } from './channel';
 import {
+  AuditLogSupportedEmojiClientEvent,
+  MegalogSupportedEmojiClientEvent,
+  registerEmojiClientEventListeners,
+} from './emoji';
+import {
   AuditLogSupportedMessageClientEvent,
   MegalogSupportedMessageClientEvent,
   registerMessageClientEventListeners,
@@ -17,11 +22,13 @@ import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
 
 export type MegalogSupportedClientEvent =
   | MegalogSupportedMessageClientEvent
-  | MegalogSupportedChannelClientEvent;
+  | MegalogSupportedChannelClientEvent
+  | MegalogSupportedEmojiClientEvent;
 
 export type AuditLogSupportedClientEvent =
   | AuditLogSupportedMessageClientEvent
-  | AuditLogSupportedChannelClientEvent;
+  | AuditLogSupportedChannelClientEvent
+  | AuditLogSupportedEmojiClientEvent;
 
 export function registerClientEventListeners(
   client: Client,
@@ -39,4 +46,5 @@ export function registerClientEventListeners(
   );
   registerMessageClientEventListeners(utils);
   registerChannelClientEventListeners(utils);
+  registerEmojiClientEventListeners(utils);
 }
