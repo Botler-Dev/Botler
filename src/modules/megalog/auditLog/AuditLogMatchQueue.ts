@@ -91,7 +91,9 @@ export class AuditLogMatchQueue {
       .reverse()
       .findIndex(entry => entry.createdTimestamp > this.lastFetchedEntryTimestamp);
     // Add a 1 second buffer to account for when the audit log entry is added before the client event arrives.
-    this.lastFetchedEntryTimestamp = entires[0].createdTimestamp - 1000;
+    const lastEntryTimestamp = entires[0].createdTimestamp - 1000;
+    if (lastEntryTimestamp > this.lastFetchedEntryTimestamp)
+      this.lastFetchedEntryTimestamp = lastEntryTimestamp;
     return entires.slice(entires.length - firstNewEntryIndex - 1);
   }
 
