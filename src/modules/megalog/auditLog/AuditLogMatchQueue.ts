@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import {
   Guild,
   GuildAuditLogsAction,
@@ -73,28 +74,27 @@ export class AuditLogMatchQueue {
   }
 
   private async fetchNewAuditLogEntries(user?: Snowflake, type?: GuildAuditLogsAction) {
+    const fetchTimestamp = dayjs().unix();
+
+    let entries: GuildAuditLogsEntry[];
     try {
       const auditLogs = await this.guild.fetchAuditLogs({
         user,
         type,
         limit: this.megalogSettings.auditLogFetchSize,
       });
-      return this.trimAuditLogEntires(auditLogs.entries.array());
+      entries = auditLogs.entries.array();
     } catch {
       return undefined;
     }
-  }
 
-  private trimAuditLogEntires(entires: GuildAuditLogsEntry[]) {
-    if (entires.length === 0) return [];
-    const firstNewEntryIndex = entires
+    const firstNewEntryIndex = entries
       .reverse()
       .findIndex(entry => entry.createdTimestamp > this.lastFetchedEntryTimestamp);
-    // Add a 1 second buffer to account for when the audit log entry is added before the client event arrives.
-    const lastEntryTimestamp = entires[0].createdTimestamp - 1000;
-    if (lastEntryTimestamp > this.lastFetchedEntryTimestamp)
-      this.lastFetchedEntryTimestamp = lastEntryTimestamp;
-    return entires.slice(entires.length - firstNewEntryIndex - 1);
+    // Add a small time buffer to account for late arriving and late firing client events.
+    this.lastFetchedEntryTimestamp = fetchTimestamp - this.guild.client.ws.ping - 500;
+
+    return firstNewEntryIndex === -1 ? [] : entries.slice(entries.length - firstNewEntryIndex - 1);
   }
 
   private static doesAuditLogEntryPassFilter(

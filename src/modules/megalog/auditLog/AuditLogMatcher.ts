@@ -63,12 +63,12 @@ export class AuditLogMatcher {
   }
 
   async tryMatching(): Promise<void> {
-    if (this.guildQueues.size === 0) return;
-    const guilds = [...this.guildQueues.values()];
-    const results = await Promise.all(guilds.map(queue => queue.tryMatch()));
+    const queues = [...this.guildQueues.values()].filter(queue => queue.length > 0);
+    if (queues.length === 0) return;
+    const results = await Promise.all(queues.map(queue => queue.tryMatch()));
     results.forEach((count, index) => {
       if (count !== undefined) return;
-      this.guildQueues.delete(guilds[index].guild.id);
+      this.guildQueues.delete(queues[index].guild.id);
     });
   }
 }
