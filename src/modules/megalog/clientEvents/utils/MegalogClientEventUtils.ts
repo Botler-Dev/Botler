@@ -95,6 +95,7 @@ export class MegalogClientEventUtils {
             from(subscriptions).pipe(
               processSubscription(this.logger, payload),
               toArray(),
+              filter(processors => processors.length > 0),
               wrapToAuditLogListener(this.logger),
               mergeMap(listener =>
                 from(payloadToAuditLogMatchFilter(...payload)).pipe(

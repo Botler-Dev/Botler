@@ -1,4 +1,5 @@
 import {ExportProxyClientEvents} from 'discord.js';
+import {checkAuditLogEntryTargetId} from './utils/checkAuditLogEntryTargetId';
 import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
 
 export type MegalogSupportedMessageClientEvent = Extract<
@@ -18,18 +19,15 @@ export function registerMessageClientEventListeners(utils: MegalogClientEventUti
     'messageDelete',
     async message => message.guild ?? undefined,
     async message => {
-      const {
-        author,
-        channel: {id: channelId},
-      } = message;
+      const {author, channel} = message;
       if (!author) return undefined;
+      const channelId = channel.id;
+      const authorId = author.id;
       return {
         action: 'MESSAGE_DELETE',
         checker: entry =>
-          !!entry.target &&
-          'id' in entry.target &&
-          entry.target.id === author.id &&
-          // Discord.js' bad typings don't properly define the extra property
+          checkAuditLogEntryTargetId(entry, authorId) &&
+          // Discord.js' bad typings don't properly define the extra property.
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (entry.extra as any)?.channel?.id === channelId,
       };
@@ -47,10 +45,8 @@ export function registerMessageClientEventListeners(utils: MegalogClientEventUti
       return {
         action: 'MESSAGE_BULK_DELETE',
         checker: entry =>
-          !!entry.target &&
-          'id' in entry.target &&
-          entry.target.id === channelId &&
-          // Discord.js' bad typings don't properly define the extra property
+          checkAuditLogEntryTargetId(entry, channelId) &&
+          // Discord.js' bad typings don't properly define the extra property.
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (entry.extra as any)?.count >= deleteCount,
       };

@@ -8,10 +8,12 @@ import {AuditLogMatchQueue} from './AuditLogMatchQueue';
 
 export type AuditLogMatchListener = (entry: GuildAuditLogsEntry) => void;
 
+export type AuditLogMatchChecker = (entry: GuildAuditLogsEntry) => boolean;
+
 export interface AuditLogMatchFilter {
   executor?: Snowflake;
   action?: GuildAuditLogsAction;
-  checker?: (entry: GuildAuditLogsEntry) => boolean;
+  checker?: AuditLogMatchChecker;
 }
 
 @injectable()

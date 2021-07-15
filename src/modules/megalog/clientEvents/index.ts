@@ -4,15 +4,24 @@ import {AuditLogMatcher} from '../auditLog/AuditLogMatcher';
 import type {MegalogEventTypeManager} from '../eventType/MegalogEventTypeManager';
 import type {MegalogChannelManager} from '../MegalogChannelManager';
 import {
+  AuditLogSupportedChannelClientEvent,
+  MegalogSupportedChannelClientEvent,
+  registerChannelClientEventListeners,
+} from './channel';
+import {
   AuditLogSupportedMessageClientEvent,
   MegalogSupportedMessageClientEvent,
   registerMessageClientEventListeners,
 } from './message';
 import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
 
-export type MegalogSupportedClientEvent = MegalogSupportedMessageClientEvent;
+export type MegalogSupportedClientEvent =
+  | MegalogSupportedMessageClientEvent
+  | MegalogSupportedChannelClientEvent;
 
-export type AuditLogSupportedClientEvent = AuditLogSupportedMessageClientEvent;
+export type AuditLogSupportedClientEvent =
+  | AuditLogSupportedMessageClientEvent
+  | AuditLogSupportedChannelClientEvent;
 
 export function registerClientEventListeners(
   client: Client,
@@ -29,4 +38,5 @@ export function registerClientEventListeners(
     auditLogMatcher
   );
   registerMessageClientEventListeners(utils);
+  registerChannelClientEventListeners(utils);
 }
