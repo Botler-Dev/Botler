@@ -4,6 +4,11 @@ import {AuditLogMatcher} from '../auditLog/AuditLogMatcher';
 import type {MegalogEventTypeManager} from '../eventType/MegalogEventTypeManager';
 import type {MegalogChannelManager} from '../MegalogChannelManager';
 import {
+  AuditLogSupportedBanClientEvent,
+  MegalogSupportedBanClientEvent,
+  registerBanClientEventListeners,
+} from './ban';
+import {
   AuditLogSupportedChannelClientEvent,
   MegalogSupportedChannelClientEvent,
   registerChannelClientEventListeners,
@@ -23,12 +28,14 @@ import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
 export type MegalogSupportedClientEvent =
   | MegalogSupportedMessageClientEvent
   | MegalogSupportedChannelClientEvent
-  | MegalogSupportedEmojiClientEvent;
+  | MegalogSupportedEmojiClientEvent
+  | MegalogSupportedBanClientEvent;
 
 export type AuditLogSupportedClientEvent =
   | AuditLogSupportedMessageClientEvent
   | AuditLogSupportedChannelClientEvent
-  | AuditLogSupportedEmojiClientEvent;
+  | AuditLogSupportedEmojiClientEvent
+  | AuditLogSupportedBanClientEvent;
 
 export function registerClientEventListeners(
   client: Client,
@@ -47,4 +54,5 @@ export function registerClientEventListeners(
   registerMessageClientEventListeners(utils);
   registerChannelClientEventListeners(utils);
   registerEmojiClientEventListeners(utils);
+  registerBanClientEventListeners(utils);
 }
