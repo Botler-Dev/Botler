@@ -9,7 +9,7 @@ model MegalogLogChannel {
 model MegalogSettings {
   version                     Int @id @default(autoincrement())
   auditLogMatchTryInterval    Int @default(1000)
-  auditLogFetchSize           Int @default(50)
+  auditLogFetchSize           Int @default(10)
   maxAuditLogMatchQueueLength Int @default(100)
   maxAuditLogMatchTries       Int @default(10)
 }

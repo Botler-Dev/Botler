@@ -13,7 +13,7 @@ export class MegalogSettingsWrapper extends SynchronizedEntityWrapper<MegalogSet
   }
 
   get auditLogFetchSize(): number {
-    return this.entity?.auditLogFetchSize ?? 50;
+    return this.entity?.auditLogFetchSize ?? 10;
   }
 
   get maxAuditLogMatchQueueLength(): number {

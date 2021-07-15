@@ -33,7 +33,7 @@ EXECUTE FUNCTION trigger_notify_entity_delete('eventName' , 'guildId');
 CREATE TABLE "MegalogSettings" (
     "version" SERIAL NOT NULL,
     "auditLogMatchTryInterval" INTEGER NOT NULL DEFAULT 1000,
-    "auditLogFetchSize" INTEGER NOT NULL DEFAULT 50,
+    "auditLogFetchSize" INTEGER NOT NULL DEFAULT 10,
     "maxAuditLogMatchQueueLength" INTEGER NOT NULL DEFAULT 100,
     "maxAuditLogMatchTries" INTEGER NOT NULL DEFAULT 10,
 
