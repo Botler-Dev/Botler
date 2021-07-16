@@ -37,6 +37,14 @@ function channelToMatchFilter(action: keyof GuildAuditLogsActions) {
   };
 }
 
+enum ChannelType {
+  text = 0,
+  voice = 2,
+  category = 4,
+  news = 5,
+  store = 6,
+}
+
 export function registerChannelClientEventListeners(utils: MegalogClientEventUtils): void {
   utils.listenToGuildEventWithAuditLog(
     'channelCreate',
@@ -104,6 +112,11 @@ export function registerChannelClientEventListeners(utils: MegalogClientEventUti
                       newChannel instanceof TextChannel &&
                       oldChannel.rateLimitPerUser === change.old &&
                       newChannel.rateLimitPerUser === change.new
+                    );
+                  case 'type':
+                    return (
+                      ChannelType[oldChannel.type] === change.old &&
+                      ChannelType[newChannel.type] === change.new
                     );
                   default:
                     return false;
