@@ -33,6 +33,11 @@ import {
   MegalogSupportedMessageClientEvent,
   registerMessageClientEventListeners,
 } from './message';
+import {
+  AuditLogSupportedRoleClientEvent,
+  MegalogSupportedRoleClientEvent,
+  registerRoleClientEventListeners,
+} from './role';
 import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
 
 export type MegalogSupportedClientEvent =
@@ -41,7 +46,8 @@ export type MegalogSupportedClientEvent =
   | MegalogSupportedEmojiClientEvent
   | MegalogSupportedBanClientEvent
   | MegalogSupportedMemberClientEvent
-  | MegalogSupportedGuildClientEvent;
+  | MegalogSupportedGuildClientEvent
+  | MegalogSupportedRoleClientEvent;
 
 export type AuditLogSupportedClientEvent =
   | AuditLogSupportedMessageClientEvent
@@ -49,7 +55,8 @@ export type AuditLogSupportedClientEvent =
   | AuditLogSupportedEmojiClientEvent
   | AuditLogSupportedBanClientEvent
   | AuditLogSupportedMemberClientEvent
-  | AuditLogSupportedGuildClientEvent;
+  | AuditLogSupportedGuildClientEvent
+  | AuditLogSupportedRoleClientEvent;
 
 export function registerClientEventListeners(
   client: Client,
@@ -71,4 +78,5 @@ export function registerClientEventListeners(
   registerBanClientEventListeners(utils);
   registerMemberClientEventListeners(utils);
   registerGuildClientEventListeners(utils);
+  registerRoleClientEventListeners(utils);
 }
