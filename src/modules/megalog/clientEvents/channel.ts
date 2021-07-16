@@ -7,6 +7,7 @@ import {
   Role,
   TextChannel,
   VoiceChannel,
+  Webhook,
 } from 'discord.js';
 import {AuditLogMatchFilter} from '../auditLog/AuditLogMatcher';
 import {checkAuditLogEntryTargetId} from './utils/checkAuditLogEntryTargetId';
@@ -14,12 +15,12 @@ import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
 
 export type MegalogSupportedChannelClientEvent = Extract<
   keyof ExportProxyClientEvents,
-  'channelCreate' | 'channelDelete' | 'channelUpdate' | 'channelPinsUpdate'
+  'channelCreate' | 'channelDelete' | 'channelUpdate' | 'channelPinsUpdate' | 'webhookUpdate'
 >;
 
 export type AuditLogSupportedChannelClientEvent = Extract<
   MegalogSupportedChannelClientEvent,
-  'channelCreate' | 'channelDelete' | 'channelUpdate' | 'channelPinsUpdate'
+  'channelCreate' | 'channelDelete' | 'channelUpdate' | 'channelPinsUpdate' | 'webhookUpdate'
 >;
 
 const channelToGuild = async (channel: Channel) =>
@@ -167,4 +168,15 @@ export function registerChannelClientEventListeners(utils: MegalogClientEventUti
         (entry.extra as any)?.channel?.id === channel.id,
     };
   });
+
+  utils.listenToGuildEventWithAuditLog('webhookUpdate', channelToGuild, async channel => ({
+    // Proper checking would require manually fetching the webhooks.
+    // The minimal gain in accuracy is not be worth it.
+    checker: entry =>
+      (entry.action === 'WEBHOOK_UPDATE' ||
+        entry.action === 'WEBHOOK_CREATE' ||
+        entry.action === 'WEBHOOK_DELETE') &&
+      entry.target instanceof Webhook &&
+      entry.target.channelID === channel.id,
+  }));
 }
