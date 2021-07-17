@@ -27,7 +27,7 @@ export class AuditLogMatchQueue {
 
   private readonly megalogSettings: MegalogSettingsWrapper;
 
-  private lastFetchedEntryTimestamp = 0;
+  private lastFetchedTimestamp!: number;
 
   private cumulativeQueryCache?: CumulativeQueryCache;
 
@@ -38,6 +38,14 @@ export class AuditLogMatchQueue {
   constructor(megalogSettings: MegalogSettingsWrapper, guild: Guild) {
     this.guild = guild;
     this.megalogSettings = megalogSettings;
+    this.updateLastFetchedTimestamp(
+      dayjs().subtract(megalogSettings.auditLogMatchTryInterval).valueOf()
+    );
+  }
+
+  private updateLastFetchedTimestamp(fetchTimestamp: number): void {
+    // Add a small time buffer to account for late arriving and late firing client events.
+    this.lastFetchedTimestamp = fetchTimestamp - this.guild.client.ws.ping - 500;
   }
 
   addEntry(listener: AuditLogMatchListener, filter: AuditLogMatchFilter): void {
@@ -74,7 +82,7 @@ export class AuditLogMatchQueue {
   }
 
   private async fetchNewAuditLogEntries(user?: Snowflake, type?: GuildAuditLogsAction) {
-    const fetchTimestamp = dayjs().unix();
+    const fetchTimestamp = dayjs().valueOf();
 
     let entries: GuildAuditLogsEntry[];
     try {
@@ -90,9 +98,8 @@ export class AuditLogMatchQueue {
 
     const firstNewEntryIndex = entries
       .reverse()
-      .findIndex(entry => entry.createdTimestamp > this.lastFetchedEntryTimestamp);
-    // Add a small time buffer to account for late arriving and late firing client events.
-    this.lastFetchedEntryTimestamp = fetchTimestamp - this.guild.client.ws.ping - 500;
+      .findIndex(entry => entry.createdTimestamp > this.lastFetchedTimestamp);
+    this.updateLastFetchedTimestamp(fetchTimestamp);
 
     return firstNewEntryIndex === -1 ? [] : entries.slice(entries.length - firstNewEntryIndex - 1);
   }
