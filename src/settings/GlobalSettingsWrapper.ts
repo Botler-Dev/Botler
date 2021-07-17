@@ -1,9 +1,10 @@
 import {GlobalSettings} from '@prisma/client';
 import {Snowflake, UserManager, UserResolvable} from 'discord.js';
-import {filter, tap} from 'rxjs/operators';
+import {tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
 import {Logger} from '@/logger';
 import {resolveIdChecked} from '@/utils/resolve';
+import {filterNullOrUndefined} from '@/utils/filterNullOrUndefined';
 import type {GlobalSettingsManager} from './GlobalSettingsManager';
 import {SyncStream, SynchronizedEntityWrapper} from '../database';
 
@@ -71,7 +72,7 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSetti
           logger.info(`Current GlobalSettings entry was deleted.`);
           manager.refetch();
         }),
-        filter((newEntity): newEntity is GlobalSettings => !!newEntity)
+        filterNullOrUndefined()
       ),
       entity
     );

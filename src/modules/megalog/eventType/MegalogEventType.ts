@@ -5,9 +5,17 @@ export type MegalogEventTypeName = string;
 
 export type MegalogEventCategoryName = string;
 
-export type MegalogAuditLogEntryProcessor = (entry: GuildAuditLogsEntry) => Promise<void>;
-
 export type MegalogEventTypeResolvable = MegalogEventTypeName | MegalogEventType;
+
+export type MegalogChannelProcessor<TClientEventName extends MegalogSupportedClientEvent> = (
+  channel: TextChannel
+) => Promise<
+  TClientEventName extends AuditLogSupportedClientEvent
+    ? MegalogAuditLogEntryProcessor | undefined
+    : void
+>;
+
+export type MegalogAuditLogEntryProcessor = (entry: GuildAuditLogsEntry) => Promise<void>;
 
 export interface MegalogEventType<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,12 +30,6 @@ export interface MegalogEventType<
   readonly clientEventName: TClientEventName;
 
   readonly processClientEvent: (
-    channel: TextChannel,
     ...args: ExportProxyClientEvents[TClientEventName]
-  ) => Promise<
-    | void
-    | (TClientEventName extends AuditLogSupportedClientEvent
-        ? MegalogAuditLogEntryProcessor
-        : never)
-  >;
+  ) => Promise<undefined | MegalogChannelProcessor<TClientEventName>>;
 }

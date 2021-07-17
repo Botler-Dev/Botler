@@ -113,8 +113,12 @@ export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLog
     this.deleteCacheEntry(eventName, guildId);
   }
 
-  getLogChannels(eventType: MegalogEventTypeResolvable): TextChannel[] | undefined {
-    const eventName = this.eventTypeManager.resolveCheckedName(eventType);
+  hasChannels(eventType: MegalogEventTypeResolvable): boolean {
+    return (this.cache.get(this.eventTypeManager.resolveName(eventType))?.size ?? 0) > 0;
+  }
+
+  getChannels(eventType: MegalogEventTypeResolvable): TextChannel[] | undefined {
+    const eventName = this.eventTypeManager.resolveName(eventType);
     return this.cache
       .get(eventName)
       ?.map((channelId, guildId) =>
@@ -123,8 +127,8 @@ export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLog
       .filter((channel): channel is TextChannel => channel instanceof TextChannel);
   }
 
-  getLogChannel(eventType: MegalogEventTypeResolvable, guild: Guild): TextChannel | undefined {
-    const eventName = this.eventTypeManager.resolveCheckedName(eventType);
+  getChannel(eventType: MegalogEventTypeResolvable, guild: Guild): TextChannel | undefined {
+    const eventName = this.eventTypeManager.resolveName(eventType);
     const channelId = this.cache.get(eventName)?.get(guild.id);
     if (!channelId) return undefined;
     const channel = guild.channels.cache.get(channelId);

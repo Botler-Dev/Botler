@@ -27,13 +27,9 @@ function payloadToMatchFilter(
 }
 
 export function registerBanClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEventWithAuditLog(
-    'guildBanAdd',
-    guildToGuild,
-    payloadToMatchFilter('MEMBER_BAN_ADD')
-  );
+  utils.listenToGuildEvent('guildBanAdd', guildToGuild, payloadToMatchFilter('MEMBER_BAN_ADD'));
 
-  utils.listenToGuildEventWithAuditLog(
+  utils.listenToGuildEvent(
     'guildBanRemove',
     guildToGuild,
     payloadToMatchFilter('MEMBER_BAN_REMOVE')

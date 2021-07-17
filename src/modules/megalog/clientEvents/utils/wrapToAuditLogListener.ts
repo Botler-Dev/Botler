@@ -16,7 +16,10 @@ export function wrapToAuditLogListener(
               from(callbacks).pipe(
                 mergeMap(callback => callback(entry)),
                 catchError(async error =>
-                  logger.error(`An audit log callback threw an error.`, error)
+                  logger.error(
+                    `Encountered an error while executing a MegalogAuditLogEntryProcessor.`,
+                    error
+                  )
                 )
               )
             )

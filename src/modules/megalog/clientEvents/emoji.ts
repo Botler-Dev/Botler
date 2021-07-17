@@ -23,19 +23,11 @@ function emojiToFilterMatch(action: keyof GuildAuditLogsActions) {
 }
 
 export function registerEmojiClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEventWithAuditLog(
-    'emojiCreate',
-    emojiToGuild,
-    emojiToFilterMatch('EMOJI_CREATE')
-  );
+  utils.listenToGuildEvent('emojiCreate', emojiToGuild, emojiToFilterMatch('EMOJI_CREATE'));
 
-  utils.listenToGuildEventWithAuditLog(
-    'emojiDelete',
-    emojiToGuild,
-    emojiToFilterMatch('EMOJI_DELETE')
-  );
+  utils.listenToGuildEvent('emojiDelete', emojiToGuild, emojiToFilterMatch('EMOJI_DELETE'));
 
-  utils.listenToGuildEventWithAuditLog('emojiUpdate', emojiToGuild, async (oldEmoji, newEmoji) => ({
+  utils.listenToGuildEvent('emojiUpdate', emojiToGuild, async (oldEmoji, newEmoji) => ({
     action: 'EMOJI_UPDATE',
     checker: entry =>
       checkAuditLogEntryTargetId(entry, oldEmoji.id) &&

@@ -27,11 +27,11 @@ function roleToMatchFilter(
 }
 
 export function registerRoleClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEventWithAuditLog('roleCreate', roleToGuild, roleToMatchFilter('ROLE_CREATE'));
+  utils.listenToGuildEvent('roleCreate', roleToGuild, roleToMatchFilter('ROLE_CREATE'));
 
-  utils.listenToGuildEventWithAuditLog('roleDelete', roleToGuild, roleToMatchFilter('ROLE_DELETE'));
+  utils.listenToGuildEvent('roleDelete', roleToGuild, roleToMatchFilter('ROLE_DELETE'));
 
-  utils.listenToGuildEventWithAuditLog('roleUpdate', roleToGuild, async (oldRole, newRole) => ({
+  utils.listenToGuildEvent('roleUpdate', roleToGuild, async (oldRole, newRole) => ({
     action: 'ROLE_UPDATE',
     checker: entry =>
       checkAuditLogEntryTargetId(entry, oldRole.id) &&

@@ -42,14 +42,14 @@ enum ExplicitContentFilterLevels {
 const inviteToGuild = async (invite: Invite) => invite.guild ?? undefined;
 
 export function registerGuildClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEventWithAuditLog(
+  utils.listenToGuildEvent(
     'guildIntegrationsUpdate',
     guildToGuild,
     // Strangely this client event only fires when a bot gets kicked.
     async () => ({action: 'INTEGRATION_DELETE'})
   );
 
-  utils.listenToGuildEventWithAuditLog('guildUpdate', guildToGuild, async (oldGuild, newGuild) => ({
+  utils.listenToGuildEvent('guildUpdate', guildToGuild, async (oldGuild, newGuild) => ({
     action: 'GUILD_UPDATE',
     checker: entry =>
       (entry.changes ?? []).every(change => {
@@ -164,12 +164,12 @@ export function registerGuildClientEventListeners(utils: MegalogClientEventUtils
       }),
   }));
 
-  utils.listenToGuildEventWithAuditLog('inviteCreate', inviteToGuild, async invite => ({
+  utils.listenToGuildEvent('inviteCreate', inviteToGuild, async invite => ({
     action: 'INVITE_CREATE',
     checker: entry => entry.changes?.find(change => change.key === 'code')?.new === invite.code,
   }));
 
-  utils.listenToGuildEventWithAuditLog('inviteDelete', inviteToGuild, async invite => ({
+  utils.listenToGuildEvent('inviteDelete', inviteToGuild, async invite => ({
     action: 'INVITE_DELETE',
     checker: entry => entry.changes?.find(change => change.key === 'code')?.old === invite.code,
   }));

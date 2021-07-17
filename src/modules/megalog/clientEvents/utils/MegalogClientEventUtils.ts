@@ -1,14 +1,15 @@
 import {Logger} from '@/logger';
+import {filterNullOrUndefined} from '@/utils/filterNullOrUndefined';
 import {Client, ExportProxyClientEvents, Guild} from 'discord.js';
-import {from, OperatorFunction} from 'rxjs';
-import {filter, map, mergeMap, toArray} from 'rxjs/operators';
+import {EMPTY, from, of} from 'rxjs';
+import {concatMap, filter, map, mergeMap, takeWhile, toArray} from 'rxjs/operators';
 import type {AuditLogSupportedClientEvent, MegalogSupportedClientEvent} from '..';
 import {AuditLogMatcher, AuditLogMatchFilter} from '../../auditLog/AuditLogMatcher';
 import {MegalogEventTypeManager} from '../../eventType/MegalogEventTypeManager';
 import {MegalogChannelManager} from '../../MegalogChannelManager';
 import {fromClientEvent} from './fromClientEvent';
-import {processSubscription} from './processSubscription';
-import {MegalogGuildSubscriptions, withSubscriptions} from './withSubscriptions';
+import {processChannel} from './processChannel';
+import {withChannelProcessor} from './withChannelProcessor';
 import {wrapToAuditLogListener} from './wrapToAuditLogListener';
 
 export type PayloadToGuildResolver<TEventName extends MegalogSupportedClientEvent> = (
@@ -18,6 +19,11 @@ export type PayloadToGuildResolver<TEventName extends MegalogSupportedClientEven
 export type PayloadToAuditLogMatchFilterResolver<TEventName extends MegalogSupportedClientEvent> = (
   ...payload: ExportProxyClientEvents[TEventName]
 ) => Promise<AuditLogMatchFilter | undefined>;
+
+export type GlobalEventGuildRelevanceFilter<TEventName extends MegalogSupportedClientEvent> = (
+  guild: Guild,
+  ...payload: ExportProxyClientEvents[TEventName]
+) => Promise<boolean>;
 
 export class MegalogClientEventUtils {
   private readonly client: Client;
@@ -44,72 +50,81 @@ export class MegalogClientEventUtils {
     this.auditLogMatcher = auditLogMatcher;
   }
 
-  private genericListenToClientEvent<TEventName extends MegalogSupportedClientEvent>(
-    eventName: TEventName,
-    payloadToGuild: PayloadToGuildResolver<TEventName>,
-    subscriptionProcessor: (
-      payload: ExportProxyClientEvents[TEventName]
-    ) => OperatorFunction<MegalogGuildSubscriptions<TEventName>, unknown>
-  ) {
-    const eventTypes = this.eventTypeManager.getClientListeners(eventName);
-    fromClientEvent(this.client, eventName)
-      .pipe(
-        mergeMap(payload =>
-          from(payloadToGuild(...payload)).pipe(
-            filter((guild): guild is NonNullable<typeof guild> => !!guild),
-            withSubscriptions<TEventName>(this.channelManager, eventTypes),
-            filter(({subscriptions}) => subscriptions.length > 0),
-            subscriptionProcessor(payload)
-          )
-        )
-      )
-      .subscribe();
-  }
-
-  listenToGuildEvent<TEventName extends MegalogSupportedClientEvent>(
-    eventName: TEventName,
-    payloadToGuild: PayloadToGuildResolver<TEventName>
-  ): void {
-    this.genericListenToClientEvent(
-      eventName,
-      payloadToGuild,
-      payload => source =>
-        source.pipe(
-          mergeMap(({subscriptions}) => from(subscriptions)),
-          processSubscription(this.logger, payload)
-        )
-    );
-  }
-
-  listenToGuildEventWithAuditLog<TEventName extends AuditLogSupportedClientEvent>(
+  listenToGuildEvent<TEventName extends AuditLogSupportedClientEvent>(
     eventName: TEventName,
     payloadToGuild: PayloadToGuildResolver<TEventName>,
     payloadToAuditLogMatchFilter: PayloadToAuditLogMatchFilterResolver<TEventName>
+  ): void;
+  listenToGuildEvent<
+    TEventName extends Exclude<MegalogSupportedClientEvent, AuditLogSupportedClientEvent>
+  >(eventName: TEventName, payloadToGuild: PayloadToGuildResolver<TEventName>): void;
+  listenToGuildEvent<TEventName extends MegalogSupportedClientEvent>(
+    eventName: TEventName,
+    payloadToGuild: PayloadToGuildResolver<TEventName>,
+    payloadToAuditLogMatchFilter?: PayloadToAuditLogMatchFilterResolver<TEventName>
   ): void {
-    this.genericListenToClientEvent(
-      eventName,
-      payloadToGuild,
-      payload => source =>
-        source.pipe(
-          mergeMap(({guild, subscriptions}) =>
-            from(subscriptions).pipe(
-              processSubscription(this.logger, payload),
-              toArray(),
-              filter(processors => processors.length > 0),
-              wrapToAuditLogListener(this.logger),
-              mergeMap(listener =>
-                from(payloadToAuditLogMatchFilter(...payload)).pipe(
-                  filter(
-                    (matchFilter): matchFilter is NonNullable<typeof matchFilter> => !!matchFilter
-                  ),
-                  map(matchFilter =>
-                    this.auditLogMatcher.requestMatch(guild, listener, matchFilter)
+    const eventTypes = this.eventTypeManager.getClientListeners(eventName);
+    if (eventTypes.length === 0) return;
+    fromClientEvent(this.client, eventName)
+      .pipe(
+        concatMap(payload =>
+          from(payloadToGuild(...payload)).pipe(
+            filterNullOrUndefined(),
+            mergeMap(guild =>
+              from(eventTypes).pipe(
+                withChannelProcessor(this.logger, payload),
+                concatMap(({type, channelProcessor}) =>
+                  of(this.channelManager.getChannel(type, guild)).pipe(
+                    filterNullOrUndefined(),
+                    processChannel(this.logger, channelProcessor)
+                  )
+                ),
+                takeWhile(() => !!payloadToAuditLogMatchFilter),
+                toArray(),
+                filter(processors => processors.length > 0),
+                wrapToAuditLogListener(this.logger),
+                mergeMap(listener =>
+                  from(payloadToAuditLogMatchFilter?.(...payload) ?? EMPTY).pipe(
+                    filterNullOrUndefined(),
+                    map(matchFilter =>
+                      this.auditLogMatcher.requestMatch(guild, listener, matchFilter)
+                    )
                   )
                 )
               )
             )
           )
         )
-    );
+      )
+      .subscribe();
+  }
+
+  listenToGlobalEvent<TEventName extends MegalogSupportedClientEvent>(
+    eventName: TEventName,
+    relevanceFilter: GlobalEventGuildRelevanceFilter<TEventName>
+  ): void {
+    const eventTypes = this.eventTypeManager.getClientListeners(eventName);
+    if (eventTypes.length === 0) return;
+    fromClientEvent(this.client, eventName)
+      .pipe(
+        concatMap(payload =>
+          from(eventTypes).pipe(
+            filter(type => this.channelManager.hasChannels(type)),
+            withChannelProcessor(this.logger, payload),
+            concatMap(({type, channelProcessor}) =>
+              from(this.channelManager.getChannels(type) ?? EMPTY).pipe(
+                concatMap(channel =>
+                  from(relevanceFilter(channel.guild, ...payload)).pipe(
+                    takeWhile(relevant => relevant),
+                    map(() => channel)
+                  )
+                ),
+                processChannel(this.logger, channelProcessor)
+              )
+            )
+          )
+        )
+      )
+      .subscribe();
   }
 }

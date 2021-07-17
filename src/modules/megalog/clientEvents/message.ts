@@ -15,7 +15,7 @@ export type AuditLogSupportedMessageClientEvent = Extract<
 export function registerMessageClientEventListeners(utils: MegalogClientEventUtils): void {
   utils.listenToGuildEvent('message', async message => message.guild ?? undefined);
 
-  utils.listenToGuildEventWithAuditLog(
+  utils.listenToGuildEvent(
     'messageDelete',
     async message => message.guild ?? undefined,
     async message => {
@@ -34,7 +34,7 @@ export function registerMessageClientEventListeners(utils: MegalogClientEventUti
     }
   );
 
-  utils.listenToGuildEventWithAuditLog(
+  utils.listenToGuildEvent(
     'messageDeleteBulk',
     async messages => messages.first()?.guild ?? undefined,
     async messages => {

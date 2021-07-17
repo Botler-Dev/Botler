@@ -13,7 +13,7 @@ export type AuditLogSupportedVoiceClientEvent = Extract<
 >;
 
 export function registerVoiceClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEventWithAuditLog(
+  utils.listenToGuildEvent(
     'voiceStateUpdate',
     async state => state.guild,
     async (oldState, newState) => ({

@@ -63,6 +63,11 @@ export class MegalogEventTypeManager {
     return typeof resolvable === 'string' ? resolvable : resolvable.name;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  resolveName(resolvable: MegalogEventTypeResolvable): MegalogEventTypeName {
+    return MegalogEventTypeManager.resolveName(resolvable);
+  }
+
   resolveCheckedName(resolvable: MegalogEventTypeResolvable): MegalogEventTypeName {
     const eventName = MegalogEventTypeManager.resolveName(resolvable);
     this.checkEventTypeName(eventName);
