@@ -43,6 +43,11 @@ import {
   MegalogSupportedRoleClientEvent,
   registerRoleClientEventListeners,
 } from './role';
+import {
+  AuditLogSupportedUserClientEvent,
+  MegalogSupportedUserClientEvent,
+  registerUserClientEventListeners,
+} from './user';
 import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
 import {
   AuditLogSupportedVoiceClientEvent,
@@ -59,7 +64,8 @@ export type MegalogSupportedClientEvent =
   | MegalogSupportedGuildClientEvent
   | MegalogSupportedRoleClientEvent
   | MegalogSupportedVoiceClientEvent
-  | MegalogSupportedReactionClientEvent;
+  | MegalogSupportedReactionClientEvent
+  | MegalogSupportedUserClientEvent;
 
 export type AuditLogSupportedClientEvent =
   | AuditLogSupportedMessageClientEvent
@@ -70,7 +76,8 @@ export type AuditLogSupportedClientEvent =
   | AuditLogSupportedGuildClientEvent
   | AuditLogSupportedRoleClientEvent
   | AuditLogSupportedVoiceClientEvent
-  | AuditLogSupportedReactionClientEvent;
+  | AuditLogSupportedReactionClientEvent
+  | AuditLogSupportedUserClientEvent;
 
 export function registerClientEventListeners(
   client: Client,
@@ -95,4 +102,5 @@ export function registerClientEventListeners(
   registerRoleClientEventListeners(utils);
   registerVoiceClientEventListeners(utils);
   registerReactionClientEventListeners(utils);
+  registerUserClientEventListeners(utils);
 }
