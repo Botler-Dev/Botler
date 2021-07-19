@@ -35,6 +35,11 @@ export class MegalogEventTypeManager {
       throw new Error(
         `Tried to register a MegalogEventType with an already existing name "${event.name}".`
       );
+    if (!/^[\da-z-]+$/.test(event.name))
+      throw new Error(
+        `The MegalogEventType name "${event.name}" is invalid. \
+Can only contain digits, dashes, and lowercase latin letters.`
+      );
     this._eventTypes.set(event.name, event);
 
     const category = this._eventCategories.get(event.category) ?? [];
