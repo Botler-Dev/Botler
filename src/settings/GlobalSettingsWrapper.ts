@@ -87,7 +87,7 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSetti
     return this.masterUserIds.includes(id);
   }
 
-  getColor(type?: ColorType): number {
+  getColor(type: ColorType): number {
     switch (type) {
       default:
       case ColorType.Default:
