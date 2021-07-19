@@ -7,6 +7,10 @@ export type MegalogEventCategoryName = string;
 
 export type MegalogEventTypeResolvable = MegalogEventTypeName | MegalogEventType;
 
+export type MegalogClientEventProcessor<TClientEventName extends MegalogSupportedClientEvent> = (
+  ...args: ExportProxyClientEvents[TClientEventName]
+) => Promise<undefined | MegalogChannelProcessor<TClientEventName>>;
+
 export type MegalogChannelProcessor<TClientEventName extends MegalogSupportedClientEvent> = (
   channel: TextChannel
 ) => Promise<
@@ -29,7 +33,5 @@ export interface MegalogEventType<
 
   readonly clientEventName: TClientEventName;
 
-  readonly processClientEvent: (
-    ...args: ExportProxyClientEvents[TClientEventName]
-  ) => Promise<undefined | MegalogChannelProcessor<TClientEventName>>;
+  readonly processClientEvent: MegalogClientEventProcessor<TClientEventName>;
 }
