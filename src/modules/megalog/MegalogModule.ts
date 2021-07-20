@@ -9,6 +9,7 @@ import {AuditLogMatcher} from './auditLog/AuditLogMatcher';
 import {registerClientEventListeners} from './clientEvents';
 import {MegalogEventTypeManager} from './eventType/MegalogEventTypeManager';
 import {attachmentSendEventType} from './eventTypes/message/attachmentSendEventType';
+import {messageEditEventType} from './eventTypes/message/messageEditEventType';
 import {MegalogChannelManager} from './MegalogChannelManager';
 import {MegalogSettingsManager} from './settings/MegalogSettingsManager';
 import {MegalogSettingsWrapper} from './settings/MegalogSettingsWrapper';
@@ -74,6 +75,7 @@ export class MegalogModule extends Module {
 
   async initialize(): Promise<void> {
     this.eventTypeManager.registerEventType(attachmentSendEventType(this.globalSettings));
+    this.eventTypeManager.registerEventType(messageEditEventType(this.globalSettings));
   }
 
   async postInitialize(): Promise<void> {
