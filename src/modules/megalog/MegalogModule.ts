@@ -1,3 +1,4 @@
+import {GlobalSettingsWrapper} from '@/settings';
 import {StaticImplements} from '@/utils/StaticImplements';
 import {Client} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
@@ -7,6 +8,7 @@ import {ModuleConstructor} from '../ModuleConstructor';
 import {AuditLogMatcher} from './auditLog/AuditLogMatcher';
 import {registerClientEventListeners} from './clientEvents';
 import {MegalogEventTypeManager} from './eventType/MegalogEventTypeManager';
+import {attachmentSendEventType} from './eventTypes/message/attachmentSendEventType';
 import {MegalogChannelManager} from './MegalogChannelManager';
 import {MegalogSettingsManager} from './settings/MegalogSettingsManager';
 import {MegalogSettingsWrapper} from './settings/MegalogSettingsWrapper';
@@ -41,7 +43,13 @@ export class MegalogModule extends Module {
 
   private readonly client: Client;
 
-  constructor(moduleContainer: DependencyContainer, client = moduleContainer.resolve(Client)) {
+  private readonly globalSettings: GlobalSettingsWrapper;
+
+  constructor(
+    moduleContainer: DependencyContainer,
+    client = moduleContainer.resolve(Client),
+    globalSettings = moduleContainer.resolve(GlobalSettingsWrapper)
+  ) {
     super(moduleContainer);
 
     this.container.registerSingleton(MegalogEventTypeManager);
@@ -51,6 +59,7 @@ export class MegalogModule extends Module {
     this.settingsManager = this.container.resolve(MegalogSettingsManager);
 
     this.client = client;
+    this.globalSettings = globalSettings;
   }
 
   async preInitialize(): Promise<void> {
@@ -61,6 +70,10 @@ export class MegalogModule extends Module {
     this._auditLogMatcher = this.container.resolve(AuditLogMatcher);
     this._channelManager = this.container.resolve(MegalogChannelManager);
     await this._channelManager.initialize();
+  }
+
+  async initialize(): Promise<void> {
+    this.eventTypeManager.registerEventType(attachmentSendEventType(this.globalSettings));
   }
 
   async postInitialize(): Promise<void> {
