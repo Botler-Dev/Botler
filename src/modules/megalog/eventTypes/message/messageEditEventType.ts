@@ -8,6 +8,7 @@ import {
   MessageEmbedThumbnail,
   MessageEmbedVideo,
   PartialMessage,
+  Webhook,
 } from 'discord.js';
 import {MessageMegalogEventCategoryName} from '.';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
@@ -114,25 +115,32 @@ export function messageEditEventType(
     processClientEvent: async (oldMessage, newMessage) => {
       if (oldMessage.editedTimestamp === newMessage.editedTimestamp) return undefined;
       return async channel => {
-        const message = await newMessage.fetch();
         const embed = new MessageEmbed()
           .setColor(globalSettings.getColor(ColorType.Default))
           .setTimestamp(newMessage.editedTimestamp ?? 0)
           .setFooter(`Message ID: ${newMessage.id} | ${messageEditEventTypeName}`);
 
-        if (!oldMessage.webhookID) {
-          embed.setAuthor(message.author.tag, message.author.displayAvatarURL());
+        let message = newMessage;
+        if (!message.author) message = await newMessage.fetch().catch(() => message);
+
+        if (message.author) embed.setAuthor(message.author.tag, message.author.displayAvatarURL());
+        else embed.setAuthor('Unknown', 'https://cdn.discordapp.com/embed/avatars/0.png');
+
+        if (message.webhookID) {
+          const webhook: Webhook | undefined = await message.fetchWebhook().catch(() => undefined);
+
+          embed.setDescription(
+            `**${
+              webhook ? `The webhook** \`${webhook.name}\`**` : 'A webhook'
+            } edited a message in ${message.channel}.** [Jump to Message](${message.url})`
+          );
+        } else if (message.author) {
           embed.setDescription(
             `**${message.author} edited a message in ${message.channel}.** [Jump to Message](${message.url})`
           );
         } else {
-          const webhook = await message.fetchWebhook();
-          embed.setAuthor(
-            webhook.name,
-            webhook.avatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png'
-          );
           embed.setDescription(
-            `**A message was edited using the webhook ${webhook.name} in ${message.channel}.** [Jump to Message](${message.url})`
+            `**A message in ${message.channel} was edited.** [Jump to Message](${message.url})`
           );
         }
 
