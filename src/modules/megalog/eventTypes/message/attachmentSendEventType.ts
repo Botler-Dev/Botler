@@ -14,11 +14,13 @@ const MAX_UPLOAD_SIZE = [
   100 * MEBI_BYTE - MESSAGE_REQUEST_OVERHEAD_SIZE,
 ] as const;
 
+const attachmentSendEventTypeName = 'attachment-send';
+
 export function attachmentSendEventType(
   globalSettings: GlobalSettingsWrapper
 ): MegalogEventType<'message'> {
   return {
-    name: 'attachment-send',
+    name: attachmentSendEventTypeName,
     description:
       'When someone sends a message with attachments those attachments get logged. This can be combined with the `message-delete-` events to see attachments of deleted messages.',
     category: MessageMegalogEventCategoryName,
@@ -44,7 +46,7 @@ export function attachmentSendEventType(
           )
           .setColor(globalSettings.getColor(ColorType.Default))
           .setTimestamp(message.createdAt)
-          .setFooter(`Message ID: ${message.id}`);
+          .setFooter(`Message ID: ${message.id} | ${attachmentSendEventTypeName}`);
         if (unsendableAttachments.size > 0)
           embed.addField(
             `Omitted oversized attachments [${unsendableAttachments.size}]`,

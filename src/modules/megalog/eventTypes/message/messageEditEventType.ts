@@ -99,11 +99,13 @@ function condenseMessage(message: Message) {
   };
 }
 
+const messageEditEventTypeName = 'message-edit';
+
 export function messageEditEventType(
   globalSettings: GlobalSettingsWrapper
 ): MegalogEventType<'messageUpdate'> {
   return {
-    name: 'message-edit',
+    name: messageEditEventTypeName,
     description: 'Logs message edits including embed and attachment edits.',
     category: MessageMegalogEventCategoryName,
     clientEventName: 'messageUpdate',
@@ -114,7 +116,7 @@ export function messageEditEventType(
         const embed = new MessageEmbed()
           .setColor(globalSettings.getColor(ColorType.Default))
           .setTimestamp(newMessage.editedTimestamp ?? 0)
-          .setFooter(`Message ID: ${newMessage.id}`);
+          .setFooter(`Message ID: ${newMessage.id} | ${messageEditEventTypeName}`);
 
         if (!oldMessage.webhookID) {
           embed.setAuthor(message.author.tag, message.author.displayAvatarURL());
