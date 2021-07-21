@@ -1,106 +1,11 @@
 /* eslint-disable unicorn/no-null */
 import {ColorType, GlobalSettingsWrapper} from '@/settings';
-import dayjs from 'dayjs';
-import {
-  Message,
-  MessageEmbed,
-  MessageEmbedImage,
-  MessageEmbedThumbnail,
-  MessageEmbedVideo,
-  PartialMessage,
-  Webhook,
-} from 'discord.js';
+import {MessageEmbed} from 'discord.js';
 import {MessageMegalogEventCategoryName} from '.';
+import {condenseMessageEdit} from '../../condensers/condenseMessageEdit';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
-
-const EMBED_FIELD_MAX_LENGTH = 1024;
-
-function addContentField(embed: MessageEmbed, before: boolean, content: null | string): void {
-  const length = content?.length ?? 0;
-  embed.addField(
-    `Text ${before ? 'before' : 'after'}${
-      length > EMBED_FIELD_MAX_LENGTH
-        ? ` (truncated to ${EMBED_FIELD_MAX_LENGTH} from ${length} characters)`
-        : ''
-    }`,
-    (content?.slice(0, EMBED_FIELD_MAX_LENGTH) ?? '*Unknown content*') || '*No content*'
-  );
-}
-
-function condenseMedia(
-  media: MessageEmbedImage | MessageEmbedThumbnail | MessageEmbedVideo | null
-) {
-  if (!media) return undefined;
-  return {
-    url: media.url ?? undefined,
-    proxy_url: media.proxyURL ?? undefined,
-    height: media.height ?? undefined,
-    width: media.width ?? undefined,
-  };
-}
-
-function condenseMessage(message: Message | PartialMessage) {
-  if (message.partial) return null;
-  return {
-    content: message.content,
-    embeds:
-      message.embeds.length === 0
-        ? undefined
-        : message.embeds
-            .filter(embed => embed.type === 'rich')
-            .map(embed => ({
-              title: embed.title ?? undefined,
-              description: embed.description ?? undefined,
-              url: embed.url ?? undefined,
-              timestamp:
-                embed.timestamp === null ? undefined : dayjs(embed.timestamp).toISOString(),
-              color: embed.color ?? undefined,
-              footer: !embed.footer
-                ? undefined
-                : {
-                    text: embed.footer.text,
-                    icon_url: embed.footer.iconURL,
-                    proxy_icon_url: embed.footer.proxyIconURL,
-                  },
-              image: condenseMedia(embed.image),
-              thumbnail: condenseMedia(embed.thumbnail),
-              video: condenseMedia(embed.video),
-              provider: !embed.provider
-                ? undefined
-                : {
-                    name: embed.provider.name,
-                    url: embed.provider.url,
-                  },
-              author: !embed.author
-                ? undefined
-                : {
-                    name: embed.author.name,
-                    url: embed.author.url,
-                    icon_url: embed.author.iconURL,
-                    proxy_icon_url: embed.author.proxyIconURL,
-                  },
-              fields:
-                embed.fields.length === 0
-                  ? undefined
-                  : embed.fields.map(field => ({
-                      name: field.name,
-                      value: field.value,
-                      inline: field.inline,
-                    })),
-            })),
-    attachments:
-      message.attachments.size === 0
-        ? undefined
-        : message.attachments.map(attachment => ({
-            id: attachment.id,
-            filename: attachment.name ?? undefined,
-            url: attachment.url,
-            proxy_url: attachment.proxyURL,
-            height: attachment.height ?? undefined,
-            width: attachment.width ?? undefined,
-          })),
-  };
-}
+import {jsonToBuffer} from '../../utils/jsonToBuffer';
+import {addContentField} from './addContentField';
 
 const messageEditEventTypeName = 'message-edit';
 
@@ -127,11 +32,11 @@ export function messageEditEventType(
         else embed.setAuthor('Unknown', 'https://cdn.discordapp.com/embed/avatars/0.png');
 
         if (message.webhookID) {
-          const webhook: Webhook | undefined = await message.fetchWebhook().catch(() => undefined);
+          const webhook = await message.fetchWebhook().catch(() => undefined);
 
           embed.setDescription(
             `**${
-              webhook ? `The webhook** \`${webhook.name}\`**` : 'A webhook'
+              webhook ? `The webhook **\`${webhook.name}\`**` : 'A webhook'
             } edited a message in ${message.channel}.** [Jump to Message](${message.url})`
           );
         } else if (message.author) {
@@ -145,23 +50,14 @@ export function messageEditEventType(
         }
 
         if (oldMessage.content !== newMessage.content) {
-          addContentField(embed, true, oldMessage.content);
-          addContentField(embed, false, newMessage.content);
+          addContentField(embed, 'Text before', oldMessage.content);
+          addContentField(embed, 'Text after', newMessage.content);
         }
 
-        const json = JSON.stringify(
-          {
-            message_id: oldMessage.id,
-            edit_timestamp: newMessage.editedTimestamp,
-            before: condenseMessage(oldMessage),
-            after: condenseMessage(newMessage),
-          },
-          undefined,
-          2
-        );
+        const json = jsonToBuffer(condenseMessageEdit(oldMessage, newMessage));
         await channel.send({
           embed,
-          files: [{attachment: Buffer.from(json, 'utf8'), name: 'message-edit-json'}],
+          files: [{attachment: json, name: 'message-edit-json'}],
         });
       };
     },
