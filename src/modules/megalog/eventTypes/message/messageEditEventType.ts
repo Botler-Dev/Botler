@@ -7,6 +7,7 @@ import {
   MessageEmbedImage,
   MessageEmbedThumbnail,
   MessageEmbedVideo,
+  PartialMessage,
 } from 'discord.js';
 import {MessageMegalogEventCategoryName} from '.';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
@@ -37,7 +38,8 @@ function condenseMedia(
   };
 }
 
-function condenseMessage(message: Message) {
+function condenseMessage(message: Message | PartialMessage) {
+  if (message.partial) return null;
   return {
     content: message.content,
     embeds:
@@ -139,10 +141,6 @@ export function messageEditEventType(
           addContentField(embed, false, newMessage.content);
         }
 
-        if (oldMessage.partial || newMessage.partial) {
-          await channel.send(embed);
-          return;
-        }
         const json = JSON.stringify(
           {
             message_id: oldMessage.id,
