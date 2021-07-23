@@ -4,7 +4,7 @@ import {tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
 import {Logger} from '@/logger';
 import {resolveIdChecked} from '@/utils/resolve';
-import {filterNullOrUndefined} from '@/utils/filterNullOrUndefined';
+import {filterNullAndUndefined} from '@/utils/filterNullAndUndefined';
 import type {GlobalSettingsManager} from './GlobalSettingsManager';
 import {SyncStream, SynchronizedEntityWrapper} from '../database';
 
@@ -72,7 +72,7 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSetti
           logger.info(`Current GlobalSettings entry was deleted.`);
           manager.refetch();
         }),
-        filterNullOrUndefined()
+        filterNullAndUndefined()
       ),
       entity
     );

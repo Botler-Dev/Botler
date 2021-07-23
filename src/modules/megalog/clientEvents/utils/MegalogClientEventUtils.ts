@@ -1,5 +1,5 @@
 import {Logger} from '@/logger';
-import {filterNullOrUndefined} from '@/utils/filterNullOrUndefined';
+import {filterNullAndUndefined} from '@/utils/filterNullAndUndefined';
 import {Client, ExportProxyClientEvents, Guild} from 'discord.js';
 import {EMPTY, from, of} from 'rxjs';
 import {concatMap, filter, map, mergeMap, takeWhile, toArray} from 'rxjs/operators';
@@ -69,13 +69,13 @@ export class MegalogClientEventUtils {
       .pipe(
         concatMap(payload =>
           from(payloadToGuild(...payload)).pipe(
-            filterNullOrUndefined(),
+            filterNullAndUndefined(),
             mergeMap(guild =>
               from(eventTypes).pipe(
                 withChannelProcessor(this.logger, payload),
                 concatMap(({type, channelProcessor}) =>
                   of(this.channelManager.getChannel(type, guild)).pipe(
-                    filterNullOrUndefined(),
+                    filterNullAndUndefined(),
                     processChannel(this.logger, channelProcessor)
                   )
                 ),
@@ -85,7 +85,7 @@ export class MegalogClientEventUtils {
                 wrapToAuditLogListener(this.logger),
                 mergeMap(listener =>
                   from(payloadToAuditLogMatchFilter?.(...payload) ?? EMPTY).pipe(
-                    filterNullOrUndefined(),
+                    filterNullAndUndefined(),
                     map(matchFilter =>
                       this.auditLogMatcher.requestMatch(guild, listener, matchFilter)
                     )

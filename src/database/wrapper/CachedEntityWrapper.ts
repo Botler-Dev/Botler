@@ -23,6 +23,9 @@ export abstract class CachedEntityWrapper<
     );
   }
 
+  /**
+   * Remove this wrapper from the cache.
+   */
   decache(): void {
     this.isCachedSubject.next(false);
   }

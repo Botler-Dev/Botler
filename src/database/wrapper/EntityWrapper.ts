@@ -13,6 +13,9 @@ export abstract class EntityWrapper<TEntityState extends Entity | undefined> {
     return this.createDefaultEntity();
   }
 
+  /**
+   * Creates a default entity which is used by {@link EntityWrapper.defaultedEntity}.
+   */
   protected createDefaultEntity?(): Exclude<TEntityState, undefined>;
 
   /**
