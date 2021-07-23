@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/no-null */
 import {ColorType, GlobalSettingsWrapper} from '@/settings';
 import {MessageEmbed} from 'discord.js';
-import {MessageMegalogEventCategoryName} from '.';
+import {messageMegalogEventCategoryName} from '.';
 import {condenseMessageEdit} from '../../condensers/condenseMessageEdit';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
@@ -15,7 +15,7 @@ export function messageEditEventType(
   return {
     name: messageEditEventTypeName,
     description: 'Logs message edits including embed and attachment edits.',
-    category: MessageMegalogEventCategoryName,
+    category: messageMegalogEventCategoryName,
     clientEventName: 'messageUpdate',
     processClientEvent: async (oldMessage, newMessage) => {
       if (oldMessage.editedTimestamp === newMessage.editedTimestamp) return undefined;

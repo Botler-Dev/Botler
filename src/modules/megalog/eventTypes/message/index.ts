@@ -1,1 +1,1 @@
-export const MessageMegalogEventCategoryName = 'message';
+export const messageMegalogEventCategoryName = 'message';

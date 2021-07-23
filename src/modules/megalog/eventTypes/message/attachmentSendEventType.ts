@@ -1,6 +1,6 @@
 import {ColorType, GlobalSettingsWrapper} from '@/settings';
 import {Collection, Guild, MessageAttachment, MessageEmbed, Snowflake} from 'discord.js';
-import {MessageMegalogEventCategoryName} from '.';
+import {messageMegalogEventCategoryName} from '.';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
 import {MegalogChannelManager} from '../../MegalogChannelManager';
 import {partitionAttachments} from './utils/partitionAttachments';
@@ -18,7 +18,7 @@ export function attachmentSendEventType(
     name: attachmentSendEventTypeName,
     description:
       'When someone sends a message with attachments those attachments get logged. This can be combined with the `message-delete-*` events to see attachments of deleted messages.',
-    category: MessageMegalogEventCategoryName,
+    category: messageMegalogEventCategoryName,
     clientEventName: 'message',
     processClientEvent: async message => {
       if (message.attachments.size === 0) return undefined;

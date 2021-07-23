@@ -1,7 +1,7 @@
 import {ColorType, GlobalSettingsWrapper} from '@/settings';
 import dayjs from 'dayjs';
 import {MessageEmbed} from 'discord.js';
-import {MessageMegalogEventCategoryName} from '.';
+import {messageMegalogEventCategoryName} from '.';
 import {condenseSingleMessageDeletion} from '../../condensers/condenseSingleMessageDeletion';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
 import {MegalogChannelManager} from '../../MegalogChannelManager';
@@ -20,7 +20,7 @@ export function messageDeleteSingleEventType(
   return {
     name: messageDeleteSingleEventTypeName,
     description: `Logs deletions of single messages. Can use \`${attachmentSendEventType.name}\` log messages to recover attachments of deleted messages.`,
-    category: MessageMegalogEventCategoryName,
+    category: messageMegalogEventCategoryName,
     clientEventName: 'messageDelete',
     processClientEvent: async message => async channel => {
       // Don't log deletions of message-delete-single log messages
