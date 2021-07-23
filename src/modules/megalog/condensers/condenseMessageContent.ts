@@ -1,4 +1,5 @@
 import {Message, PartialMessage} from 'discord.js';
+import {CachedAttachments} from '../eventTypes/message/attachmentSendEventType';
 import {condenseAttachment, CondensedAttachment} from './condenseAttachment';
 import {CondensedEmbed, condenseEmbed} from './condenseEmbed';
 
@@ -9,7 +10,10 @@ export interface CondensedMessageContent {
   attachments?: CondensedAttachment[];
 }
 
-export function condenseMessageContent(message: Message | PartialMessage): CondensedMessageContent {
+export function condenseMessageContent(
+  message: Message | PartialMessage,
+  cachedAttachments?: CachedAttachments
+): CondensedMessageContent {
   return {
     partial: message.partial,
     content: message.content ?? undefined,
@@ -20,6 +24,11 @@ export function condenseMessageContent(message: Message | PartialMessage): Conde
     attachments:
       message.attachments.size === 0
         ? undefined
-        : message.attachments.map(attachment => condenseAttachment(attachment)),
+        : message.attachments.map(attachment =>
+            condenseAttachment(
+              attachment,
+              !attachment.name ? undefined : cachedAttachments?.get(attachment.name)
+            )
+          ),
   };
 }

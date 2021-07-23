@@ -5,7 +5,7 @@ import {MessageMegalogEventCategoryName} from '.';
 import {condenseMessageEdit} from '../../condensers/condenseMessageEdit';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
-import {addContentField} from './addContentField';
+import {addContentField} from './utils/addContentField';
 
 const messageEditEventTypeName = 'message-edit';
 

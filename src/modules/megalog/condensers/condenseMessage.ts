@@ -1,4 +1,5 @@
 import {Message, PartialMessage} from 'discord.js';
+import {CachedAttachments} from '../eventTypes/message/attachmentSendEventType';
 import {CondensedMessageContent, condenseMessageContent} from './condenseMessageContent';
 import {CondensedReaction, condenseReaction} from './condenseReaction';
 
@@ -12,7 +13,10 @@ export interface CondensedMessage extends CondensedMessageContent {
   reactions?: CondensedReaction[];
 }
 
-export function condenseMessage(message: Message | PartialMessage): CondensedMessage {
+export function condenseMessage(
+  message: Message | PartialMessage,
+  cachedAttachments?: CachedAttachments
+): CondensedMessage {
   return {
     id: message.id,
     channel_id: message.channel.id,
@@ -24,6 +28,6 @@ export function condenseMessage(message: Message | PartialMessage): CondensedMes
       message.reactions.cache.size === 0
         ? undefined
         : message.reactions.cache.map(reaction => condenseReaction(reaction)),
-    ...condenseMessageContent(message),
+    ...condenseMessageContent(message, cachedAttachments),
   };
 }

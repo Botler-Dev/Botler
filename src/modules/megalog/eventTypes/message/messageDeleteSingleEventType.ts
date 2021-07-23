@@ -4,17 +4,22 @@ import {MessageEmbed} from 'discord.js';
 import {MessageMegalogEventCategoryName} from '.';
 import {condenseSingleMessageDeletion} from '../../condensers/condenseSingleMessageDeletion';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
+import {MegalogChannelManager} from '../../MegalogChannelManager';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
-import {addContentField} from './addContentField';
+import {attachmentSendEventType, getCachedAttachments} from './attachmentSendEventType';
+import {addContentField} from './utils/addContentField';
+import {partitionAttachments} from './utils/partitionAttachments';
+import {toDiscordMegaByteString} from './utils/toDiscordMegaByteString';
 
 const messageDeleteSingleEventTypeName = 'message-delete-single';
 
 export function messageDeleteSingleEventType(
-  globalSettings: GlobalSettingsWrapper
+  globalSettings: GlobalSettingsWrapper,
+  channelManager: MegalogChannelManager
 ): MegalogEventType<'messageDelete'> {
   return {
     name: messageDeleteSingleEventTypeName,
-    description: 'Logs deletions of single messages. Ignores bulk deletions.',
+    description: `Logs deletions of single messages. Can use \`${attachmentSendEventType.name}\` log messages to recover attachments of deleted messages.`,
     category: MessageMegalogEventCategoryName,
     clientEventName: 'messageDelete',
     processClientEvent: async message => async channel => {
@@ -48,12 +53,50 @@ export function messageDeleteSingleEventType(
       }
       embed.setDescription(`**${innerDescription}.**`);
 
-      // TODO: add cached attachment logic
+      const cachedAttachments =
+        message.attachments.size === 0
+          ? undefined
+          : await getCachedAttachments(channelManager, channel.guild, message.id);
+      const condensed = condenseSingleMessageDeletion(
+        message,
+        cachedAttachments,
+        dayjs().valueOf()
+      );
+      const condensedBuffer = jsonToBuffer(condensed);
+      const partitions = cachedAttachments
+        ? partitionAttachments(
+            cachedAttachments.array(),
+            channel.guild.premiumTier,
+            condensedBuffer.byteLength
+          )
+        : undefined;
 
-      const json = jsonToBuffer(condenseSingleMessageDeletion(message, dayjs().valueOf()));
+      if (message.attachments.size > 0) {
+        embed.addField(
+          `Attachments [${message.attachments.size}]`,
+          message.attachments
+            .map(attachment => {
+              const cached = !attachment.name ? undefined : cachedAttachments?.get(attachment.name);
+              const attached = !cached
+                ? false
+                : !!partitions?.sendable.find(
+                    sendableAttachment => (sendableAttachment.name ?? '') === attachment.name
+                  );
+              return `[${attachment.name}](${
+                cached?.url ?? attachment.url
+              }) - ${toDiscordMegaByteString(attachment.size)} - ${
+                cached ? (attached ? 'attached' : `cached`) : `original`
+              }`;
+            })
+            .join('\n')
+        );
+      }
       const logMessage = await channel.send({
         embed,
-        files: [{attachment: json, name: 'single-message-deletion-json'}],
+        files: [
+          ...(partitions?.sendable ?? []),
+          {attachment: condensedBuffer, name: 'single-message-deletion-json'},
+        ],
       });
       return async auditEntry => {
         embed.setDescription(`**${innerDescription} probably by ${auditEntry.executor}.**`);

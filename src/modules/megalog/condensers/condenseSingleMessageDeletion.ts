@@ -1,4 +1,5 @@
 import {Message, PartialMessage} from 'discord.js';
+import {CachedAttachments} from '../eventTypes/message/attachmentSendEventType';
 import {CondensedMessage, condenseMessage} from './condenseMessage';
 
 export interface CondensedSingleMessageDeletion extends CondensedMessage {
@@ -7,10 +8,11 @@ export interface CondensedSingleMessageDeletion extends CondensedMessage {
 
 export function condenseSingleMessageDeletion(
   message: Message | PartialMessage,
+  cachedAttachments: CachedAttachments | undefined,
   deletedTimestamp: number
 ): CondensedSingleMessageDeletion {
   return {
     deleted_timestamp: deletedTimestamp,
-    ...condenseMessage(message),
+    ...condenseMessage(message, cachedAttachments),
   };
 }
