@@ -1,5 +1,4 @@
 import {Logger, MasterLogger} from '@/logger';
-import {Duration} from 'dayjs/plugin/duration';
 import {Guild, GuildAuditLogsAction, GuildAuditLogsEntry, Snowflake} from 'discord.js';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
@@ -37,10 +36,10 @@ export class AuditLogMatcher {
       .subscribe(interval => this.updateInterval(interval));
   }
 
-  private updateInterval(interval: Duration) {
+  private updateInterval(intervalMilliseconds: number) {
     if (this.interval) clearInterval(this.interval);
-    this.logger.info(`Set try-matching interval to ${interval.asMilliseconds()}ms.`);
-    this.interval = setInterval(() => this.tryMatching(), interval.asMilliseconds());
+    this.logger.info(`Set try-matching interval to ${intervalMilliseconds}ms.`);
+    this.interval = setInterval(() => this.tryMatching(), intervalMilliseconds);
   }
 
   private getGuildQueue(guild: Guild): AuditLogMatchQueue {

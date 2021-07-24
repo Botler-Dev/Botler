@@ -1,7 +1,5 @@
 import {SynchronizedEntityWrapper} from '@/database';
 import {MegalogSettings} from '@prisma/client';
-import dayjs from 'dayjs';
-import {Duration} from 'dayjs/plugin/duration';
 
 /**
  * {@link SynchronizedEntityWrapper} for the {@link MegalogSettings}.
@@ -16,10 +14,10 @@ export class MegalogSettingsWrapper extends SynchronizedEntityWrapper<MegalogSet
   }
 
   /**
-   * Interval in which the {@link AuditLogMatcher} tries to match audit log entries.
+   * Interval in milliseconds in which the {@link AuditLogMatcher} tries to match audit log entries.
    */
-  get auditLogMatchTryInterval(): Duration {
-    return dayjs.duration(this.entity?.auditLogMatchTryInterval ?? 1000);
+  get auditLogMatchTryInterval(): number {
+    return this.entity?.auditLogMatchTryInterval ?? 1000;
   }
 
   /**
