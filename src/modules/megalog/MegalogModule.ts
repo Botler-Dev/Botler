@@ -15,6 +15,10 @@ import {MegalogChannelManager} from './MegalogChannelManager';
 import {MegalogSettingsManager} from './settings/MegalogSettingsManager';
 import {MegalogSettingsWrapper} from './settings/MegalogSettingsWrapper';
 
+/**
+ * Module that logs nearly all Discord events to text channels.
+ * It already covers most events but you can dynamically add more custom event types via {@link MegalogModule.eventTypeManager}.
+ */
 @StaticImplements<ModuleConstructor>()
 export class MegalogModule extends Module {
   static readonly moduleName = 'megalog';

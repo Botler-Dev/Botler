@@ -16,10 +16,13 @@ type EventChannels = Collection<Snowflake, Snowflake>;
 
 type DeletedMegalogLogChannel = Pick<MegalogLogChannel, 'eventName' | 'guildId'>;
 
+/**
+ * Singleton class that manages and caches all megalog subscriptions.
+ */
 @injectable()
 export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLogChannel']> {
   /**
-   * Maps {@link MegalogEventName} to all guilds that have a log channel set for that event.
+   * Maps {@link MegalogEventTypeName} to all guilds that have a log channel set for that event.
    */
   private readonly cache = new Map<MegalogEventTypeName, EventChannels>();
 
@@ -80,6 +83,9 @@ export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLog
     this.cache.get(eventName)?.delete(guildId);
   }
 
+  /**
+   * Create or reassign a guild subscription.
+   */
   async assignLogChannel(
     eventType: MegalogEventTypeResolvable,
     channel: TextChannel
@@ -104,6 +110,9 @@ export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLog
     this.updateCacheEntry(eventName, channel.guild.id, channel.id);
   }
 
+  /**
+   * Delete a guild subscription if it exists.
+   */
   async unassignLogChannel(
     eventType: MegalogEventTypeResolvable,
     guildId: Snowflake
@@ -113,10 +122,16 @@ export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLog
     this.deleteCacheEntry(eventName, guildId);
   }
 
+  /**
+   * If a certain {@link MegalogEventType} has any subscriptions.
+   */
   hasChannels(eventType: MegalogEventTypeResolvable): boolean {
     return (this.cache.get(this.eventTypeManager.resolveName(eventType))?.size ?? 0) > 0;
   }
 
+  /**
+   * Get all {@link TextChannel}s that are subscribed to a certain {@link MegalogEventType}.
+   */
   getChannels(eventType: MegalogEventTypeResolvable): TextChannel[] | undefined {
     const eventName = this.eventTypeManager.resolveName(eventType);
     return this.cache
@@ -127,6 +142,9 @@ export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLog
       .filter((channel): channel is TextChannel => channel instanceof TextChannel);
   }
 
+  /**
+   * Get the {@link TextChannel} of a certain guild that is subscribed to a certain {@link MegalogEventType} if one exists.
+   */
   getChannel(eventType: MegalogEventTypeResolvable, guild: Guild): TextChannel | undefined {
     const eventName = this.eventTypeManager.resolveName(eventType);
     const channelId = this.cache.get(eventName)?.get(guild.id);
