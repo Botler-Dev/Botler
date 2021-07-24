@@ -11,6 +11,9 @@ import {concatMap, filter, tap} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
 import {MegalogSettingsWrapper} from './MegalogSettingsWrapper';
 
+/**
+ * Singleton that holds and synchronizes the {@link MegalogSettingsWrapper}.
+ */
 @injectable()
 export class MegalogSettingsManager extends ModelManager<PrismaClient['megalogSettings']> {
   private cache?: MegalogSettingsWrapper;
@@ -19,6 +22,9 @@ export class MegalogSettingsManager extends ModelManager<PrismaClient['megalogSe
 
   private readonly eventHub: DatabaseEventHub;
 
+  /**
+   * {@link MegalogSettingsManager.initialize} needs to be called after construction to start the functionality.
+   */
   constructor(prisma: PrismaClient, logger: Logger, eventHub: DatabaseEventHub) {
     super(prisma.megalogSettings);
     this.logger = logger;
@@ -64,10 +70,16 @@ export class MegalogSettingsManager extends ModelManager<PrismaClient['megalogSe
     );
   }
 
+  /**
+   * Gets the cached {@link MegalogSettingsWrapper} instance if it exists.
+   */
   getUnchecked(): MegalogSettingsWrapper | undefined {
     return this.cache;
   }
 
+  /**
+   * Gets the cached {@link MegalogSettingsWrapper} instance or throws an error if it is not cached.
+   */
   get(): MegalogSettingsWrapper {
     const wrapper = this.cache;
     if (!wrapper)
