@@ -8,16 +8,27 @@ import {
   MegalogEventTypeResolvable,
 } from './MegalogEventType';
 
+const isKebabCase = (text: string) => /^[\da-z-]+$/.test(text);
+
+/**
+ * Singleton that handles all {@link MegalogEventType}s and categories.
+ */
 @injectable()
 export class MegalogEventTypeManager {
   private readonly _eventTypes = new Map<MegalogEventTypeName, MegalogEventType>();
 
+  /**
+   * All registered {@link MegalogEventType}.
+   */
   get eventTypes(): ReadonlyMap<MegalogEventTypeName, MegalogEventType> {
     return this._eventTypes;
   }
 
   private readonly _eventCategories = new Map<MegalogEventCategoryName, MegalogEventType[]>();
 
+  /**
+   * All categories with the corresponding {@link MegalogEventType}s.
+   */
   get eventCategories(): ReadonlyMap<MegalogEventCategoryName, ReadonlyArray<MegalogEventType>> {
     return this._eventCategories;
   }
@@ -35,10 +46,13 @@ export class MegalogEventTypeManager {
       throw new Error(
         `Tried to register a MegalogEventType with an already existing name "${event.name}".`
       );
-    if (!/^[\da-z-]+$/.test(event.name))
+    if (!isKebabCase(event.name))
       throw new Error(
-        `The MegalogEventType name "${event.name}" is invalid. \
-Can only contain digits, dashes, and lowercase latin letters.`
+        `The MegalogEventType name "${event.name}" is invalid. Must be in kebab-case.`
+      );
+    if (!isKebabCase(event.category))
+      throw new Error(
+        `The MegalogEventType category name "${event.category}" is invalid. Must be in kebab-case.`
       );
     this._eventTypes.set(event.name, event);
 
@@ -53,12 +67,19 @@ Can only contain digits, dashes, and lowercase latin letters.`
     this.logger.info(`Registered event type "${event.name}".`);
   }
 
+  /**
+   * Get all {@link MegalogEventType}s that listen to a certain {@link MegalogSupportedClientEvent}.
+   */
   getClientListeners<TEventName extends MegalogSupportedClientEvent>(
     clientEventName: TEventName
   ): ReadonlyArray<MegalogEventType<TEventName>> {
     return (this.clientListeners.get(clientEventName) ?? []) as MegalogEventType<TEventName>[];
   }
 
+  /**
+   * Check if a {@link MegalogEventType} with the provided name is registered.
+   * Throw an error if not.
+   */
   checkEventTypeName(name: MegalogEventTypeName): void {
     if (!this.eventTypes.has(name))
       throw new Error(`No MegalogEventType has been registered with the name "${name}".`);
@@ -73,6 +94,9 @@ Can only contain digits, dashes, and lowercase latin letters.`
     return MegalogEventTypeManager.resolveName(resolvable);
   }
 
+  /**
+   * Like {@link MegalogEventTypeManager.resolveName} but passes the result through {@link MegalogEventTypeManager.checkEventTypeName}.
+   */
   resolveCheckedName(resolvable: MegalogEventTypeResolvable): MegalogEventTypeName {
     const eventName = MegalogEventTypeManager.resolveName(resolvable);
     this.checkEventTypeName(eventName);
