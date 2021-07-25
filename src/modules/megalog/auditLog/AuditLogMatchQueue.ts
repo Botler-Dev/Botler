@@ -20,6 +20,9 @@ interface CumulativeQueryCache {
   type?: keyof GuildAuditLogsActions;
 }
 
+/**
+ * Self managing {@link GuildAuditLogsEntry} queue for a specific guild with the actual matching logic.
+ */
 export class AuditLogMatchQueue {
   readonly guild: Guild;
 
@@ -31,6 +34,9 @@ export class AuditLogMatchQueue {
 
   private cumulativeQueryCache?: CumulativeQueryCache;
 
+  /**
+   * Number of requests in the queue.
+   */
   get length(): number {
     return this.entires.length;
   }
@@ -43,6 +49,9 @@ export class AuditLogMatchQueue {
     );
   }
 
+  /**
+   * Sets the {@link AuditLogMatchQueue.lastFetchedTimestamp} to the provided timestamp with a small time buffer.
+   */
   private updateLastFetchedTimestamp(fetchTimestamp: number): void {
     // Add a small time buffer to account for late arriving and late firing client events.
     this.lastFetchedTimestamp = fetchTimestamp - this.guild.client.ws.ping - 500;
@@ -62,6 +71,9 @@ export class AuditLogMatchQueue {
     this.cumulativeQueryCache = undefined;
   }
 
+  /**
+   * The query that includes all match filters in the queue.
+   */
   private getCumulativeQuery() {
     if (this.cumulativeQueryCache) return this.cumulativeQueryCache;
 
@@ -81,6 +93,9 @@ export class AuditLogMatchQueue {
     return cumulativeQuery;
   }
 
+  /**
+   * Fetches all new {@link GuildAuditLogsEntry}s after {@link AuditLogMatchQueue.lastFetchedTimestamp}
+   */
   private async fetchNewAuditLogEntries(user?: Snowflake, type?: GuildAuditLogsAction) {
     const fetchTimestamp = dayjs().valueOf();
 
@@ -115,6 +130,9 @@ export class AuditLogMatchQueue {
     );
   }
 
+  /**
+   * Try to match all requests in the queue.
+   */
   async tryMatch(): Promise<number | undefined> {
     if (this.entires.length === 0) return 0;
     const query = this.getCumulativeQuery();

@@ -5,16 +5,35 @@ import {injectable} from 'tsyringe';
 import {MegalogSettingsWrapper} from '../settings/MegalogSettingsWrapper';
 import {AuditLogMatchQueue} from './AuditLogMatchQueue';
 
+/**
+ * Match listener that is called once a matching {@link GuildAuditLogsEntry} is found.
+ */
 export type AuditLogMatchListener = (entry: GuildAuditLogsEntry) => void;
 
+/**
+ * Checker for if a {@link GuildAuditLogsEntry} is a match.
+ * {@link entry} will always match the rest of the {@link AuditLogMatchFilter} criteria.
+ */
 export type AuditLogMatchChecker = (entry: GuildAuditLogsEntry) => boolean;
 
+/**
+ * Match criteria for {@link AuditLogMatchFilter}.
+ */
 export interface AuditLogMatchFilter {
+  /**
+   * ID of user that executed the action.
+   */
   executor?: Snowflake;
+  /**
+   * Action that was executed.
+   */
   action?: GuildAuditLogsAction;
   checker?: AuditLogMatchChecker;
 }
 
+/**
+ * Singleton class that takes {@link GuildAuditLogsEntry} match requests and manages their resolution.
+ */
 @injectable()
 export class AuditLogMatcher {
   private readonly guildQueues = new Map<Snowflake, AuditLogMatchQueue>();
@@ -51,6 +70,10 @@ export class AuditLogMatcher {
     return guildQueue;
   }
 
+  /**
+   * Add a {@link GuildAuditLogsEntry} match request.
+   * Drops the request immediately if the bot does not have the `VIEW_AUDIT_LOG` permission in the guild.
+   */
   requestMatch(
     guild: Guild,
     listener: AuditLogMatchListener,
@@ -61,6 +84,9 @@ export class AuditLogMatcher {
     return true;
   }
 
+  /**
+   * Try to resolve all match requests.
+   */
   async tryMatching(): Promise<void> {
     const queues = [...this.guildQueues.values()].filter(queue => queue.length > 0);
     if (queues.length === 0) return;
