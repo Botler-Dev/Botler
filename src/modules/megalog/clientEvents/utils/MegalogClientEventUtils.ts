@@ -50,6 +50,9 @@ export class MegalogClientEventUtils {
     this.auditLogMatcher = auditLogMatcher;
   }
 
+  /**
+   * Listen to a {@link MegalogSupportedClientEvent} that is only relevant to a single guild.
+   */
   listenToGuildEvent<TEventName extends AuditLogSupportedClientEvent>(
     eventName: TEventName,
     payloadToGuild: PayloadToGuildResolver<TEventName>,
@@ -99,6 +102,9 @@ export class MegalogClientEventUtils {
       .subscribe();
   }
 
+  /**
+   * Listen to a {@link MegalogSupportedClientEvent} that is relevant to all guilds.
+   */
   listenToGlobalEvent<TEventName extends MegalogSupportedClientEvent>(
     eventName: TEventName,
     relevanceFilter: GlobalEventGuildRelevanceFilter<TEventName>

@@ -4,6 +4,9 @@ import {catchError, map, mergeMap} from 'rxjs/operators';
 import {AuditLogMatchListener} from '../../auditLog/AuditLogMatcher';
 import {MegalogAuditLogEntryProcessor} from '../../eventType/MegalogEventType';
 
+/**
+ * Wraps the array of incoming {@link MegalogAuditLogEntryProcessor} into an {@link AuditLogMatchListener}
+ */
 export function wrapToAuditLogListener(
   logger: Logger
 ): OperatorFunction<MegalogAuditLogEntryProcessor[], AuditLogMatchListener> {
