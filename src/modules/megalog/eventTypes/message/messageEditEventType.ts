@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/no-null */
 import {ColorType, GlobalSettingsWrapper} from '@/settings';
-import {MessageEmbed} from 'discord.js';
+import {Message, MessageEmbed, PartialMessage} from 'discord.js';
 import {messageMegalogEventCategoryName} from '.';
 import {condenseMessageEdit} from '../../condensers/condenseMessageEdit';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
@@ -8,6 +8,21 @@ import {jsonToBuffer} from '../../utils/jsonToBuffer';
 import {addContentField} from './utils/addContentField';
 
 const messageEditEventTypeName = 'message-edit';
+
+async function generateDescription(message: Message | PartialMessage) {
+  let innerDescription: string;
+  if (message.webhookID) {
+    const webhook = await message.fetchWebhook().catch(() => undefined);
+    innerDescription = `${
+      webhook ? `The webhook **\`${webhook.name}\`**` : 'A webhook'
+    } edited a message in ${message.channel}`;
+  } else if (message.author) {
+    innerDescription = `${message.author} edited a message in ${message.channel}`;
+  } else {
+    innerDescription = `A message in ${message.channel} was edited`;
+  }
+  return `**${innerDescription}.** [Jump to Message](${message.url})`;
+}
 
 export function messageEditEventType(
   globalSettings: GlobalSettingsWrapper
@@ -20,34 +35,18 @@ export function messageEditEventType(
     processClientEvent: async (oldMessage, newMessage) => {
       if (oldMessage.editedTimestamp === newMessage.editedTimestamp) return undefined;
       return async channel => {
-        const embed = new MessageEmbed()
-          .setColor(globalSettings.getColor(ColorType.Default))
-          .setTimestamp(newMessage.editedTimestamp ?? 0)
-          .setFooter(`Message ID: ${newMessage.id} | ${messageEditEventTypeName}`);
-
         let message = newMessage;
         if (!message.author) message = await newMessage.fetch().catch(() => message);
 
-        if (message.author) embed.setAuthor(message.author.tag, message.author.displayAvatarURL());
-        else embed.setAuthor('Unknown', 'https://cdn.discordapp.com/embed/avatars/0.png');
-
-        if (message.webhookID) {
-          const webhook = await message.fetchWebhook().catch(() => undefined);
-
-          embed.setDescription(
-            `**${
-              webhook ? `The webhook **\`${webhook.name}\`**` : 'A webhook'
-            } edited a message in ${message.channel}.** [Jump to Message](${message.url})`
+        const embed = new MessageEmbed()
+          .setColor(globalSettings.getColor(ColorType.Default))
+          .setTimestamp(newMessage.editedTimestamp ?? 0)
+          .setDescription(await generateDescription(message))
+          .setFooter(`Message ID: ${message.id} | ${messageEditEventTypeName}`)
+          .setAuthor(
+            message.author?.tag ?? 'Unknown',
+            message.author?.displayAvatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png'
           );
-        } else if (message.author) {
-          embed.setDescription(
-            `**${message.author} edited a message in ${message.channel}.** [Jump to Message](${message.url})`
-          );
-        } else {
-          embed.setDescription(
-            `**A message in ${message.channel} was edited.** [Jump to Message](${message.url})`
-          );
-        }
 
         if (oldMessage.content !== newMessage.content) {
           addContentField(embed, 'Text before', oldMessage.content);

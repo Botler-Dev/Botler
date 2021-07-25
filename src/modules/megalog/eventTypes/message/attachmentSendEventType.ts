@@ -64,6 +64,9 @@ export function attachmentSendEventType(
 
 export type CachedAttachments = Collection<string, MessageAttachment>;
 
+/**
+ * Gets the cached attachments for a message if the cache can be found.
+ */
 export async function getCachedAttachments(
   channelManager: MegalogChannelManager,
   guild: Guild,

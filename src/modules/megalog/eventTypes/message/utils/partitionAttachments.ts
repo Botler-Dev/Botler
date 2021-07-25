@@ -13,12 +13,23 @@ const MEBI_BYTE = 2 ** 20;
  */
 const MAX_UPLOAD_SIZES = [8 * MEBI_BYTE, 8 * MEBI_BYTE, 50 * MEBI_BYTE, 100 * MEBI_BYTE] as const;
 
+/**
+ * Result of attachment partitioning.
+ */
 export interface AttachmentPartition {
   sendable: MessageAttachment[];
   unsendable: MessageAttachment[];
+  /**
+   * Cumulative size of all sendable attachments.
+   */
   sendableSize: number;
 }
 
+/**
+ * Partitions the given attachments into sendable and unsendable depending on the upload size limit.
+ *
+ * @param additionalOverhead Additional size overhead in bytes of the message (for example extra required attachments) to take into account.
+ */
 export function partitionAttachments(
   attachments: MessageAttachment[],
   guildPremiumTier: number,

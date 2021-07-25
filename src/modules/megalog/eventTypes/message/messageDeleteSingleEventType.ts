@@ -1,6 +1,6 @@
 import {ColorType, GlobalSettingsWrapper} from '@/settings';
 import dayjs from 'dayjs';
-import {MessageEmbed} from 'discord.js';
+import {Message, MessageEmbed, PartialMessage} from 'discord.js';
 import {messageMegalogEventCategoryName} from '.';
 import {condenseSingleMessageDeletion} from '../../condensers/condenseSingleMessageDeletion';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
@@ -12,6 +12,18 @@ import {partitionAttachments} from './utils/partitionAttachments';
 import {toDiscordMegaByteString} from './utils/toDiscordMegaByteString';
 
 const messageDeleteSingleEventTypeName = 'message-delete-single';
+
+async function generateInnerDescription(message: Message | PartialMessage) {
+  if (message.webhookID) {
+    const webhook = await message.fetchWebhook().catch(() => undefined);
+    return `A message from ${webhook ? `the webhook **\`${webhook.name}\`**` : `a webhook`} in ${
+      message.channel
+    } was deleted`;
+  }
+  return `A message${message.author ? ` from ${message.author}` : ''} was deleted in ${
+    message.channel
+  }`;
+}
 
 export function messageDeleteSingleEventType(
   globalSettings: GlobalSettingsWrapper,
@@ -33,44 +45,31 @@ export function messageDeleteSingleEventType(
       const embed = new MessageEmbed()
         .setColor(globalSettings.getColor(ColorType.Bad))
         .setTimestamp(Date.now())
-        .setFooter(`Message ID: ${message.id} | ${messageDeleteSingleEventTypeName}`);
+        .setFooter(`Message ID: ${message.id} | ${messageDeleteSingleEventTypeName}`)
+        .setAuthor(
+          message.author?.tag ?? 'Unknown',
+          message.author?.displayAvatarURL() ?? 'https://cdn.discordapp.com/embed/avatars/0.png'
+        );
 
       addContentField(embed, 'Text Content', message.content);
 
-      if (message.author) embed.setAuthor(message.author.tag, message.author.displayAvatarURL());
-      else embed.setAuthor('Unknown', 'https://cdn.discordapp.com/embed/avatars/0.png');
-
-      let innerDescription: string;
-      if (message.webhookID) {
-        const webhook = await message.fetchWebhook().catch(() => undefined);
-        innerDescription = `A message from ${
-          webhook ? `the webhook **\`${webhook.name}\`**` : `a webhook`
-        } in ${message.channel} was deleted`;
-      } else {
-        innerDescription = `A message${
-          message.author ? ` from ${message.author}` : ''
-        } was deleted in ${message.channel}`;
-      }
+      const innerDescription = await generateInnerDescription(message);
       embed.setDescription(`**${innerDescription}.**`);
 
       const cachedAttachments =
         message.attachments.size === 0
           ? undefined
           : await getCachedAttachments(channelManager, channel.guild, message.id);
-      const condensed = condenseSingleMessageDeletion(
-        message,
-        cachedAttachments,
-        dayjs().valueOf()
+      const condensedBuffer = jsonToBuffer(
+        condenseSingleMessageDeletion(message, cachedAttachments, dayjs().valueOf())
       );
-      const condensedBuffer = jsonToBuffer(condensed);
-      const partitions = cachedAttachments
-        ? partitionAttachments(
+      const partitions = !cachedAttachments
+        ? undefined
+        : partitionAttachments(
             cachedAttachments.array(),
             channel.guild.premiumTier,
             condensedBuffer.byteLength
-          )
-        : undefined;
-
+          );
       if (message.attachments.size > 0) {
         embed.addField(
           `Attachments [${message.attachments.size}]`,
@@ -100,7 +99,7 @@ export function messageDeleteSingleEventType(
       });
       return async auditEntry => {
         embed.setDescription(`**${innerDescription} probably by ${auditEntry.executor}.**`);
-        // The reason is ignored because single message deletions by bots
+        // The auditEntry.reason is ignored because single message deletions by bots
         // are not logged and thus no reason is ever specified.
         await logMessage.edit(embed);
       };
