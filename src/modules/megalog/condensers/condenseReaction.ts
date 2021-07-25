@@ -1,5 +1,9 @@
 import {MessageReaction} from 'discord.js';
 
+/**
+ * Condensed {@link MessageReaction}.
+ * Partially mirrors the [Discord API Reaction structure](https://discord.com/developers/docs/resources/channel#reaction-object).
+ */
 export interface CondensedReaction {
   emoji: string;
   count?: number;

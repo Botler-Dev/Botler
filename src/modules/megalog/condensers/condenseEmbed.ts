@@ -5,12 +5,20 @@ import {
   MessageEmbedVideo,
 } from 'discord.js';
 
+/**
+ * Condensed {@link MessageEmbedFooter}.
+ * Mirrors the [Discord API Embed Footer structure](https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure).
+ */
 export interface CondensedEmbedFooter {
   text?: string;
   icon_url?: string;
   proxy_icon_url?: string;
 }
 
+/**
+ * Condensed {@link MessageEmbedVideo}, {@link MessageEmbedThumbnail}, and {@link MessageEmbedImage}.
+ * Mirrors the [Discord API Embed Video, Thumbnail, and Image structure](https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure).
+ */
 export interface CondensedMedia {
   url?: string;
   proxy_url?: string;
@@ -18,11 +26,19 @@ export interface CondensedMedia {
   width?: number;
 }
 
+/**
+ * Condensed {@link MessageEmbedProvider}.
+ * Mirrors the [Discord API Embed Provider structure](https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure).
+ */
 export interface CondensedEmbedProvider {
   name: string;
   url: string;
 }
 
+/**
+ * Condensed {@link MessageEmbedAuthor}.
+ * Mirrors the [Discord API Embed Author structure](https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure).
+ */
 export interface CondensedEmbedAuthor {
   name?: string;
   url?: string;
@@ -30,12 +46,20 @@ export interface CondensedEmbedAuthor {
   proxy_icon_url?: string;
 }
 
+/**
+ * Condensed {@link MessageEmbedField}.
+ * Mirrors the [Discord API Embed Field structure](https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure).
+ */
 export interface CondensedEmbedField {
   name: string;
   value: string;
   inline: boolean;
 }
 
+/**
+ * Condensed {@link MessageEmbed}.
+ * Mirrors the [Discord API Embed structure](https://discord.com/developers/docs/resources/channel#embed-object-embed-structure).
+ */
 export interface CondensedEmbed {
   title?: string;
   description?: string;

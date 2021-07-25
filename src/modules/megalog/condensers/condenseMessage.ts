@@ -3,6 +3,10 @@ import {CachedAttachments} from '../eventTypes/message/attachmentSendEventType';
 import {CondensedMessageContent, condenseMessageContent} from './condenseMessageContent';
 import {CondensedReaction, condenseReaction} from './condenseReaction';
 
+/**
+ * Condensed {@link Message}.
+ * Partially mirrors the [Discord API Message structure](https://discord.com/developers/docs/resources/channel#message-object-message-structure).
+ */
 export interface CondensedMessage extends CondensedMessageContent {
   id: string;
   channel_id: string;

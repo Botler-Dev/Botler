@@ -1,11 +1,29 @@
 import {Message, PartialMessage} from 'discord.js';
 import {CondensedMessageContent, condenseMessageContent} from './condenseMessageContent';
 
+/**
+ * Condensed representation of a message edit.
+ */
 export interface CondensedMessageEdit {
+  /**
+   * ID of origin channel of the edited message.
+   */
   channel_id: string;
+  /**
+   * ID of the edited message.
+   */
   message_id: string;
+  /**
+   * Timestamp when the edit occurred.
+   */
   edited_timestamp: number;
+  /**
+   * Message content before the edit.
+   */
   before: CondensedMessageContent;
+  /**
+   * Message content after the edit.
+   */
   after: CondensedMessageContent;
 }
 

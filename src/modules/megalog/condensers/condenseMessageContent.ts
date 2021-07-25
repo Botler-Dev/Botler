@@ -3,7 +3,14 @@ import {CachedAttachments} from '../eventTypes/message/attachmentSendEventType';
 import {condenseAttachment, CondensedAttachment} from './condenseAttachment';
 import {CondensedEmbed, condenseEmbed} from './condenseEmbed';
 
+/**
+ * Condensed content of a {@link Message}.
+ * Partially mirrors the [Discord API Message structure](https://discord.com/developers/docs/resources/channel#message-object-message-structure)
+ */
 export interface CondensedMessageContent {
+  /**
+   * If the message was only partially loaded when condensed.
+   */
   partial: boolean;
   content?: string;
   embeds?: CondensedEmbed[];
