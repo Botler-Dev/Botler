@@ -14,7 +14,7 @@ export class MegalogSettingsWrapper extends SynchronizedEntityWrapper<MegalogSet
   }
 
   /**
-   * Interval in milliseconds in which the {@link AuditLogMatcher} tries to match audit log entries.
+   * Interval in milliseconds in which the {@link AuditLogMatcher} tries to resolve match requests.
    */
   get auditLogMatchTryInterval(): number {
     return this.entity?.auditLogMatchTryInterval ?? 1000;
