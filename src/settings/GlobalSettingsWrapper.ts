@@ -3,7 +3,6 @@ import {Snowflake, UserManager, UserResolvable} from 'discord.js';
 import {tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
 import {Logger} from '@/logger';
-import {resolveIdChecked} from '@/utils/resolve';
 import {filterNullAndUndefined} from '@/utils/filterNullAndUndefined';
 import type {GlobalSettingsManager} from './GlobalSettingsManager';
 import {SyncStream, SynchronizedEntityWrapper} from '../database';
@@ -29,11 +28,12 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSetti
   }
 
   get defaultPrefix(): string {
-    return this.entity.defaultPrefix;
+    return this.entity.defaultPrefix ?? '!?';
   }
 
-  set defaultPrefix(value: string) {
-    this.updateEntity({defaultPrefix: value});
+  set defaultPrefix(value: string | undefined) {
+    // eslint-disable-next-line unicorn/no-null
+    this.updateEntity({defaultPrefix: value ?? null});
   }
 
   get masterUserIds(): ReadonlyArray<Snowflake> {
@@ -41,7 +41,7 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSetti
   }
 
   get cleanInterval(): number {
-    return this.entity.cleanInterval;
+    return this.entity.cleanInterval ?? 600_000;
   }
 
   private readonly manager: GlobalSettingsManager;
@@ -83,21 +83,21 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSetti
   protected createDefaultEntity = undefined;
 
   isBotMaster(user: UserResolvable): boolean {
-    const id = resolveIdChecked(this.userManager, user);
-    return this.masterUserIds.includes(id);
+    const id = this.userManager.resolveID(user);
+    return !!id && this.masterUserIds.includes(id);
   }
 
   getColor(type: ColorType): number {
     switch (type) {
       default:
       case ColorType.Default:
-        return this.entity.colorDefault;
+        return this.entity.colorDefault ?? 7_506_394;
       case ColorType.Good:
-        return this.entity.colorGood;
+        return this.entity.colorGood ?? 3_461_464;
       case ColorType.Bad:
-        return this.entity.colorBad;
+        return this.entity.colorBad ?? 16_718_602;
       case ColorType.Warn:
-        return this.entity.colorWarn;
+        return this.entity.colorWarn ?? 16_745_728;
     }
   }
 

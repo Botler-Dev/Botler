@@ -21,7 +21,7 @@ export class DatabaseCleaner {
     this.logger = masterLogger.getScope('cleaner');
     globalSettings.afterEntityChangeWithInitial
       .pipe(
-        map(entity => entity.cleanInterval),
+        map(() => globalSettings.cleanInterval),
         distinctUntilChanged()
       )
       .subscribe(interval => this.updateInterval(interval));
