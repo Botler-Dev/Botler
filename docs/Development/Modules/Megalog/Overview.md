@@ -24,7 +24,7 @@ Below is a list of all the potential event categories with all event types suppo
 |                                   |
 |         `member` CATEGORY         |           -           |
 |           `member-join`           |          No           |
-|          `member-leave`           |          No           |
+|          `member-leave`           |          Yes          |
 |     `member-update-nickname`      |          Yes          |
 |       `member-update-roles`       |          Yes          |
 |           `member-ban`            |          Yes          |

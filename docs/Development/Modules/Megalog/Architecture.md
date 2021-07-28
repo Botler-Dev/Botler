@@ -2,12 +2,6 @@
 
 The Megalog module is split into 4 main parts.
 
-!!! note "Global & Guild Events"
-    This page sometimes differentiates between global and guild events.
-
-    - Global events are relevant to all guilds (like username change)
-    - Guild events are relevant to only one guild (like channel creation)
-
 ## Event Types
 
 A `MegalogEventType` instance represents a loggable event like a message edit and is responsible for processing and logging all events of said type.
@@ -33,8 +27,8 @@ The `MegalogChannelManager` manages all Megalog subscriptions and lets consumers
 
 The `AuditLogMatcher` is responsible for taking audit-log match requests and try to resolve them. This is done using a provided match filter which is run on new polled audit-log entries and is used to map Discord client events to audit-log entires. Once a match is found a listener is called and the request is removed from the match queue.
 
-The matcher itself does not make any guarantees that a matching audit-log entry will be found and that the listener will ever be called. It will drop requests after some time and has queues with limited sizes for each guild. To improve the efficiency and matching accuracy the matcher's behavior can be adjusted via the database megalog settings.
+The matcher itself does not make any guarantees that a matching audit-log entry will be found and that the listener will ever be called. It will drop requests after some time and has queues with limited sizes for each guild. To improve the efficiency and matching accuracy the matcher's behavior can be adjusted via the [module settings](Configuration.md).
 
 ## Client Event Listeners
 
-The client event listeners are not really a component but the accumulated usage of all the above-mentioned parts. They register the listeners in the [Discord client](https://discord.js.org/#/docs/main/stable/class/Client) and communicate with all the necessary components to execute the event processing pipeline. Which listeners are implemented and which have the audit-log matching functionality is defined in `MegalogSupportedClientEvent` and `AuditLogSupportedClientEvent` respectively.
+The client event listeners are not really a component but the accumulated usage of all the above-mentioned parts. They register the listeners in the [Discord client](https://discord.js.org/#/docs/main/stable/class/Client) and communicate with all the necessary components to execute the event processing pipeline. What listeners are implemented and their exact behavior is defined in the [Client Events page](Client-Events.md).
