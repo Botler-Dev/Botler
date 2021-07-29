@@ -1,6 +1,6 @@
 # Configuration
 
-For Botler to start there needs to be at least one entry in the `GlobalSettings` table. You can insert it yourself with your tool of choice or make Botler create it via the `DISCORD_TOKEN` environment variable.
+For Botler to start he needs a Discord token contained in the `GlobalSettings` table in the database. Alternatively during development, you can provide the token via the `DISCORD_TOKEN` and skip creating a `GlobalSettings` entry.
 
 ## Environment variables
 
