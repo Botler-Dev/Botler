@@ -4,7 +4,7 @@ import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {container} from 'tsyringe';
 
 import {DatabaseCleaner, DatabaseEventHub} from './database';
-import {GlobalSettingsManager, GlobalSettingsWrapper} from './settings';
+import {getGlobalSettings, GlobalSettingsWrapper} from './settings';
 import {proxyNativeConsole, Logger, MasterLogger} from './logger';
 import {CommandModule} from './modules/command/CommandModule';
 import {ModuleLoader} from './modules/ModuleLoader';
@@ -22,8 +22,6 @@ export class Bot {
 
   private cleaner!: DatabaseCleaner;
 
-  private globalSettingsManager!: GlobalSettingsManager;
-
   private globalSettings!: GlobalSettingsWrapper;
 
   private client!: Client;
@@ -32,10 +30,10 @@ export class Bot {
 
   public async initializeBot(): Promise<void> {
     this.masterLogger = new MasterLogger();
-    container.register(MasterLogger, {useValue: this.masterLogger});
+    container.registerInstance(MasterLogger, this.masterLogger);
 
     this.globalLogger = this.masterLogger.getScope('global');
-    container.register(Logger, {useValue: this.globalLogger});
+    container.registerInstance(Logger, this.globalLogger);
     proxyNativeConsole(this.globalLogger);
 
     this.prisma = await this.createPrismaClient();
@@ -45,14 +43,8 @@ export class Bot {
     container.register(DatabaseEventHub, {useValue: this.eventHub});
     await this.eventHub.initialize();
 
-    this.globalSettingsManager = new GlobalSettingsManager(
-      this.prisma,
-      this.masterLogger,
-      this.eventHub
-    );
-    await this.globalSettingsManager.initialize();
-    this.globalSettings = this.globalSettingsManager.get();
-    container.register(GlobalSettingsWrapper, {useValue: this.globalSettings});
+    this.globalSettings = await getGlobalSettings(this.prisma, this.eventHub, this.masterLogger);
+    container.registerInstance(GlobalSettingsWrapper, this.globalSettings);
 
     container.registerSingleton(DatabaseCleaner);
     this.cleaner = container.resolve(DatabaseCleaner);
@@ -80,7 +72,7 @@ export class Bot {
     await this.client.login(this.globalSettings.discordToken);
     this.globalSettings.afterEntityChangeWithInitial
       .pipe(
-        map(entity => entity.discordToken),
+        map(entity => entity?.discordToken),
         distinctUntilChanged(),
         skip(1)
       )

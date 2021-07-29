@@ -1,5 +1,5 @@
 import {Collection, ReadonlyCollection} from 'discord.js';
-import {merge, Subject} from 'rxjs';
+import {merge, Observable, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Entity} from '../wrapper/EntityWrapper';
 import {DatabaseEventHub} from '../DatabaseEventHub';
@@ -8,7 +8,7 @@ import {getTableDeleteStream, getTableNonDeleteStream} from './changeStreams';
 /**
  * Stream of the entity's state in the database.
  */
-export type SyncStream<TEntity> = Subject<TEntity | undefined>;
+export type SyncStream<TEntity> = Observable<TEntity | undefined>;
 
 export interface ExhaustStreamPayload<TEntity extends Entity, TCacheKey> {
   key: TCacheKey;
@@ -32,7 +32,7 @@ export class CacheSynchronizer<
   TMinimalPayloadKeys extends keyof TEntity = keyof TEntity,
   TCacheKey = unknown
 > {
-  private _syncStreams = new Collection<TCacheKey, SyncStream<TEntity>>();
+  private _syncStreams = new Collection<TCacheKey, Subject<TEntity | undefined>>();
 
   protected get syncStreams(): ReadonlyCollection<TCacheKey, SyncStream<TEntity>> {
     return this._syncStreams;
@@ -55,7 +55,7 @@ export class CacheSynchronizer<
   /**
    * Creates a {@link CacheSynchronizer} that then has to be initialized using {@link CacheSynchronizer.initialize}().
    *
-   * @param {string} tableName Name of the PostgreSQL table. (Can be dynamically get via `Prisma.ModelName.YourModelName`)
+   * @param {string} tableName Name of the PostgreSQL table. (Can be dynamically retrieved via `Prisma.ModelName.YourModelName`)
    * @param {CacheKeyResolver<Pick<TEntity, TMinimalPayloadKeys>, TCacheKey>} cacheKeyResolver Convert received entities into {@link TCacheKey}
    * @memberof CacheSynchronizer
    */
@@ -84,7 +84,7 @@ export class CacheSynchronizer<
 
     merge(entityStream, deleteStream).subscribe(({key, entity}) => {
       if (key === undefined) return;
-      const stream = this.syncStreams.get(key);
+      const stream = this._syncStreams.get(key);
       if (!stream) {
         this.exhaustStream.next({key, entity});
         return;
@@ -94,7 +94,7 @@ export class CacheSynchronizer<
   }
 
   getSyncStream(key: TCacheKey): SyncStream<TEntity> {
-    let stream = this.syncStreams.get(key);
+    let stream = this._syncStreams.get(key);
     if (stream) return stream;
     stream = new Subject();
     this._syncStreams.set(key, stream);

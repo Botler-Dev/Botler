@@ -1,11 +1,11 @@
 import {GlobalSettings} from '@prisma/client';
 import {Snowflake, UserManager, UserResolvable} from 'discord.js';
-import {tap} from 'rxjs/operators';
 import {container} from 'tsyringe';
+import {Immutable} from 'immer';
 import {Logger} from '@/logger';
-import {filterNullAndUndefined} from '@/utils/filterNullAndUndefined';
-import type {GlobalSettingsManager} from './GlobalSettingsManager';
-import {SyncStream, SynchronizedEntityWrapper} from '../database';
+import {isRunningInProduction} from '@/utils/environment';
+import {ExitCode, exitWithError} from '@/utils/process';
+import {SyncStream, SettingsWrapper} from '../database';
 
 export enum ColorType {
   Default,
@@ -17,34 +17,33 @@ export enum ColorType {
 /**
  * Represents the global settings in the database and automatically updates when there are database changes.
  */
-export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSettings> {
-  get version(): number {
-    return this.entity.version;
-  }
-
+export class GlobalSettingsWrapper extends SettingsWrapper<GlobalSettings> {
   get discordToken(): string {
-    this.logger.warn('Discord token was accessed.');
-    return this.entity.discordToken;
-  }
-
-  get defaultPrefix(): string {
-    return this.entity.defaultPrefix ?? '!?';
-  }
-
-  set defaultPrefix(value: string | undefined) {
-    // eslint-disable-next-line unicorn/no-null
-    this.updateEntity({defaultPrefix: value ?? null});
+    this.logger.warn('Accessing the Discord token.');
+    if (this.entity?.discordToken) {
+      this.logger.info(`Using database provided Discord token.`);
+      return this.entity?.discordToken;
+    }
+    if (isRunningInProduction)
+      exitWithError(ExitCode.InvalidConfiguration, 'Discord token in the database is not set.');
+    if (!process.env.DISCORD_TOKEN)
+      exitWithError(
+        ExitCode.InvalidConfiguration,
+        'The Discord token in the database and the "DISCORD_TOKEN" environment variable are not set.'
+      );
+    this.logger.warn(
+      `Using environment variable provided Discord token. This would be fatal in production.`
+    );
+    return process.env.DISCORD_TOKEN;
   }
 
   get masterUserIds(): ReadonlyArray<Snowflake> {
-    return this.entity.masterUserIds;
+    return this.entity?.masterUserIds ?? [];
   }
 
   get cleanInterval(): number {
-    return this.entity.cleanInterval ?? 600_000;
+    return this.entity?.cleanInterval ?? 600_000;
   }
-
-  private readonly manager: GlobalSettingsManager;
 
   private readonly logger: Logger;
 
@@ -57,30 +56,13 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSetti
   }
 
   constructor(
-    manager: GlobalSettingsManager,
-    syncStream: SyncStream<GlobalSettings>,
-    entity: GlobalSettings,
+    syncStream: SyncStream<Immutable<GlobalSettings>>,
+    entity: Immutable<GlobalSettings> | undefined,
     logger: Logger
   ) {
-    super(
-      syncStream.pipe(
-        tap(newEntity => {
-          if (newEntity) {
-            logger.info(`Current GlobalSettings entry was updated.`);
-            return;
-          }
-          logger.info(`Current GlobalSettings entry was deleted.`);
-          manager.refetch();
-        }),
-        filterNullAndUndefined()
-      ),
-      entity
-    );
-    this.manager = manager;
+    super(syncStream, entity);
     this.logger = logger;
   }
-
-  protected createDefaultEntity = undefined;
 
   isBotMaster(user: UserResolvable): boolean {
     const id = this.userManager.resolveID(user);
@@ -91,22 +73,13 @@ export class GlobalSettingsWrapper extends SynchronizedEntityWrapper<GlobalSetti
     switch (type) {
       default:
       case ColorType.Default:
-        return this.entity.colorDefault ?? 7_506_394;
+        return this.entity?.colorDefault ?? 7_506_394;
       case ColorType.Good:
-        return this.entity.colorGood ?? 3_461_464;
+        return this.entity?.colorGood ?? 3_461_464;
       case ColorType.Bad:
-        return this.entity.colorBad ?? 16_718_602;
+        return this.entity?.colorBad ?? 16_718_602;
       case ColorType.Warn:
-        return this.entity.colorWarn ?? 16_745_728;
+        return this.entity?.colorWarn ?? 16_745_728;
     }
-  }
-
-  async save(): Promise<void> {
-    await this.manager.model.update({
-      where: {
-        version: this.version,
-      },
-      data: this.entity as GlobalSettings,
-    });
   }
 }

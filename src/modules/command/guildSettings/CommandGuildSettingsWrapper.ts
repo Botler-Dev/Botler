@@ -1,8 +1,8 @@
 import {CommandGuildSettings} from '@prisma/client';
 import {Guild} from 'discord.js';
 import {SyncStream, SynchronizedEntityWrapper} from '@/database';
-import {GlobalSettingsWrapper} from '@/settings';
 import type {CommandGuildSettingsManager} from './CommandGuildSettingsManager';
+import {CommandSettingsWrapper} from '../settings/CommandSettingsWrapper';
 
 /**
  * Holds the current settings of the command module for a specific guild.
@@ -22,7 +22,7 @@ export class CommandGuildSettingsWrapper extends SynchronizedEntityWrapper<
   }
 
   set rawPrefix(value: string | undefined) {
-    this.prefix = value ?? this.globalSettings.defaultPrefix;
+    this.prefix = value ?? this.commandSettings.defaultPrefix;
   }
 
   /**
@@ -31,21 +31,21 @@ export class CommandGuildSettingsWrapper extends SynchronizedEntityWrapper<
    * Setting it to the default prefix will make the guild use the global settings default.
    */
   get prefix(): string {
-    return this.rawPrefix ?? this.globalSettings.defaultPrefix;
+    return this.rawPrefix ?? this.commandSettings.defaultPrefix;
   }
 
   set prefix(value: string) {
     this.updateEntity({
-      prefix: value !== this.globalSettings.defaultPrefix ? value : undefined,
+      prefix: value !== this.commandSettings.defaultPrefix ? value : undefined,
     });
   }
 
-  private readonly globalSettings: GlobalSettingsWrapper;
+  private readonly commandSettings: CommandSettingsWrapper;
 
   private readonly manager: CommandGuildSettingsManager;
 
   constructor(
-    globalSettings: GlobalSettingsWrapper,
+    commandSettings: CommandSettingsWrapper,
     manager: CommandGuildSettingsManager,
     syncStream: SyncStream<CommandGuildSettings>,
     entity: CommandGuildSettings | undefined,
@@ -53,7 +53,7 @@ export class CommandGuildSettingsWrapper extends SynchronizedEntityWrapper<
   ) {
     super(syncStream, entity);
     this.guild = guild;
-    this.globalSettings = globalSettings;
+    this.commandSettings = commandSettings;
     this.manager = manager;
   }
 

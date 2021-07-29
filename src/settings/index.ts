@@ -1,3 +1,2 @@
-export * from './GlobalSettingsManager';
-export * from './GlobalSettingsSynchronizer';
+export * from './getGlobalSettings';
 export * from './GlobalSettingsWrapper';

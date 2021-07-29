@@ -1,18 +1,7 @@
-import {SynchronizedEntityWrapper} from '@/database';
+import {SettingsWrapper} from '@/database';
 import {MegalogSettings} from '@prisma/client';
 
-/**
- * {@link SynchronizedEntityWrapper} for the {@link MegalogSettings}.
- */
-export class MegalogSettingsWrapper extends SynchronizedEntityWrapper<MegalogSettings | undefined> {
-  /**
-   * Version of the {@link MegalogSettings} being used.
-   * Always the highest in the table or `undefined` if non exists.
-   */
-  get version(): number | undefined {
-    return this.entity?.version;
-  }
-
+export class MegalogSettingsWrapper extends SettingsWrapper<MegalogSettings> {
   /**
    * Interval in milliseconds in which the {@link AuditLogMatcher} tries to resolve match requests.
    */

@@ -9,8 +9,7 @@ generator client {
 
 model GlobalSettings {
   version       Int      @id @default(autoincrement())
-  discordToken  String
-  defaultPrefix String?
+  discordToken  String?
   colorDefault  Int?
   colorBad      Int?
   colorGood     Int?

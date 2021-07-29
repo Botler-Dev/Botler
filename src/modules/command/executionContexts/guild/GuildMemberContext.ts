@@ -1,5 +1,5 @@
 import {GuildMember} from 'discord.js';
-import {CommandGuildSettingsWrapper} from '../../settings/CommandGuildSettingsWrapper';
+import {CommandGuildSettingsWrapper} from '../../guildSettings/CommandGuildSettingsWrapper';
 import {GuildContext} from './GuildContext';
 
 /**
