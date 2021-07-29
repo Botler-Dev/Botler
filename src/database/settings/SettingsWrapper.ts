@@ -8,8 +8,6 @@ export interface SettingsEntity {
   version: number;
 }
 
-export type EntityFromSettingsWrapper<TWrapper extends SettingsWrapper> = TWrapper['entity'];
-
 /**
  * {@link SynchronizedEntityWrapper} specifically for system settings.
  */

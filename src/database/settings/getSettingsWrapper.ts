@@ -15,10 +15,20 @@ export type SettingsWrapperCreator<TWrapper extends SettingsWrapper> = (
   entity: TWrapper['entity'] | undefined
 ) => TWrapper;
 
+/**
+ * Listener that gets called on all entity updates to the {@link SettingsWrapper}
+ *
+ * @param entity The new entity that will be used.
+ */
 export type SettingsUpdateListener<TEntity extends SettingsEntity> = (
   entity: TEntity | undefined
 ) => void;
 
+/**
+ * Get a synchronized {@link SettingsWrapper} for a given table.
+ *
+ * @param tableName Name of the PostgreSQL table. (Can be dynamically retrieved via `Prisma.ModelName.YourModelName`)
+ */
 export async function getSettingsWrapper<TWrapper extends SettingsWrapper>(
   eventHub: DatabaseEventHub,
   tableName: string,

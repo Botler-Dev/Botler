@@ -72,7 +72,7 @@ export class Bot {
     await this.client.login(this.globalSettings.discordToken);
     this.globalSettings.afterEntityChangeWithInitial
       .pipe(
-        map(entity => entity?.discordToken),
+        map(entity => entity?.discordToken ?? undefined),
         distinctUntilChanged(),
         skip(1)
       )

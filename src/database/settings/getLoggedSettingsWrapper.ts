@@ -7,6 +7,9 @@ import {
 } from './getSettingsWrapper';
 import {SettingsWrapper} from './SettingsWrapper';
 
+/**
+ * Like {@link SettingsWrapper} but logs all updates and fetches.
+ */
 export function getLoggedSettingsWrapper<TWrapper extends SettingsWrapper>(
   eventHub: DatabaseEventHub,
   logger: Logger,
