@@ -19,3 +19,25 @@ CREATE TABLE "CommandSettings" (
 
     PRIMARY KEY ("version")
 );
+
+CREATE CONSTRAINT TRIGGER "CommandSettings_insert_trigger"
+    AFTER INSERT
+    ON "CommandSettings"
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+EXECUTE FUNCTION trigger_notify_entity_insert_or_update();
+
+CREATE CONSTRAINT TRIGGER "CommandSettings_update_trigger"
+    AFTER UPDATE
+    ON "CommandSettings"
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+    WHEN (OLD <> NEW)
+EXECUTE FUNCTION trigger_notify_entity_insert_or_update();
+
+CREATE CONSTRAINT TRIGGER "CommandSettings_delete_trigger"
+    AFTER DELETE
+    ON "CommandSettings"
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+EXECUTE FUNCTION trigger_notify_entity_delete('version');
