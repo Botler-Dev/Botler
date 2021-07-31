@@ -9,5 +9,6 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN yarn prisma generate
 RUN yarn build:dev
+COPY migrations ./migrations
 
 CMD yarn start:dev

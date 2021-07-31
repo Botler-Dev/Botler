@@ -19,6 +19,9 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 # Needed for module-alias config
 COPY --from=builder /app/package.json ./package.json
+# For running migrations
+COPY migrations ./migrations
+COPY --from=builder /app/schema.prisma ./schema.prisma
 
 # Do not use Yarn here because the slim version does not have it installed
 CMD ["node","./dist/main.js"]
