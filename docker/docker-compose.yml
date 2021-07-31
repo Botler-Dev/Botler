@@ -30,7 +30,7 @@ services:
 
       - DATABASE_USERNAME
       - DATABASE_HOST=${DATABASE_HOST:-botler-database}
-      - DATABASE_PORT=${DATABASE_PORT:-5432}
+      # Do not include DATABASE_PORT as internally it is always 5432
       - DATABASE_DATABASE
       - DATABASE_ARGS
       - DATABASE_URL
