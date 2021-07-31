@@ -9,12 +9,11 @@ generator client {
 
 model GlobalSettings {
   version       Int      @id @default(autoincrement())
-  discordToken  String
-  defaultPrefix String   @default("?!")
-  colorDefault  Int      @default(7506394)
-  colorBad      Int      @default(16718602)
-  colorGood     Int      @default(3461464)
-  colorWarn     Int      @default(16745728)
-  cleanInterval Int      @default(600000)
+  discordToken  String?
+  colorDefault  Int?
+  colorBad      Int?
+  colorGood     Int?
+  colorWarn     Int?
+  cleanInterval Int?
   masterUserIds String[] @db.VarChar(20)
 }

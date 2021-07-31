@@ -1,5 +1,5 @@
 import {Guild} from 'discord.js';
-import {CommandGuildSettingsWrapper} from '../../settings/CommandGuildSettingsWrapper';
+import {CommandGuildSettingsWrapper} from '../../guildSettings/CommandGuildSettingsWrapper';
 
 /**
  * Guild part of the command execution contexts.

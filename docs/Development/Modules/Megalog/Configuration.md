@@ -1,6 +1,6 @@
 # Configuring Megalog
 
-The Megalog has a few settings that can be changed at runtime. All have defaults that can be overwritten by creating a row in the `MegalogSettings` and setting the corresponding column to a non-null value. If multiple rows exist, the one with the highest `version` number gets chosen.
+The Megalog stores its configuration in the database and uses the [Settings API](../../Database/Settings.md).
 
 ## Settings
 

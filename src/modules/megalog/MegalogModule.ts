@@ -1,3 +1,5 @@
+import {PrismaClient} from '@prisma/client';
+import {DatabaseEventHub} from '@/database';
 import {GlobalSettingsWrapper} from '@/settings';
 import {StaticImplements} from '@/utils/StaticImplements';
 import {Client} from 'discord.js';
@@ -12,7 +14,7 @@ import {attachmentSendEventType} from './eventTypes/message/attachmentSendEventT
 import {messageDeleteSingleEventType} from './eventTypes/message/messageDeleteSingleEventType';
 import {messageEditEventType} from './eventTypes/message/messageEditEventType';
 import {MegalogChannelManager} from './MegalogChannelManager';
-import {MegalogSettingsManager} from './settings/MegalogSettingsManager';
+import {getMegalogSettings} from './settings/getMegalogSettings';
 import {MegalogSettingsWrapper} from './settings/MegalogSettingsWrapper';
 
 /**
@@ -45,8 +47,6 @@ export class MegalogModule extends Module {
     return this._auditLogMatcher;
   }
 
-  private settingsManager: MegalogSettingsManager;
-
   private readonly client: Client;
 
   private readonly globalSettings: GlobalSettingsWrapper;
@@ -61,16 +61,18 @@ export class MegalogModule extends Module {
     this.container.registerSingleton(MegalogEventTypeManager);
     this.container.registerSingleton(MegalogChannelManager);
     this.container.registerSingleton(AuditLogMatcher);
-    this.container.registerSingleton(MegalogSettingsManager);
-    this.settingsManager = this.container.resolve(MegalogSettingsManager);
 
     this.client = client;
     this.globalSettings = globalSettings;
   }
 
   async preInitialize(): Promise<void> {
-    await this.settingsManager.initialize();
-    this.container.registerInstance(MegalogSettingsWrapper, this.settingsManager.get());
+    const settings = await getMegalogSettings(
+      this.container.resolve(PrismaClient),
+      this.container.resolve(DatabaseEventHub),
+      this.logger
+    );
+    this.container.registerInstance(MegalogSettingsWrapper, settings);
 
     this._eventTypeManager = this.container.resolve(MegalogEventTypeManager);
     this._auditLogMatcher = this.container.resolve(AuditLogMatcher);

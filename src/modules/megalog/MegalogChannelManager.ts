@@ -1,5 +1,5 @@
 import {DatabaseEventHub, ModelManager} from '@/database';
-import {getTableDeleteStream, getTableNonDeleteStream} from '@/database/synchronizer/changeStreams';
+import {getTableDeleteStream, getTableNonDeleteStream} from '@/database';
 import {Logger} from '@/logger';
 import {MegalogLogChannel, Prisma, PrismaClient} from '@prisma/client';
 import {Client, Collection, Guild, Snowflake, TextChannel} from 'discord.js';

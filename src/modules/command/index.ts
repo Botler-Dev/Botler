@@ -36,7 +36,7 @@ export * from './parsers/snowflakeParser';
 export * from './parsers/stringParser';
 export * from './parsers/userParser';
 
-export * from './settings/CommandGuildSettingsWrapper';
+export * from './guildSettings/CommandGuildSettingsWrapper';
 
 export * from './CommandManager';
 export * from './CommandCategory';

@@ -1,8 +1,10 @@
 import {Client, GuildMember, Message, MessageReaction, PartialUser, User} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
+import {PrismaClient} from '@prisma/client';
 
 import {GlobalSettingsWrapper} from '@/settings';
 import {StaticImplements} from '@/utils/StaticImplements';
+import {DatabaseEventHub} from '@/database';
 import {Module} from '../Module';
 import {ModuleConstructor} from '../ModuleConstructor';
 import {CommandCategory} from './CommandCategory';
@@ -28,7 +30,9 @@ import {
 } from './executionContexts/ReactionExecutionContext';
 import {ParseResults, ParserEngine} from './parser/ParserEngine';
 import {commandParser} from './parsers/commandParser';
-import {CommandGuildSettingsManager} from './settings/CommandGuildSettingsManager';
+import {CommandGuildSettingsManager} from './guildSettings/CommandGuildSettingsManager';
+import {CommandSettingsWrapper} from './settings/CommandSettingsWrapper';
+import {getCommandSettings} from './settings/getCommandSettings';
 
 /**
  * Module that manages and executes Discord commands and provides a framework to create these commands.
@@ -59,7 +63,9 @@ export class CommandModule extends Module {
 
   private readonly commandCaches: CommandCacheManager;
 
-  private readonly guildSettings: CommandGuildSettingsManager;
+  private guildSettings!: CommandGuildSettingsManager;
+
+  private commandSettings!: CommandSettingsWrapper;
 
   private readonly client: Client;
 
@@ -86,10 +92,16 @@ export class CommandModule extends Module {
     this.commandCaches = this.container.resolve(CommandCacheManager);
 
     this.container.registerSingleton(CommandGuildSettingsManager);
-    this.guildSettings = this.container.resolve(CommandGuildSettingsManager);
   }
 
   async preInitialize(): Promise<void> {
+    this.commandSettings = await getCommandSettings(
+      this.container.resolve(PrismaClient),
+      this.container.resolve(DatabaseEventHub),
+      this.logger
+    );
+    this.container.registerInstance(CommandSettingsWrapper, this.commandSettings);
+    this.guildSettings = this.container.resolve(CommandGuildSettingsManager);
     await this.responseListeners.initialize();
     await this.reactionListeners.initialize();
     await this.guildSettings.initialize();
@@ -124,7 +136,7 @@ export class CommandModule extends Module {
         return;
       }
 
-      const prefix = guildContext?.settings.prefix ?? this.globalSettings.defaultPrefix;
+      const prefix = guildContext?.settings.prefix ?? this.commandSettings.defaultPrefix;
       if (!message.content.startsWith(prefix)) return;
 
       const parser = new ParserEngine(message.content, {

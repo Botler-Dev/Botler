@@ -2,9 +2,9 @@ import {CommandGuildSettings, Prisma, PrismaClient} from '@prisma/client';
 import {GuildManager, GuildResolvable, Snowflake} from 'discord.js';
 import {injectable} from 'tsyringe';
 import {DatabaseEventHub, CacheManager, CacheSynchronizer} from '@/database';
-import {GlobalSettingsWrapper} from '@/settings';
 import {resolveIdChecked} from '@/utils/resolve';
 import {CommandGuildSettingsWrapper} from './CommandGuildSettingsWrapper';
+import {CommandSettingsWrapper} from '../settings/CommandSettingsWrapper';
 
 @injectable()
 export class CommandGuildSettingsManager extends CacheManager<
@@ -14,18 +14,18 @@ export class CommandGuildSettingsManager extends CacheManager<
 > {
   private readonly synchronizer: CacheSynchronizer<CommandGuildSettings, 'guildId', Snowflake>;
 
-  private readonly globalSettings: GlobalSettingsWrapper;
+  private readonly commandSettings: CommandSettingsWrapper;
 
   private readonly guildManager: GuildManager;
 
   constructor(
     prisma: PrismaClient,
-    globalSettings: GlobalSettingsWrapper,
     guildManager: GuildManager,
-    eventHub: DatabaseEventHub
+    eventHub: DatabaseEventHub,
+    commandSettings: CommandSettingsWrapper
   ) {
     super(prisma.commandGuildSettings);
-    this.globalSettings = globalSettings;
+    this.commandSettings = commandSettings;
     this.guildManager = guildManager;
     this.synchronizer = new CacheSynchronizer(
       eventHub,
@@ -47,7 +47,7 @@ export class CommandGuildSettingsManager extends CacheManager<
     const syncStream = this.synchronizer.getSyncStream(id);
     const entity = await this.model.findUnique({where: {guildId: id}});
     const wrapper = new CommandGuildSettingsWrapper(
-      this.globalSettings,
+      this.commandSettings,
       this,
       syncStream,
       entity ?? undefined,
