@@ -3,7 +3,6 @@ version: '3.8'
 services:
   db:
     image: postgres:alpine
-    container_name: botler-database
     restart: unless-stopped
     ports:
       - ${DATABASE_PORT:-5432}:5432
@@ -29,7 +28,7 @@ services:
       - LOGGER_STAMP_FORMAT
 
       - DATABASE_USERNAME
-      - DATABASE_HOST=${DATABASE_HOST:-botler-database}
+      - DATABASE_HOST=${DATABASE_HOST:-db}
       # Do not include DATABASE_PORT as internally it is always 5432
       - DATABASE_DATABASE
       - DATABASE_ARGS
