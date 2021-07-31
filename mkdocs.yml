@@ -64,4 +64,9 @@ nav:
               - Overview: Development/Modules/Command/Overview.md
               - Argument Parser: Development/Modules/Command/Argument-Parser.md
               - Command Cache: Development/Modules/Command/Command-Cache.md
+          - Megalog:
+              - Overview: Development/Modules/Megalog/Overview.md
+              - Configuration: Development/Modules/Megalog/Configuration.md
+              - Architecture: Development/Modules/Megalog/Architecture.md
+              - Client-Events: Development/Modules/Megalog/Client-Events.md
       - Documentation: Development/Documentation.md

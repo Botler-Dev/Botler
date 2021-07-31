@@ -19,7 +19,7 @@ will be implemented in what version.
 | -------------------------- | ------------------------------------------------------------ | ------ |
 | **Channel Logging System** | Unified way of creating logging systems for guild channels   |
 | **Config Change Logger**   | Audit log of the bot                                         |
-| **Megalogger**             | Guild channel logger for every event that Botler can receive |
+| **Megalogger**             | Guild channel logger for every event that Botler can receive | WIP    |
 | **Moderation Commands**    | Moderation commands with case logging and auto unmute        |
 | **YouTube Webhooks**       | Subscribe to YouTube channels                                |
 

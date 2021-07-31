@@ -9,14 +9,12 @@ import {
 import {from} from 'rxjs';
 import {mergeAll} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
-import {DatabaseEventHub, EntityManager} from '@/database';
+import {DatabaseEventHub, ModelManager} from '@/database';
 import {resolveIdChecked, resolveTextBasedChannelId} from '@/utils/resolve';
 import {ListenerCriterionCache} from './ListenerCriterionCache';
 
 @injectable()
-export class ResponseListenerManager extends EntityManager<
-  PrismaClient['commandResponseListener']
-> {
+export class ResponseListenerManager extends ModelManager<PrismaClient['commandResponseListener']> {
   private readonly cache = new ListenerCriterionCache<
     [channelId?: Snowflake, userId?: Snowflake]
   >();

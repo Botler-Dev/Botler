@@ -4,21 +4,6 @@ type Key = string | number | symbol;
 
 type Constructor<Instance> = new (...args: unknown[]) => Instance;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type ImmutablePrimitive = undefined | null | boolean | string | number | Function;
-
-type Immutable<T> = T extends ImmutablePrimitive
-  ? T
-  : T extends Map<infer K, infer V>
-  ? ImmutableMap<K, V>
-  : T extends Set<infer M>
-  ? ImmutableSet<M>
-  : ImmutableObject<T>;
-
-type ImmutableMap<K, V> = ReadonlyMap<Immutable<K>, Immutable<V>>;
-type ImmutableSet<T> = ReadonlySet<Immutable<T>>;
-type ImmutableObject<T> = {readonly [K in keyof T]: Immutable<T[K]>};
-
 declare module 'discord.js' {
   import {DMChannel, NewsChannel, TextChannel} from 'discord.js';
 
@@ -29,6 +14,12 @@ declare module 'discord.js' {
   type TextBasedChannelResolvable = Snowflake | TextBasedChannel;
 
   type AnyEmojiResolvable = EmojiResolvable | string;
+
+  /**
+   * Proxy export of {@link ClientEvents} because Discord.js does not directly export it.
+   * Technically breaks the encapsulation rule but it will throw an error if something ever changes so ¯\_(ツ)_/¯
+   */
+  type ExportProxyClientEvents = ClientEvents;
 }
 
 declare namespace NodeJS {

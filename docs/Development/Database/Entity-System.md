@@ -9,15 +9,18 @@ Botler uses a custom entity system that wraps the raw database entities and pris
 
 ## Architecture
 
-The system is divided into a uncached, cached, and synchronized part. Each being an extension of the former (synchronized extends cached extends uncached). To understand how it works you can read the part below and also look at the code in `src/database`. Though do not take the GlobalSettings implementation as an example as it handles a special case of only having one wrapper in the entire cache that can change what entity it represents in the database.
+The system is divided into an uncached, cached, and synchronized part with each being an extension of the former (synchronized extends cached extends uncached). To understand how it works you can read the part below and also take a look at implementations like the `CommandGuildSettings`.
+
+!!! note
+    The entity system provides components in a loose fashion meaning implementations do not necessarily have to follow the architecture described below. In some situations leaving out the wrappers, creating custom `SyncStream`s or other omissions/additions can be beneficial.
 
 ### Uncached
 
-In the center, there is an `EntityManager` that holds a Prisma model and is a gateway for requesting data. There, raw entities can be wrapped with an `EntityWrapper`. The wrapper can either make the entity only mutable through its functions or directly expose it. All modifications are synchronous and are only saved once `.save()` is called on the wrapper.
+In the center, there is an `ModelManager` that holds a Prisma model and is a gateway for requesting data. There, raw entities can be wrapped with an `EntityWrapper`. The wrapper can either make the entity only mutable through its functions or directly expose it. All modifications are synchronous and are only saved once `.save()` is called on the wrapper.
 
 ### Cached
 
-The cached part uses a `CacheManager` which extends from `WrapperManager`. This manager additionally holds cache management logic and the actual cache of `CachedEntityWrapper`s. Extending from `EntityManager`, they keep track of their caching status.
+The cached part uses a `CacheManager` which extends from `WrapperManager`. This manager additionally holds cache management logic and the actual cache of `CachedEntityWrapper`s. Extending from `ModelManager`, they keep track of their caching status.
 
 ### Synchronized
 

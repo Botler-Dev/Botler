@@ -47,13 +47,13 @@ export class CommandGuildSettingsManager extends CacheManager<
     const syncStream = this.synchronizer.getSyncStream(id);
     const entity = await this.model.findUnique({where: {guildId: id}});
     const wrapper = new CommandGuildSettingsWrapper(
+      this.globalSettings,
       this,
       syncStream,
       entity ?? undefined,
-      await this.guildManager.fetch(id),
-      this.globalSettings
+      await this.guildManager.fetch(id)
     );
-    wrapper.afterUncache.subscribe(() => this.synchronizer.removeSyncStream(id));
+    wrapper.afterDecache.subscribe(() => this.synchronizer.removeSyncStream(id));
     this.cacheWrapper(id, wrapper);
     return wrapper;
   }

@@ -9,6 +9,7 @@ import {proxyNativeConsole, Logger, MasterLogger} from './logger';
 import {CommandModule} from './modules/command/CommandModule';
 import {ModuleLoader} from './modules/ModuleLoader';
 import {ExitCode, exitWithMessage} from './utils/process';
+import {MegalogModule} from './modules/megalog/MegalogModule';
 
 export class Bot {
   private masterLogger!: MasterLogger;
@@ -65,7 +66,10 @@ export class Bot {
     container.registerInstance(GuildManager, this.client.guilds);
     container.registerInstance(ChannelManager, this.client.channels);
 
-    this.moduleLoader = new ModuleLoader(container, this.masterLogger, [CommandModule]);
+    this.moduleLoader = new ModuleLoader(container, this.masterLogger, [
+      CommandModule,
+      MegalogModule,
+    ]);
     container.registerInstance(ModuleLoader, this.moduleLoader);
     await this.moduleLoader.initialize();
 

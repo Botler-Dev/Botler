@@ -22,7 +22,4 @@ On post initialization, the Command module starts listening for messages that fi
 
 The module also listens for reactions or messages corresponding to set listeners. Similar to the initial execution, it will build a `ReactionExecutionContext` or `ResponseExecutionContext` respectively. Those contexts contain similar features to `InitialExecutionContext`.
 
-In case an error occurs during command execution, the module automatically catches it. If it is a normal error it will send a generic "Something went wrong" Discord message and log the error to the console. If it is an error extending the `CommandError` it will call the `send` method, if defined, and log the real error in the `realError` property, if defined. This allows the execution to be aborted inside helper functions without if checking the return value and for discord abort response messages.
-
-!!! example
-    `MessageExecutionContext.parseNext` is a good `CommandError` usage example. In case the parse failed a `MissingParameterError` gets thrown, which does not get logged but instead sends a "Missing parameter" Discord error response. And this without any additional logic on the caller side.
+In case an error occurs during command execution, the module automatically catches it. If it is a normal error it will send a generic "Something went wrong" Discord message and log the error to the console. If it is an error extending the `CommandError` class it will call the `send` method, if defined, and log the real error in the `realError` property, if defined. This allows the execution to be aborted inside helper functions without if checking the return value and sending a manual Discord abort response message.
