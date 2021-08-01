@@ -3,6 +3,9 @@ pipeline {
   options {
     skipStagesAfterUnstable()
   }
+  environment {
+    DISCORD_WEBHOOK = credentials('discord-webhook')
+  }
   stages {
     stage('Install Dependencies') {
       steps {
@@ -43,7 +46,7 @@ pipeline {
   }
   post {
     always {
-      discordSend webhookURL: credentials('discord-webhook')
+      discordSend webhookURL: DISCORD_WEBHOOK
     }
   }
 }
