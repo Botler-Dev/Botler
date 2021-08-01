@@ -3,10 +3,11 @@ pipeline {
     docker {
       image 'node:15-alpine'
       reuseNode true
-      args '-v $HOME/yarn-cache:/usr/local/share/.cache/yarn'
+      args '-v $HOME/yarn-cache:/yarn-cache:rw,z'
     }
   }
   environment {
+    YARN_CACHE_FOLDER = '/yarn-cache'
     DISCORD_WEBHOOK = credentials('discord-webhook')
   }
   options {
