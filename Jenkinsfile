@@ -11,6 +11,7 @@ pipeline {
     }
     stage('Build') {
       steps {
+        sh 'yarn prisma generate'
         sh 'yarn build:prod'
       }
     }
