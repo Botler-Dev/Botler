@@ -3,6 +3,7 @@ pipeline {
     docker {
       image 'node:15-alpine'
       reuseNode true
+      args '-v ~/.cache:/.cache'
     }
   }
   environment {
