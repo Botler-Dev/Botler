@@ -1,17 +1,17 @@
 pipeline {
+  environment {
+    YARN_CACHE_FOLDER = '/yarn-cache'
+    DISCORD_WEBHOOK = credentials('discord-webhook')
+  }
   agent {
     docker {
       image 'node:15-alpine'
       reuseNode true
-      args '-v $HOME/yarn-cache:/yarn-cache'
+      args '-v $HOME/yarn-cache:$YARN_CACHE_FOLDER'
     }
   }
   options {
     skipStagesAfterUnstable()
-  }
-  environment {
-    YARN_CACHE_FOLDER = '/yarn-cache'
-    DISCORD_WEBHOOK = credentials('discord-webhook')
   }
   stages {
     stage('Install Dependencies') {
