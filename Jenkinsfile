@@ -41,4 +41,9 @@ pipeline {
       }
     }
   }
+  post {
+    always {
+      discordSend webhookURL: credentials('discord-webhook')
+    }
+  }
 }
