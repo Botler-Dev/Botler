@@ -51,7 +51,7 @@ pipeline {
   }
   post {
     unsuccessful {
-      discordSend webhookURL: DISCORD_WEBHOOK, description: "**[$JOB_NAME #$BUILD_NUMBER]($BUILD_URL) was unsuccessful**"
+      discordSend webhookURL: DISCORD_WEBHOOK, description: "**[$JOB_NAME #$BUILD_NUMBER](${JENKINS_URL}blue/organizations/jenkins/Botler/detail/master/$BUILD_NUMBER/pipeline) was unsuccessful**"
     }
     always {
       sh "chmod -R a+w \$PWD"
