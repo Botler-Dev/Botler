@@ -45,8 +45,8 @@ pipeline {
     }
   }
   post {
-    always {
-      discordSend webhookURL: DISCORD_WEBHOOK
+    unsuccessful {
+      discordSend webhookURL: DISCORD_WEBHOOK, title: '[$JOB_NAME #$BUILD_NUMBER](BUILD_URL) was unsuccessful'
     }
   }
 }
