@@ -3,11 +3,9 @@ pipeline {
     docker {
       image 'node:15-alpine'
       reuseNode true
-      args '-v $HOME/yarn-cache:/root/yarn-cache'
     }
   }
   environment {
-    YARN_CACHE_FOLDER = '/root/yarn-cache'
     DISCORD_WEBHOOK = credentials('discord-webhook')
   }
   options {
@@ -53,7 +51,7 @@ pipeline {
   }
   post {
     unsuccessful {
-      discordSend webhookURL: DISCORD_WEBHOOK, title: "[$JOB_NAME #$BUILD_NUMBER]($BUILD_URL) was unsuccessful"
+      discordSend webhookURL: DISCORD_WEBHOOK, description: "**[$JOB_NAME #$BUILD_NUMBER]($BUILD_URL) was unsuccessful**"
     }
   }
 }
