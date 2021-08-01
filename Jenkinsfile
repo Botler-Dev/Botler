@@ -15,7 +15,8 @@ pipeline {
   stages {
     stage('Install Dependencies') {
       steps {
-        sh 'yarn install --frozen-lockfile'
+        sh 'echo $YARN_CACHE_FOLDER'
+        sh 'yarn install --frozen-lockfile --cache-folder yarn-cache'
       }
     }
     stage('Build') {
