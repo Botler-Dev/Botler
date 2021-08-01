@@ -3,7 +3,7 @@ pipeline {
     docker {
       image 'node:15-alpine'
       reuseNode true
-      args '-v $HOME/yarn-cache:/yarn-cache:rw,z'
+      args '-u 0 -v $HOME/yarn-cache:/yarn-cache'
     }
   }
   environment {
@@ -54,6 +54,9 @@ pipeline {
   post {
     unsuccessful {
       discordSend webhookURL: DISCORD_WEBHOOK, description: "**[$JOB_NAME #$BUILD_NUMBER]($BUILD_URL) was unsuccessful**"
+    }
+    always {
+      sh "chmod -R a+w \$PWD"
     }
   }
 }
