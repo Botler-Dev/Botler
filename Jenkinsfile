@@ -1,3 +1,7 @@
+def deployCompose (command) {
+  yarn "docker:prod --project-name Botler --env-file \$DEPLOY_CONFIG $command"
+}
+
 pipeline {
   agent any
   environment {
@@ -38,9 +42,19 @@ pipeline {
       }
     }
     stage('Deploy') {
-      when { branch 'latest' }
+      environment {
+        DEPLOY_CONFIG = credentials('deploy-config')
+      }
+      /* when { branch 'latest' } */
       steps {
-        echo 'Hello, deploy me pls'
+        script {
+          deployCompose('build bot')
+          if (0 != sh('git diff --exit-code $GIT_PREVIOUS_COMMIT $GIT_COMMIT migrations')) {
+            deployCompose('down bot')
+            deployCompose('run --rm bot node_modules/.bin/prisma migrate deploy')
+          }
+          deployCompose('up --detach')
+        }
       }
     }
   }
