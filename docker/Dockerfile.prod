@@ -7,8 +7,7 @@ RUN yarn install --frozen-lockfile
 
 COPY tsconfig.json ./
 COPY src ./src
-RUN yarn prisma generate
-RUN yarn build:prod
+RUN yarn prisma generate && yarn build:prod
 
 RUN yarn install --production
 
@@ -22,6 +21,10 @@ COPY --from=builder /app/package.json ./package.json
 # For running migrations
 COPY migrations ./migrations
 COPY --from=builder /app/schema.prisma ./schema.prisma
+
+COPY docker/entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Do not use Yarn here because the slim version does not have it installed
 CMD ["node","./dist/main.js"]

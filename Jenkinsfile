@@ -42,10 +42,10 @@ pipeline {
       }
     }
     stage('Deploy') {
+      when { branch 'master' }
       environment {
         DEPLOY_CONFIG = credentials('deploy-config')
       }
-      when { branch 'master' }
       steps {
         script {
           deployCompose('build bot')
@@ -55,12 +55,13 @@ pipeline {
           }
           deployCompose('up --detach')
         }
+        discordSend webhookURL: DISCORD_WEBHOOK, description: "**[$JOB_NAME #$BUILD_NUMBER](${JENKINS_URL}blue/organizations/jenkins/Botler/detail/master/$BUILD_NUMBER/pipeline) deployed a new version.**"
       }
     }
   }
   post {
     unsuccessful {
-      discordSend webhookURL: DISCORD_WEBHOOK, description: "**[$JOB_NAME #$BUILD_NUMBER](${JENKINS_URL}blue/organizations/jenkins/Botler/detail/master/$BUILD_NUMBER/pipeline) was unsuccessful**"
+      discordSend webhookURL: DISCORD_WEBHOOK, description: "**[$JOB_NAME #$BUILD_NUMBER](${JENKINS_URL}blue/organizations/jenkins/Botler/detail/master/$BUILD_NUMBER/pipeline) was unsuccessful.**"
     }
   }
 }

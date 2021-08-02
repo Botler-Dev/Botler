@@ -44,13 +44,6 @@ There are two main different ways to run Botler: in a [Docker container](#using-
 
 The bot and the database can be entirely run inside Docker using Docker Compose in development and production environments.
 
-Both configurations can be configured using the same environment variables listed on the [Configuration page](Configuration.md) with some changes to the default configuration:
-
-|      Name       |    Dev Default    | Prod Default |
-| :-------------: | :---------------: | :----------: |
-| `DATABASE_HOST` | `botler-database` |     same     |
-|   `NODE_ENV`    |   `development`   | `production` |
-
 !!! attention "The `.env` file"
     The `docker-compose` command automatically consumes `.env` files in its working directory. Depending on its content it could accidentally set `DATABASE_HOST` to not point at the database container.
 
