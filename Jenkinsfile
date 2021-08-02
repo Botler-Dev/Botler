@@ -48,11 +48,12 @@ pipeline {
       }
       steps {
         script {
-          deployCompose('build bot')
+          deployCompose('build')
           if (0 != sh(script: "git diff --exit-code $GIT_PREVIOUS_COMMIT $GIT_COMMIT migrations", returnStatus: true)) {
             deployCompose('stop bot')
             deployCompose('run --rm bot node_modules/.bin/prisma migrate deploy')
           }
+          deployCompose('run --rm bot ls -la /')
           deployCompose('up --detach')
         }
         discordSend webhookURL: DISCORD_WEBHOOK, description: "**[$JOB_NAME #$BUILD_NUMBER](${JENKINS_URL}blue/organizations/jenkins/Botler/detail/master/$BUILD_NUMBER/pipeline) deployed a new version.**"
