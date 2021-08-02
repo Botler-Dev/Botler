@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:15-alpine'
-      args '-u 0 -v $HOME/yarn-cache:/yarn-cache'
-    }
-  }
+  agent any
   environment {
     DISCORD_WEBHOOK = credentials('discord-webhook')
   }
@@ -14,20 +9,20 @@ pipeline {
   stages {
     stage('Install Dependencies') {
       steps {
-        sh 'yarn install --frozen-lockfile --cache-folder /yarn-cache'
+        yarn 'install --frozen-lockfile'
       }
     }
     stage('Build') {
       steps {
-        sh 'yarn prisma generate'
-        sh 'yarn build:prod'
+        yarn 'prisma generate'
+        yarn 'build:prod'
       }
     }
     stage('Check Style') {
       parallel {
         stage('Check Linting') {
           steps {
-            sh 'yarn lint:ci'
+            yarn 'lint:ci'
           }
           post {
             always {
@@ -37,7 +32,7 @@ pipeline {
         }
         stage('Check Formatting') {
           steps {
-            sh 'yarn format:check'
+            yarn 'format:check'
           }
         }
       }
@@ -52,9 +47,6 @@ pipeline {
   post {
     unsuccessful {
       discordSend webhookURL: DISCORD_WEBHOOK, description: "**[$JOB_NAME #$BUILD_NUMBER](${JENKINS_URL}blue/organizations/jenkins/Botler/detail/master/$BUILD_NUMBER/pipeline) was unsuccessful**"
-    }
-    always {
-      sh "chmod -R a+w \$PWD"
     }
   }
 }
