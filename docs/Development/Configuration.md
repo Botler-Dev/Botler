@@ -1,10 +1,38 @@
 # Configuration
 
-For Botler to start he needs a Discord token contained in the `GlobalSettings` table in the database. Alternatively during development, you can provide the token via the `DISCORD_TOKEN` and skip creating a `GlobalSettings` entry.
+Botler receives its configuration through two ways:
+
+1. Environment variables for configuring
+    - Settings needed prior to a database connection
+    - Settings specific to an environment
+    - Settings that should be easily accessible during development
+2. Settings stored in the database
+    - For settings changeable at runtime
+    - All remaining configurations
+
+As a bare minimum the bot needs a database connection provided by environment variables and a Discord token provided by the database or in development alternatively by the `DISCORD_TOKEN` environment variable.
+
+## Database Settings
+
+The settings stored in the database are all changeable at runtime unless explicitly specified and are separated between global and module specific settings each stored in different tables. As this document covers core settings please refer to the respective module documentation for module specific settings. Below is a list of all global database-provided settings which are stored in the `GlobalSettings` table.
+
+| <div style="width:120px">Name</div> | Default  | Description                                                                                                                                                        |
+| :---------------------------------: | :------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|           `discordToken`            |    -     | The Discord token used to connect to Discord. Changing this value at runtime will cause the bot to exit. Depending on the environment this means a simple restart. |
+|           `colorDefault`            | 7506394  | Default color for message embed.                                                                                                                                   |
+|             `colorGood`             | 3461464  | Color for message embed with a good meaning.                                                                                                                       |
+|             `colorBad`              | 16718602 | Color for message embed with a bad meaning.                                                                                                                        |
+|             `colorWarn`             | 16745728 | Color for embed messages to draw attention or a warn.                                                                                                              |
+|           `cleanInterval`           |  600000  | Interval in milliseconds in which the database gets cleaned.                                                                                                       |
+|           `masterUserIds`           |    -     | List of user IDs with admin privileges in the bot.                                                                                                                 |
 
 ## Environment variables
 
-This table shows all environment variables that Botler can be configured with.
+Depending on how you run Botler, there are different available environment variables to change each building on top of the other.
+
+### Node Application
+
+The node application itself applies certain defaults to make it easier during development.
 
 | <div style="width:150px">Name</div> |        Dev Default        | Prod Default | Description                                                                                                                                                                          |
 | :---------------------------------: | :-----------------------: | :----------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -36,3 +64,23 @@ This table shows all environment variables that Botler can be configured with.
 !!! tip "More Logger Colors"
     You can set label colors (`LOGGER_*_COLOR` variables) to any [CSS color keyword](https://www.w3.org/wiki/CSS/Properties/color/keywords)
     or even a hex color prefixed with `#` like `#008000` (green).
+
+### Docker Container
+
+The bot can be run inside a Docker container using the provided Docker images.
+
+|    Name    |  Dev Default  | Prod Default |
+| :--------: | :-----------: | :----------: |
+| `NODE_ENV` | `development` | `production` |
+
+!!! attention
+    When using the default entry point of the provided images, the `DATABASE_URL` gets automatically set if not explicitly overwritten. This is to ease the use of the prisma client inside of the containers.
+
+### Docker Compose
+
+The bot, the database, or both can be run using the provided Docker Compose file. The database uses the same `DATABASE_*` environment variables to configure itself.
+
+| <div style="width:170px">Name</div> | Dev Default | Prod Default | Description                                                                                                                                      |
+| :---------------------------------: | :---------: | :----------: | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+|      `EXTERNAL_DATABASE_PORT`       |   `5432`    |    `5432`    | Port on which the database will be exposed. Does not effect what port the `bot` service needs to use meaning `DATABASE_PORT` can left untouched. |
+|           `DATABASE_HOST`           |    `db`     |     same     |
