@@ -5,7 +5,7 @@ services:
     image: postgres:alpine
     restart: unless-stopped
     ports:
-      - ${DATABASE_PORT:-5432}:5432
+      - ${EXTERNAL_DATABASE_PORT:-5432}:5432
     environment:
       - POSTGRES_USER=${DATABASE_USERNAME}
       - POSTGRES_DB=${DATABASE_DATABASE}
@@ -29,7 +29,7 @@ services:
 
       - DATABASE_USERNAME
       - DATABASE_HOST=${DATABASE_HOST:-db}
-      # Do not include DATABASE_PORT as internally it is always 5432
+      - DATABASE_PORT
       - DATABASE_DATABASE
       - DATABASE_ARGS
       - DATABASE_URL
