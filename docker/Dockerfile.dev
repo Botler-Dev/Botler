@@ -10,5 +10,8 @@ COPY src ./src
 RUN yarn prisma generate
 RUN yarn build:dev
 COPY migrations ./migrations
+COPY docker/entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD yarn start:dev
