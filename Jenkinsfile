@@ -45,11 +45,11 @@ pipeline {
       environment {
         DEPLOY_CONFIG = credentials('deploy-config')
       }
-      /* when { branch 'latest' } */
+      when { branch 'master' }
       steps {
         script {
           deployCompose('build bot')
-          if (0 != sh(script: "git diff --exit-code $GIT_PREVIOUS_COMMIT $GIT_COMMIT migrations", returnStatus: true)) {
+          if (true/* 0 != sh(script: "git diff --exit-code $GIT_PREVIOUS_COMMIT $GIT_COMMIT migrations", returnStatus: true) */) {
             deployCompose('stop bot')
             deployCompose('run --rm bot node_modules/.bin/prisma migrate deploy')
           }
