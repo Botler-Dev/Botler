@@ -49,8 +49,8 @@ pipeline {
       steps {
         script {
           deployCompose('build bot')
-          if (0 != sh('git diff --exit-code $GIT_PREVIOUS_COMMIT $GIT_COMMIT migrations')) {
-            deployCompose('down bot')
+          if (0 != sh('git diff --exit-code $GIT_PREVIOUS_COMMIT $GIT_COMMIT migrations', returnStatus: true)) {
+            deployCompose('stop bot')
             deployCompose('run --rm bot node_modules/.bin/prisma migrate deploy')
           }
           deployCompose('up --detach')
