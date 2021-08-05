@@ -27,7 +27,7 @@ export function condenseMessage(
     author_id: message.author?.id,
     webhook_id: message.webhookID ?? undefined,
     timestamp: message.createdTimestamp,
-    edited_timestamp: message.editedTimestamp ?? undefined,
+    edited_timestamp: message.editedTimestamp || undefined,
     reactions:
       message.reactions.cache.size === 0
         ? undefined
