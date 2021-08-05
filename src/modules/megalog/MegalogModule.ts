@@ -16,6 +16,7 @@ import {messageEditEventType} from './eventTypes/message/messageEditEventType';
 import {MegalogChannelManager} from './MegalogChannelManager';
 import {getMegalogSettings} from './settings/getMegalogSettings';
 import {MegalogSettingsWrapper} from './settings/MegalogSettingsWrapper';
+import {MegalogGuildSettingsManager} from './guildSettings/MegalogGuildSettingsManager';
 
 /**
  * Module that logs nearly all Discord events to text channels.
@@ -47,6 +48,12 @@ export class MegalogModule extends Module {
     return this._auditLogMatcher;
   }
 
+  private _guildSettings!: MegalogGuildSettingsManager;
+
+  get guildSettings(): MegalogGuildSettingsManager {
+    return this._guildSettings;
+  }
+
   private readonly client: Client;
 
   private readonly globalSettings: GlobalSettingsWrapper;
@@ -57,13 +64,13 @@ export class MegalogModule extends Module {
     globalSettings = moduleContainer.resolve(GlobalSettingsWrapper)
   ) {
     super(moduleContainer);
+    this.client = client;
+    this.globalSettings = globalSettings;
 
     this.container.registerSingleton(MegalogEventTypeManager);
     this.container.registerSingleton(MegalogChannelManager);
     this.container.registerSingleton(AuditLogMatcher);
-
-    this.client = client;
-    this.globalSettings = globalSettings;
+    this.container.registerSingleton(MegalogGuildSettingsManager);
   }
 
   async preInitialize(): Promise<void> {
@@ -77,7 +84,9 @@ export class MegalogModule extends Module {
     this._eventTypeManager = this.container.resolve(MegalogEventTypeManager);
     this._auditLogMatcher = this.container.resolve(AuditLogMatcher);
     this._channelManager = this.container.resolve(MegalogChannelManager);
+    this._guildSettings = this.container.resolve(MegalogGuildSettingsManager);
     await this._channelManager.initialize();
+    await this._guildSettings.initialize();
   }
 
   async initialize(): Promise<void> {
