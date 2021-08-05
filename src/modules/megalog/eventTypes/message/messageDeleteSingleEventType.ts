@@ -4,6 +4,7 @@ import {Message, MessageEmbed, PartialMessage} from 'discord.js';
 import {messageMegalogEventCategoryName} from '.';
 import {condenseSingleMessageDeletion} from '../../condensers/condenseSingleMessageDeletion';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
+import {MegalogGuildSettingsManager} from '../../guildSettings/MegalogGuildSettingsManager';
 import {MegalogChannelManager} from '../../MegalogChannelManager';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
 import {attachmentSendEventType, getCachedAttachments} from './attachmentSendEventType';
@@ -27,7 +28,8 @@ async function generateInnerDescription(message: Message | PartialMessage) {
 
 export function messageDeleteSingleEventType(
   globalSettings: GlobalSettingsWrapper,
-  channelManager: MegalogChannelManager
+  channelManager: MegalogChannelManager,
+  guildSettingsManager: MegalogGuildSettingsManager
 ): MegalogEventType<'messageDelete'> {
   return {
     name: messageDeleteSingleEventTypeName,
@@ -60,15 +62,20 @@ export function messageDeleteSingleEventType(
         message.attachments.size === 0
           ? undefined
           : await getCachedAttachments(channelManager, channel.guild, message.id);
-      const condensedBuffer = jsonToBuffer(
-        condenseSingleMessageDeletion(message, cachedAttachments, dayjs().valueOf())
-      );
+
+      const guildSettings = await guildSettingsManager.fetch(channel.guild);
+
+      const condensedBuffer = !guildSettings.attachCondensedJson
+        ? undefined
+        : jsonToBuffer(
+            condenseSingleMessageDeletion(message, cachedAttachments, dayjs().valueOf())
+          );
       const partitions = !cachedAttachments
         ? undefined
         : partitionAttachments(
             cachedAttachments.array(),
             channel.guild.premiumTier,
-            condensedBuffer.byteLength
+            condensedBuffer?.byteLength
           );
       if (message.attachments.size > 0) {
         embed.addField(
@@ -94,7 +101,14 @@ export function messageDeleteSingleEventType(
         embed,
         files: [
           ...(partitions?.sendable ?? []),
-          {attachment: condensedBuffer, name: 'single-message-deletion-json'},
+          ...(!condensedBuffer
+            ? []
+            : [
+                {
+                  attachment: condensedBuffer,
+                  name: `single-message-deletion${guildSettings.condensedFileNameEnding}`,
+                },
+              ]),
         ],
       });
       return async auditEntry => {

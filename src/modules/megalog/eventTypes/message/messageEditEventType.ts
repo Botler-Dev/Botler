@@ -4,6 +4,7 @@ import {Message, MessageEmbed, PartialMessage} from 'discord.js';
 import {messageMegalogEventCategoryName} from '.';
 import {condenseMessageEdit} from '../../condensers/condenseMessageEdit';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
+import {MegalogGuildSettingsManager} from '../../guildSettings/MegalogGuildSettingsManager';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
 import {addContentField} from './utils/addContentField';
 
@@ -25,7 +26,8 @@ async function generateDescription(message: Message | PartialMessage) {
 }
 
 export function messageEditEventType(
-  globalSettings: GlobalSettingsWrapper
+  globalSettings: GlobalSettingsWrapper,
+  guildSettingsManager: MegalogGuildSettingsManager
 ): MegalogEventType<'messageUpdate'> {
   return {
     name: messageEditEventTypeName,
@@ -53,10 +55,17 @@ export function messageEditEventType(
           addContentField(embed, 'Text after', newMessage.content);
         }
 
-        const json = jsonToBuffer(condenseMessageEdit(oldMessage, newMessage));
+        const guildSettings = await guildSettingsManager.fetch(channel.guild);
         await channel.send({
           embed,
-          files: [{attachment: json, name: 'message-edit-json'}],
+          files: !guildSettings.attachCondensedJson
+            ? []
+            : [
+                {
+                  attachment: jsonToBuffer(condenseMessageEdit(oldMessage, newMessage)),
+                  name: `message-edit${guildSettings.condensedFileNameEnding}`,
+                },
+              ],
         });
       };
     },
