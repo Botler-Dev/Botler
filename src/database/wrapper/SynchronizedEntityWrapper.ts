@@ -53,7 +53,7 @@ export abstract class SynchronizedEntityWrapper<
       typeof arg1 === 'object'
         ? {
             ...this.defaultedEntity,
-            arg1,
+            ...arg1,
           }
         : produce(this.defaultedEntity, arg1)
     );
