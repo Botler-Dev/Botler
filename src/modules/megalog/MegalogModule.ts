@@ -17,6 +17,7 @@ import {MegalogSubscriptionManager} from './MegalogSubscriptionManager';
 import {getMegalogSettings} from './settings/getMegalogSettings';
 import {MegalogSettingsWrapper} from './settings/MegalogSettingsWrapper';
 import {MegalogGuildSettingsManager} from './guildSettings/MegalogGuildSettingsManager';
+import {MegalogIgnoreManager} from './MegalogIgnoreManager';
 
 /**
  * Module that logs nearly all Discord events to text channels.
@@ -30,17 +31,11 @@ export class MegalogModule extends Module {
 
   static readonly optionalDependencies = [CommandModule];
 
-  private _eventTypeManager!: MegalogEventTypeManager;
+  readonly eventTypeManager: MegalogEventTypeManager;
 
-  get eventTypeManager(): MegalogEventTypeManager {
-    return this._eventTypeManager;
-  }
+  readonly subscriptionManager: MegalogSubscriptionManager;
 
-  private _subscriptionManager!: MegalogSubscriptionManager;
-
-  get subscriptionManager(): MegalogSubscriptionManager {
-    return this._subscriptionManager;
-  }
+  readonly ignoreManager: MegalogIgnoreManager;
 
   private _auditLogMatcher!: AuditLogMatcher;
 
@@ -69,8 +64,12 @@ export class MegalogModule extends Module {
 
     this.container.registerSingleton(MegalogEventTypeManager);
     this.container.registerSingleton(MegalogSubscriptionManager);
+    this.container.registerSingleton(MegalogIgnoreManager);
     this.container.registerSingleton(AuditLogMatcher);
     this.container.registerSingleton(MegalogGuildSettingsManager);
+    this.eventTypeManager = this.container.resolve(MegalogEventTypeManager);
+    this.subscriptionManager = this.container.resolve(MegalogSubscriptionManager);
+    this.ignoreManager = this.container.resolve(MegalogIgnoreManager);
   }
 
   async preInitialize(): Promise<void> {
@@ -81,11 +80,10 @@ export class MegalogModule extends Module {
     );
     this.container.registerInstance(MegalogSettingsWrapper, settings);
 
-    this._eventTypeManager = this.container.resolve(MegalogEventTypeManager);
     this._auditLogMatcher = this.container.resolve(AuditLogMatcher);
-    this._subscriptionManager = this.container.resolve(MegalogSubscriptionManager);
     this._guildSettings = this.container.resolve(MegalogGuildSettingsManager);
-    await this._subscriptionManager.initialize();
+    await this.subscriptionManager.initialize();
+    await this.ignoreManager.initialize();
     await this._guildSettings.initialize();
   }
 

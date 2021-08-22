@@ -6,6 +6,13 @@ model MegalogLogChannel {
   @@id([eventName, guildId])
 }
 
+model MegalogIgnoreChannel {
+  guildId   String @db.VarChar(20)
+  channelId String @db.VarChar(20)
+
+  @@id([guildId, channelId])
+}
+
 model MegalogSettings {
   version                          Int      @id @default(autoincrement())
   auditLogMatchTryInterval         Int?
