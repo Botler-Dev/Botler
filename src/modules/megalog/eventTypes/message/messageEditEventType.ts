@@ -5,6 +5,7 @@ import {messageMegalogEventCategoryName} from '.';
 import {condenseMessageEdit} from '../../condensers/condenseMessageEdit';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
 import {MegalogGuildSettingsManager} from '../../guildSettings/MegalogGuildSettingsManager';
+import {MegalogChannelManager} from '../../MegalogChannelManager';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
 import {addContentField} from './utils/addContentField';
 
@@ -27,7 +28,8 @@ async function generateDescription(message: Message | PartialMessage) {
 
 export function messageEditEventType(
   globalSettings: GlobalSettingsWrapper,
-  guildSettingsManager: MegalogGuildSettingsManager
+  guildSettingsManager: MegalogGuildSettingsManager,
+  channelManager: MegalogChannelManager
 ): MegalogEventType<'messageUpdate'> {
   return {
     name: messageEditEventTypeName,
@@ -35,7 +37,13 @@ export function messageEditEventType(
     category: messageMegalogEventCategoryName,
     clientEventName: 'messageUpdate',
     processClientEvent: async (oldMessage, newMessage) => {
-      if (oldMessage.editedTimestamp === newMessage.editedTimestamp) return undefined;
+      if (
+        oldMessage.editedTimestamp === newMessage.editedTimestamp ||
+        (oldMessage.author &&
+          oldMessage.author.id === oldMessage.client.user?.id &&
+          channelManager.channelHasSubscriptions(oldMessage.channel))
+      )
+        return undefined;
       return async channel => {
         let message = newMessage;
         if (!message.author) message = await newMessage.fetch().catch(() => message);

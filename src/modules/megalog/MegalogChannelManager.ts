@@ -1,8 +1,16 @@
 import {DatabaseEventHub, ModelManager} from '@/database';
 import {getTableDeleteStream, getTableNonDeleteStream} from '@/database';
 import {Logger} from '@/logger';
+import {resolveTextBasedChannelId} from '@/utils/resolve';
 import {MegalogLogChannel, Prisma, PrismaClient} from '@prisma/client';
-import {Client, Collection, Guild, Snowflake, TextChannel} from 'discord.js';
+import {
+  Client,
+  Collection,
+  Guild,
+  Snowflake,
+  TextBasedChannelResolvable,
+  TextChannel,
+} from 'discord.js';
 import {from, merge} from 'rxjs';
 import {injectable} from 'tsyringe';
 import {MegalogEventTypeName, MegalogEventTypeResolvable} from './eventType/MegalogEventType';
@@ -25,6 +33,11 @@ export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLog
    * Maps {@link MegalogEventTypeName} to all guilds that have a log channel set for that event.
    */
   private readonly cache = new Map<MegalogEventTypeName, EventChannels>();
+
+  /**
+   * Number of events have been assigned to a certain {@link TextChannel}.
+   */
+  private readonly channelSubscriptionCounts = new Map<Snowflake, number>();
 
   private readonly logger: Logger;
 
@@ -75,12 +88,34 @@ export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLog
     if (!channels) {
       channels = new Collection();
       this.cache.set(eventName, channels);
+    } else {
+      const previousChannelId = channels.get(guildId);
+      if (previousChannelId) this.subtractChannelSubscription(previousChannelId);
     }
     channels.set(guildId, channelId);
+    this.addChannelSubscription(channelId);
   }
 
   private deleteCacheEntry(eventName: MegalogEventTypeName, guildId: Snowflake) {
-    this.cache.get(eventName)?.delete(guildId);
+    const channels = this.cache.get(eventName);
+    if (!channels) return;
+    const channelId = channels.get(guildId);
+    if (!channelId) return;
+    this.subtractChannelSubscription(channelId);
+    channels.delete(guildId);
+  }
+
+  private addChannelSubscription(channelId: Snowflake) {
+    this.channelSubscriptionCounts.set(
+      channelId,
+      (this.channelSubscriptionCounts.get(channelId) ?? 0) + 1
+    );
+  }
+
+  private subtractChannelSubscription(channelId: Snowflake) {
+    const channelOccupancy = this.channelSubscriptionCounts.get(channelId);
+    if (!channelOccupancy) this.channelSubscriptionCounts.delete(channelId);
+    else this.channelSubscriptionCounts.set(channelId, channelOccupancy - 1);
   }
 
   /**
@@ -157,5 +192,13 @@ export class MegalogChannelManager extends ModelManager<PrismaClient['megalogLog
       return undefined;
     }
     return channel;
+  }
+
+  /**
+   * Fast check if the provided {@link TextBasedChannelResolvable} as any events assigned to it.
+   */
+  channelHasSubscriptions(channel: TextBasedChannelResolvable): boolean {
+    const id = resolveTextBasedChannelId(channel);
+    return !!this.channelSubscriptionCounts.get(id);
   }
 }

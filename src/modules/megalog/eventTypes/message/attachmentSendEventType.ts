@@ -12,7 +12,8 @@ const generateFooter = (messageId: Snowflake) =>
   `Message ID: ${messageId} | ${attachmentSendEventTypeName}`;
 
 export function attachmentSendEventType(
-  globalSettings: GlobalSettingsWrapper
+  globalSettings: GlobalSettingsWrapper,
+  channelManager: MegalogChannelManager
 ): MegalogEventType<'message'> {
   return {
     name: attachmentSendEventTypeName,
@@ -21,7 +22,12 @@ export function attachmentSendEventType(
     category: messageMegalogEventCategoryName,
     clientEventName: 'message',
     processClientEvent: async message => {
-      if (message.attachments.size === 0) return undefined;
+      if (
+        message.attachments.size === 0 ||
+        (message.author.id === message.client.user?.id &&
+          channelManager.channelHasSubscriptions(message.channel))
+      )
+        return undefined;
       return async channel => {
         if (message.author.id === message.client.user?.id && message.channel.id === channel.id)
           return;
