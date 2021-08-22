@@ -90,13 +90,9 @@ export class MegalogModule extends Module {
   }
 
   async initialize(): Promise<void> {
-    this.eventTypeManager.registerEventType(
-      attachmentSendEventType(this.globalSettings, this.channelManager)
-    );
-    this.eventTypeManager.registerEventType(
-      messageEditEventType(this.globalSettings, this.guildSettings, this.channelManager)
-    );
-    this.eventTypeManager.registerEventType(
+    this.eventTypeManager.registerEventTypes(
+      attachmentSendEventType(this.globalSettings, this.channelManager),
+      messageEditEventType(this.globalSettings, this.guildSettings, this.channelManager),
       messageDeleteSingleEventType(this.globalSettings, this.channelManager, this.guildSettings)
     );
   }
