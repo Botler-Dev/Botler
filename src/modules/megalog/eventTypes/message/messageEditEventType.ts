@@ -5,7 +5,7 @@ import {messageMegalogEventCategoryName} from '.';
 import {condenseMessageEdit} from '../../condensers/condenseMessageEdit';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
 import {MegalogGuildSettingsManager} from '../../guildSettings/MegalogGuildSettingsManager';
-import {MegalogChannelManager} from '../../MegalogChannelManager';
+import {MegalogSubscriptionManager} from '../../MegalogSubscriptionManager';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
 import {addContentField} from './utils/addContentField';
 
@@ -29,7 +29,7 @@ async function generateDescription(message: Message | PartialMessage) {
 export function messageEditEventType(
   globalSettings: GlobalSettingsWrapper,
   guildSettingsManager: MegalogGuildSettingsManager,
-  channelManager: MegalogChannelManager
+  subscriptionManager: MegalogSubscriptionManager
 ): MegalogEventType<'messageUpdate'> {
   return {
     name: messageEditEventTypeName,
@@ -41,7 +41,7 @@ export function messageEditEventType(
         oldMessage.editedTimestamp === newMessage.editedTimestamp ||
         (oldMessage.author &&
           oldMessage.author.id === oldMessage.client.user?.id &&
-          channelManager.channelHasSubscriptions(oldMessage.channel))
+          subscriptionManager.channelHasSubscriptions(oldMessage.channel))
       )
         return undefined;
       return async channel => {

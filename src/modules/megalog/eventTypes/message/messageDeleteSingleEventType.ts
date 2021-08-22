@@ -5,7 +5,7 @@ import {messageMegalogEventCategoryName} from '.';
 import {condenseSingleMessageDeletion} from '../../condensers/condenseSingleMessageDeletion';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
 import {MegalogGuildSettingsManager} from '../../guildSettings/MegalogGuildSettingsManager';
-import {MegalogChannelManager} from '../../MegalogChannelManager';
+import {MegalogSubscriptionManager} from '../../MegalogSubscriptionManager';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
 import {attachmentSendEventType, getCachedAttachments} from './attachmentSendEventType';
 import {addContentField} from './utils/addContentField';
@@ -28,7 +28,7 @@ async function generateInnerDescription(message: Message | PartialMessage) {
 
 export function messageDeleteSingleEventType(
   globalSettings: GlobalSettingsWrapper,
-  channelManager: MegalogChannelManager,
+  subscriptionManager: MegalogSubscriptionManager,
   guildSettingsManager: MegalogGuildSettingsManager
 ): MegalogEventType<'messageDelete'> {
   return {
@@ -61,7 +61,7 @@ export function messageDeleteSingleEventType(
       const cachedAttachments =
         message.attachments.size === 0
           ? undefined
-          : await getCachedAttachments(channelManager, channel.guild, message.id);
+          : await getCachedAttachments(subscriptionManager, channel.guild, message.id);
 
       const guildSettings = await guildSettingsManager.fetch(channel.guild);
 

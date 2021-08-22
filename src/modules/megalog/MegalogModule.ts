@@ -13,7 +13,7 @@ import {MegalogEventTypeManager} from './eventType/MegalogEventTypeManager';
 import {attachmentSendEventType} from './eventTypes/message/attachmentSendEventType';
 import {messageDeleteSingleEventType} from './eventTypes/message/messageDeleteSingleEventType';
 import {messageEditEventType} from './eventTypes/message/messageEditEventType';
-import {MegalogChannelManager} from './MegalogChannelManager';
+import {MegalogSubscriptionManager} from './MegalogSubscriptionManager';
 import {getMegalogSettings} from './settings/getMegalogSettings';
 import {MegalogSettingsWrapper} from './settings/MegalogSettingsWrapper';
 import {MegalogGuildSettingsManager} from './guildSettings/MegalogGuildSettingsManager';
@@ -36,10 +36,10 @@ export class MegalogModule extends Module {
     return this._eventTypeManager;
   }
 
-  private _channelManager!: MegalogChannelManager;
+  private _subscriptionManager!: MegalogSubscriptionManager;
 
-  get channelManager(): MegalogChannelManager {
-    return this._channelManager;
+  get subscriptionManager(): MegalogSubscriptionManager {
+    return this._subscriptionManager;
   }
 
   private _auditLogMatcher!: AuditLogMatcher;
@@ -68,7 +68,7 @@ export class MegalogModule extends Module {
     this.globalSettings = globalSettings;
 
     this.container.registerSingleton(MegalogEventTypeManager);
-    this.container.registerSingleton(MegalogChannelManager);
+    this.container.registerSingleton(MegalogSubscriptionManager);
     this.container.registerSingleton(AuditLogMatcher);
     this.container.registerSingleton(MegalogGuildSettingsManager);
   }
@@ -83,17 +83,21 @@ export class MegalogModule extends Module {
 
     this._eventTypeManager = this.container.resolve(MegalogEventTypeManager);
     this._auditLogMatcher = this.container.resolve(AuditLogMatcher);
-    this._channelManager = this.container.resolve(MegalogChannelManager);
+    this._subscriptionManager = this.container.resolve(MegalogSubscriptionManager);
     this._guildSettings = this.container.resolve(MegalogGuildSettingsManager);
-    await this._channelManager.initialize();
+    await this._subscriptionManager.initialize();
     await this._guildSettings.initialize();
   }
 
   async initialize(): Promise<void> {
     this.eventTypeManager.registerEventTypes(
-      attachmentSendEventType(this.globalSettings, this.channelManager),
-      messageEditEventType(this.globalSettings, this.guildSettings, this.channelManager),
-      messageDeleteSingleEventType(this.globalSettings, this.channelManager, this.guildSettings)
+      attachmentSendEventType(this.globalSettings, this.subscriptionManager),
+      messageEditEventType(this.globalSettings, this.guildSettings, this.subscriptionManager),
+      messageDeleteSingleEventType(
+        this.globalSettings,
+        this.subscriptionManager,
+        this.guildSettings
+      )
     );
   }
 
@@ -101,7 +105,7 @@ export class MegalogModule extends Module {
     registerClientEventListeners(
       this.client,
       this.logger,
-      this.channelManager,
+      this.subscriptionManager,
       this.eventTypeManager,
       this.auditLogMatcher
     );

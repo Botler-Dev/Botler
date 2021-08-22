@@ -16,9 +16,9 @@ Each instance can specify a single `MegalogSupportedClientEvent` to listen to an
 
 All event types need to have a unique name and be registered in the `MegalogEventTypeManager` (which is accessible from outside the module) during initialization so the module can properly wire up all the client events correctly.
 
-## Channel Manager
+## Subscription Manager
 
-The `MegalogChannelManager` manages all Megalog subscriptions and lets consumers assign and unassign channels. It retains a synchronized cache of all channel and guild IDs subscribed to a specific event type and converts them to actual `TextChannel` instances when queried.
+The `MegalogSubscriptionManager` manages all Megalog subscriptions and lets consumers assign and unassign channels. It retains a synchronized cache of all channel and guild IDs subscribed to a specific event type and converts them to actual `TextChannel` instances when queried.
 
 !!! attention
     In the database, the actual subscriptions are mapped with the Megalog event type names meaning these should not be changed after deployment. Though in case they need to be changed the database data can also be updated via migrations.

@@ -6,7 +6,7 @@ import {concatMap, filter, map, mergeMap, takeWhile, toArray} from 'rxjs/operato
 import type {AuditLogSupportedClientEvent, MegalogSupportedClientEvent} from '..';
 import {AuditLogMatcher, AuditLogMatchFilter} from '../../auditLog/AuditLogMatcher';
 import {MegalogEventTypeManager} from '../../eventType/MegalogEventTypeManager';
-import {MegalogChannelManager} from '../../MegalogChannelManager';
+import {MegalogSubscriptionManager} from '../../MegalogSubscriptionManager';
 import {fromClientEvent} from './fromClientEvent';
 import {processChannel} from './processChannel';
 import {withChannelProcessor} from './withChannelProcessor';
@@ -30,7 +30,7 @@ export class MegalogClientEventUtils {
 
   private readonly logger: Logger;
 
-  private readonly channelManager: MegalogChannelManager;
+  private readonly subscriptionManager: MegalogSubscriptionManager;
 
   private readonly eventTypeManager: MegalogEventTypeManager;
 
@@ -39,13 +39,13 @@ export class MegalogClientEventUtils {
   constructor(
     client: Client,
     logger: Logger,
-    channelManager: MegalogChannelManager,
+    subscriptionManager: MegalogSubscriptionManager,
     eventTypeManager: MegalogEventTypeManager,
     auditLogMatcher: AuditLogMatcher
   ) {
     this.client = client;
     this.logger = logger;
-    this.channelManager = channelManager;
+    this.subscriptionManager = subscriptionManager;
     this.eventTypeManager = eventTypeManager;
     this.auditLogMatcher = auditLogMatcher;
   }
@@ -77,7 +77,7 @@ export class MegalogClientEventUtils {
               from(eventTypes).pipe(
                 withChannelProcessor(this.logger, payload),
                 concatMap(({type, channelProcessor}) =>
-                  of(this.channelManager.getChannel(type, guild)).pipe(
+                  of(this.subscriptionManager.getSubscribedChannel(type, guild)).pipe(
                     filterNullAndUndefined(),
                     processChannel(this.logger, channelProcessor)
                   )
@@ -115,10 +115,10 @@ export class MegalogClientEventUtils {
       .pipe(
         concatMap(payload =>
           from(eventTypes).pipe(
-            filter(type => this.channelManager.hasChannels(type)),
+            filter(type => this.subscriptionManager.hasSubscribers(type)),
             withChannelProcessor(this.logger, payload),
             concatMap(({type, channelProcessor}) =>
-              from(this.channelManager.getChannels(type) ?? EMPTY).pipe(
+              from(this.subscriptionManager.getSubscribedChannels(type) ?? EMPTY).pipe(
                 concatMap(channel =>
                   from(relevanceFilter(channel.guild, ...payload)).pipe(
                     takeWhile(relevant => relevant),

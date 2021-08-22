@@ -2,7 +2,7 @@ import {Logger} from '@/logger';
 import {Client} from 'discord.js';
 import {AuditLogMatcher} from '../auditLog/AuditLogMatcher';
 import type {MegalogEventTypeManager} from '../eventType/MegalogEventTypeManager';
-import type {MegalogChannelManager} from '../MegalogChannelManager';
+import type {MegalogSubscriptionManager} from '../MegalogSubscriptionManager';
 import {
   AuditLogSupportedBanClientEvent,
   MegalogSupportedBanClientEvent,
@@ -82,14 +82,14 @@ export type AuditLogSupportedClientEvent =
 export function registerClientEventListeners(
   client: Client,
   logger: Logger,
-  channelManager: MegalogChannelManager,
+  subscriptionManager: MegalogSubscriptionManager,
   eventTypeManager: MegalogEventTypeManager,
   auditLogMatcher: AuditLogMatcher
 ): void {
   const utils = new MegalogClientEventUtils(
     client,
     logger,
-    channelManager,
+    subscriptionManager,
     eventTypeManager,
     auditLogMatcher
   );
