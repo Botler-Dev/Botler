@@ -46,8 +46,7 @@ export class ReactionListenerManager extends ModelManager<PrismaClient['commandR
       .pipe(mergeAll())
       .subscribe(entity =>
         this.cache.remove(
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          entity.cacheId!,
+          entity.cacheId,
           entity.messageId,
           entity.userId || undefined,
           entity.emojiId || undefined,
@@ -60,8 +59,7 @@ export class ReactionListenerManager extends ModelManager<PrismaClient['commandR
     const listeners = await this.model.findMany();
     listeners.forEach(listener =>
       this.cache.add(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        listener.cacheId!,
+        listener.cacheId,
         listener.messageId,
         listener.userId || undefined,
         listener.emojiId || undefined,

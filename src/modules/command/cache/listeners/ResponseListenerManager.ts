@@ -28,15 +28,13 @@ export class ResponseListenerManager extends ModelManager<PrismaClient['commandR
       )
     )
       .pipe(mergeAll())
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      .subscribe(entity => this.cache.remove(entity.cacheId!, entity.userId || undefined));
+      .subscribe(entity => this.cache.remove(entity.cacheId, entity.userId || undefined));
   }
 
   async initialize(): Promise<void> {
     const listeners = await this.model.findMany();
     listeners.forEach(listener =>
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.cache.add(listener.cacheId!, listener.channelId, listener.userId || undefined)
+      this.cache.add(listener.cacheId, listener.channelId, listener.userId || undefined)
     );
   }
 
