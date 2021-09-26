@@ -72,6 +72,7 @@ export class Bot {
 
   private async login(): Promise<void> {
     await this.client.login(this.globalSettings.discordToken);
+    this.globalLogger.info('Successfully connected to Discord.');
     this.globalSettings.afterEntityChangeWithInitial
       .pipe(
         map(entity => entity?.discordToken ?? undefined),
