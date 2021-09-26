@@ -7,7 +7,7 @@ The Megalog module is split into 4 main parts.
 A `MegalogEventType` instance represents a loggable event like a message edit and is responsible for processing and logging all events of said type.
 Each instance can specify a single `MegalogSupportedClientEvent` to listen to and provides an entry point for the following processing pipeline:
 
-1. The entry point, a `MegalogClientEventProcessor`, gets called once per client event and determines if the event is relevant to the specific Megalog event type.
+1. The entry point, a `MegalogClientEventProcessor`, gets called once per [not-ignored](#ignore-manager) client event and determines if the event is relevant to the specific Megalog event type.
     - For global events, it additionally should execute all non-guild-specific processing.
 2. If the client event is relevant it returns a `MegalogChannelProcessor`.
 3. The channel processor is called for each subscribed channel and should send the log message. For guild events this is once and for global events this can be multiple times.
@@ -22,6 +22,10 @@ The `MegalogSubscriptionManager` manages all Megalog subscriptions and lets cons
 
 !!! attention
     In the database, the actual subscriptions are mapped with the Megalog event type names meaning these should not be changed after deployment. Though in case they need to be changed the database data can also be updated via migrations.
+
+## Ignore Manager
+
+The `MegalogIgnoreManager` manages a list of ignored channels. All client events related to these ignored channels get automatically dropped before reaching the event type processors. The ignore checks are kept fast by a synchronized cache.
 
 ## Audit-Log Matcher
 
