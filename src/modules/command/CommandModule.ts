@@ -1,4 +1,12 @@
-import {Client, GuildMember, Message, MessageReaction, PartialUser, User} from 'discord.js';
+import {
+  Client,
+  GuildMember,
+  Message,
+  MessageReaction,
+  PartialMessageReaction,
+  PartialUser,
+  User,
+} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 import {PrismaClient} from '@prisma/client';
 
@@ -167,21 +175,21 @@ export class CommandModule extends Module {
   }
 
   private async processReactionEvent(
-    reaction: MessageReaction,
+    reaction: MessageReaction | PartialMessageReaction,
     user: User | PartialUser,
     action: ReactionAction
   ): Promise<void> {
     if (user.bot) return;
-    if (reaction.partial) await reaction.fetch();
+    const fetchedReaction = reaction.partial ? await reaction.fetch() : reaction;
     // eslint-disable-next-line no-param-reassign
     if (user.partial) user = await user.fetch();
-    const cacheIds = this.reactionListeners.findCacheIds(reaction, user, action);
+    const cacheIds = this.reactionListeners.findCacheIds(fetchedReaction, user, action);
     if (cacheIds.length === 0) return;
     const caches = await this.commandCaches.fetchCaches(cacheIds);
 
-    if (reaction.message.partial) await reaction.message.fetch();
-    const guildContext = reaction.message.guild
-      ? await this.createGuildMemberContext(await reaction.message.guild.members.fetch(user))
+    if (fetchedReaction.message.partial) await fetchedReaction.message.fetch();
+    const guildContext = fetchedReaction.message.guild
+      ? await this.createGuildMemberContext(await fetchedReaction.message.guild.members.fetch(user))
       : undefined;
 
     await Promise.all(
@@ -193,7 +201,7 @@ export class CommandModule extends Module {
             this.client,
             cache.command,
             cache,
-            reaction,
+            fetchedReaction,
             action,
             user as User,
             guildContext
@@ -228,7 +236,7 @@ export class CommandModule extends Module {
         context instanceof MessageExecutionContext ||
         context instanceof ReactionExecutionContext
       ) {
-        commandError = new UnexpectedError(context.sender, error);
+        commandError = new UnexpectedError(context.sender, error as Error);
       }
 
       if (!commandError || commandError.realError)

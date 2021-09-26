@@ -51,45 +51,46 @@
   },
   "homepage": "https://github.com/Botler-Dev/Botler#readme",
   "engines": {
-    "node": ">=15"
+    "node": ">=16"
   },
   "_moduleAliases": {
     "@": "dist"
   },
   "dependencies": {
-    "@prisma/client": "^2.25.0",
-    "chalk": "^4.1.1",
-    "dayjs": "^1.10.5",
-    "discord.js": "^12.5.3",
-    "immer": "^9.0.3",
+    "@prisma/client": "^3.1.1",
+    "chalk": "^4.1.2",
+    "dayjs": "^1.10.7",
+    "discord.js": "^13.1.0",
+    "immer": "^9.0.6",
     "module-alias": "^2.2.2",
-    "pg": "^8.6.0",
+    "pg": "^8.7.1",
     "pg-listen": "^1.7.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.1.0",
+    "rxjs": "^7.3.0",
     "string-similarity": "^4.0.4",
-    "tsyringe": "^4.5.0"
+    "tsyringe": "^4.6.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
-    "@types/node": "^15.12.4",
-    "@types/pg": "^8.6.0",
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.10.1",
+    "@types/pg": "^8.6.1",
     "@types/string-similarity": "^4.0.0",
-    "@types/ws": "^7.4.5",
-    "@typescript-eslint/eslint-plugin": "^4.28.0",
-    "@typescript-eslint/parser": "^4.28.0",
+    "@types/ws": "^8.2.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.2",
+    "@typescript-eslint/parser": "^4.31.2",
     "dotenv": "^10.0.0",
-    "eslint": "^7.29.0",
+    "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-config-airbnb-typescript": "^12.3.1",
+    "eslint-config-airbnb-typescript": "^14.0.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-unicorn": "^33.0.1",
-    "jest": "^27.0.5",
-    "prettier": "^2.3.2",
+    "eslint-import-resolver-custom-alias": "^1.2.0",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-unicorn": "^36.0.0",
+    "jest": "^27.2.2",
+    "prettier": "^2.4.1",
     "prettier-airbnb-config": "^1.0.0",
-    "prisma": "^2.25.0",
+    "prisma": "^3.1.1",
     "prisma-merge": "^0.2.0",
-    "typescript": "^4.3.4"
+    "typescript": "^4.4.3"
   }
 }

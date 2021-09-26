@@ -1,5 +1,11 @@
-import {Client, EmojiResolvable, MessageReaction} from 'discord.js';
-import {Message, MessageEmbed, TextBasedChannel} from 'discord.js';
+import {
+  Message,
+  MessageEmbed,
+  Client,
+  EmojiResolvable,
+  MessageReaction,
+  TextBasedChannels,
+} from 'discord.js';
 import {GlobalSettingsWrapper} from '@/settings';
 import {optional, unchecked} from '@/utils/optionCleaners';
 import {OptionsCleanerDefinition, cleanOptions} from '@/utils/optionsCleaner';
@@ -39,13 +45,13 @@ export interface ReactionOption {
  * Sender for command of a specific channel to send responses in a standardized format.
  */
 export class MessageSender {
-  readonly channel: TextBasedChannel;
+  readonly channel: TextBasedChannels;
 
   private readonly globalSettings: GlobalSettingsWrapper;
 
   private readonly client: Client;
 
-  constructor(globalSettings: GlobalSettingsWrapper, client: Client, channel: TextBasedChannel) {
+  constructor(globalSettings: GlobalSettingsWrapper, client: Client, channel: TextBasedChannels) {
     this.globalSettings = globalSettings;
     this.client = client;
     this.channel = channel;
@@ -54,8 +60,8 @@ export class MessageSender {
   /**
    * Send a custom message.
    */
-  sendRaw = ((...args: Parameters<TextBasedChannel['send']>) =>
-    this.channel.send(...args)) as TextBasedChannel['send'];
+  sendRaw = ((...args: Parameters<TextBasedChannels['send']>) =>
+    this.channel.send(...args)) as TextBasedChannels['send'];
 
   /**
    * Send a simple message.
@@ -66,10 +72,12 @@ export class MessageSender {
     if (cleaned.reactionOptions)
       description += `\n\n${this.reactionOptionsToString(cleaned.reactionOptions)}`;
     const message = await this.sendRaw({
-      embed: {
-        color: this.getColor(cleaned.type),
-        description,
-      },
+      embeds: [
+        {
+          color: this.getColor(cleaned.type),
+          description,
+        },
+      ],
     });
     if (cleaned.reactionOptions) await MessageSender.reactOptions(message, cleaned.reactionOptions);
     return message;
@@ -99,7 +107,7 @@ export class MessageSender {
     });
     if (cleaned.reactionOptions)
       embed.addField('Reaction Options', this.reactionOptionsToString(cleaned.reactionOptions));
-    const message = await this.sendRaw(embed);
+    const message = await this.sendRaw({embeds: [embed]});
     if (cleaned.reactionOptions) MessageSender.reactOptions(message, cleaned.reactionOptions);
     return message;
   }

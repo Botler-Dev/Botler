@@ -15,7 +15,7 @@ import {toDiscordMegaByteString} from './utils/toDiscordMegaByteString';
 const messageDeleteSingleEventTypeName = 'message-delete-single';
 
 async function generateInnerDescription(message: Message | PartialMessage) {
-  if (message.webhookID) {
+  if (message.webhookId) {
     const webhook = await message.fetchWebhook().catch(() => undefined);
     return `A message from ${webhook ? `the webhook **\`${webhook.name}\`**` : `a webhook`} in ${
       message.channel
@@ -73,7 +73,7 @@ export function messageDeleteSingleEventType(
       const partitions = !cachedAttachments
         ? undefined
         : partitionAttachments(
-            cachedAttachments.array(),
+            [...cachedAttachments.values()],
             channel.guild.premiumTier,
             condensedBuffer?.byteLength
           );
@@ -98,7 +98,7 @@ export function messageDeleteSingleEventType(
         );
       }
       const logMessage = await channel.send({
-        embed,
+        embeds: [embed],
         files: [
           ...(partitions?.sendable ?? []),
           ...(!condensedBuffer
@@ -115,7 +115,7 @@ export function messageDeleteSingleEventType(
         embed.setDescription(`**${innerDescription} probably by ${auditEntry.executor}.**`);
         // The auditEntry.reason is ignored because single message deletions by bots
         // are not logged and thus no reason is ever specified.
-        await logMessage.edit(embed);
+        await logMessage.edit({embeds: [embed]});
       };
     },
   };

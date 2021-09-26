@@ -1,6 +1,7 @@
-import {Collection, ReadonlyCollection} from 'discord.js';
+import {Collection} from 'discord.js';
 import {DependencyContainer} from 'tsyringe';
 import {MasterLogger, Logger} from '@/logger';
+import {ReadonlyCollection} from '@/utils/ReadonlyCollection';
 import type {Module} from './Module';
 import {ModuleConstructor, ModuleResolvable, resolveModuleName} from './ModuleConstructor';
 
@@ -103,10 +104,9 @@ export class ModuleLoader {
       // This will always be overwritten once the module loadability is determined.
       checkedModules.set(module, true);
 
-      loadable =
-        module.requiredDependencies
-          .map(dependency => this.resolveModuleConstructor(dependency))
-          .find(constructor => !this.checkModule(checkedModules, constructor)) === undefined;
+      loadable = !module.requiredDependencies
+        .map(dependency => this.resolveModuleConstructor(dependency))
+        .some(constructor => !this.checkModule(checkedModules, constructor));
 
       if (loadable)
         module.optionalDependencies

@@ -4,18 +4,6 @@ type Key = string | number | symbol;
 
 type Constructor<Instance> = new (...args: unknown[]) => Instance;
 
-declare module 'discord.js' {
-  import {DMChannel, NewsChannel, TextChannel} from 'discord.js';
-
-  type ReadonlyCollection<K, V> = Omit<Collection<K, V>, 'set' | 'delete' | 'clear' | 'sweep'>;
-
-  type TextBasedChannel = TextChannel | DMChannel | NewsChannel;
-
-  type TextBasedChannelResolvable = Snowflake | TextBasedChannel;
-
-  type AnyEmojiResolvable = EmojiResolvable | string;
-}
-
 declare namespace NodeJS {
   interface ProcessEnv {
     LOGGER_STAMP_LABEL?: string;

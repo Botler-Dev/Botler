@@ -65,7 +65,7 @@ export class GlobalSettingsWrapper extends SettingsWrapper<GlobalSettings> {
   }
 
   isBotMaster(user: UserResolvable): boolean {
-    const id = this.userManager.resolveID(user);
+    const id = this.userManager.resolveId(user);
     return !!id && this.masterUserIds.includes(id);
   }
 

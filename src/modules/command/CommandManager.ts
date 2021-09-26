@@ -1,6 +1,7 @@
-import {Collection, ReadonlyCollection} from 'discord.js';
+import {Collection} from 'discord.js';
 import {injectable} from 'tsyringe';
 import {Logger} from '@/logger';
+import {ReadonlyCollection} from '@/utils/ReadonlyCollection';
 import {CommandName, Command} from './command/Command';
 
 /**

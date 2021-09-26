@@ -33,7 +33,7 @@ export function attachmentSendEventType(
           return;
 
         const partitions = partitionAttachments(
-          message.attachments.array(),
+          [...message.attachments.values()],
           channel.guild.premiumTier
         );
         const embed = new MessageEmbed()
@@ -60,7 +60,7 @@ export function attachmentSendEventType(
               .join('\n')
           );
         await channel.send({
-          embed,
+          embeds: [embed],
           files: partitions.sendable,
         });
       };

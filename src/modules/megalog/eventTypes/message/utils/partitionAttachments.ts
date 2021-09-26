@@ -1,4 +1,4 @@
-import {MessageAttachment} from 'discord.js';
+import {MessageAttachment, PremiumTier} from 'discord.js';
 
 /**
  * Estimated max size of a message create request without attachments in bytes.
@@ -11,7 +11,12 @@ const MEBI_BYTE = 2 ** 20;
 /**
  * Guild premium tiers mapped to the max upload sizes.
  */
-const MAX_UPLOAD_SIZES = [8 * MEBI_BYTE, 8 * MEBI_BYTE, 50 * MEBI_BYTE, 100 * MEBI_BYTE] as const;
+enum MaxUploadSize {
+  NONE = 8 * MEBI_BYTE,
+  TIER_1 = 8 * MEBI_BYTE,
+  TIER_2 = 50 * MEBI_BYTE,
+  TIER_3 = 100 * MEBI_BYTE,
+}
 
 /**
  * Result of attachment partitioning.
@@ -32,14 +37,14 @@ export interface AttachmentPartition {
  */
 export function partitionAttachments(
   attachments: MessageAttachment[],
-  guildPremiumTier: number,
+  guildPremiumTier: PremiumTier,
   additionalOverhead = 0
 ): AttachmentPartition {
   if (attachments.length === 0) return {sendable: [], unsendable: [], sendableSize: 0};
   const sorted = attachments.sort(
     (attachment1, attachment2) => attachment1.size - attachment2.size
   );
-  const sizeLimit = MAX_UPLOAD_SIZES[guildPremiumTier];
+  const sizeLimit = MaxUploadSize[guildPremiumTier];
 
   let cumulativeSize = additionalOverhead + MAX_MESSAGE_REQUEST_OVERHEAD_SIZE;
   const firstUnsendableIndex = sorted.findIndex(attachment => {

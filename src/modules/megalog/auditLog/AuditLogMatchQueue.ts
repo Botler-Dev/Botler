@@ -106,7 +106,7 @@ export class AuditLogMatchQueue {
         type,
         limit: this.megalogSettings.auditLogFetchSize,
       });
-      entries = auditLogs.entries.array();
+      entries = [...auditLogs.entries.values()];
     } catch {
       return undefined;
     }
@@ -125,7 +125,7 @@ export class AuditLogMatchQueue {
   ) {
     return (
       (filter.action === undefined || entry.action === filter.action) &&
-      (!filter.executor || entry.executor.id === filter.executor) &&
+      (!filter.executor || entry.executor?.id === filter.executor) &&
       (!filter.checker || filter.checker(entry))
     );
   }

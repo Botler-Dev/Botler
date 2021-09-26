@@ -51,12 +51,9 @@ export const roleClientEventListenerDefinitions: ClientEventListenerDefinitions<
               return oldRole.name === change.old && newRole.name === change.new;
             case 'permissions':
               return (
-                oldRole.permissions.bitfield === change.old &&
-                newRole.permissions.bitfield === change.new
+                oldRole.permissions.bitfield.toString() === change.old &&
+                newRole.permissions.bitfield.toString() === change.new
               );
-            // Legacy key is easier to check.
-            case 'permissions_new':
-              return true;
             case 'color':
               return oldRole.color === change.old && newRole.color === change.new;
             case 'hoist':

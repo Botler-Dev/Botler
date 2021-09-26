@@ -1,16 +1,9 @@
 import {DatabaseEventHub, ModelManager} from '@/database';
 import {getTableDeleteStream, getTableNonDeleteStream} from '@/database';
 import {Logger} from '@/logger';
-import {resolveTextBasedChannelId} from '@/utils/resolve';
+import {resolveTextBasedChannelId, TextBasedChannelResolvable} from '@/utils/resolve';
 import {MegalogLogChannel, Prisma, PrismaClient} from '@prisma/client';
-import {
-  Client,
-  Collection,
-  Guild,
-  Snowflake,
-  TextBasedChannelResolvable,
-  TextChannel,
-} from 'discord.js';
+import {Client, Collection, Guild, Snowflake, TextChannel} from 'discord.js';
 import {from, merge} from 'rxjs';
 import {injectable} from 'tsyringe';
 import {MegalogEventTypeName, MegalogEventTypeResolvable} from './eventType/MegalogEventType';

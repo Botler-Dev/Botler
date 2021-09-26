@@ -95,6 +95,6 @@ export class MegalogIgnoreManager extends ModelManager<PrismaClient['megalogIgno
     if (!guildObject) return [];
     return [...(this.cache.get(guildObject.id)?.values() ?? [])]
       .map(channelId => guildObject.channels.cache.get(channelId))
-      .filter((channel): channel is NonNullable<typeof channel> => !!channel);
+      .filter((channel): channel is GuildChannel => channel instanceof GuildChannel);
   }
 }

@@ -1,4 +1,4 @@
-import {Guild, MessageReaction, Snowflake} from 'discord.js';
+import {Guild, MessageReaction, PartialMessageReaction, Snowflake} from 'discord.js';
 import {ClientEventListenerType} from './utils/createClientEventListener';
 import {ClientEventListenerDefinitions} from './utils/createClientEventListeners';
 
@@ -12,12 +12,12 @@ export type SupportedReactionAuditLogClientEvent = never;
 
 export type SupportedReactionGlobalClientEvent = never;
 
-const reactionToGuild = (reaction: MessageReaction): Guild | undefined =>
+const reactionToGuild = (reaction: MessageReaction | PartialMessageReaction): Guild | undefined =>
   reaction.message.guild ?? undefined;
 
-const reactionToInvolvedChannel = (reaction: MessageReaction): Snowflake[] => [
-  reaction.message.channel.id,
-];
+const reactionToInvolvedChannel = (
+  reaction: MessageReaction | PartialMessageReaction
+): Snowflake[] => [reaction.message.channel.id];
 
 export const reactionClientEventListenerDefinitions: ClientEventListenerDefinitions<
   SupportedReactionGuildClientEvent,

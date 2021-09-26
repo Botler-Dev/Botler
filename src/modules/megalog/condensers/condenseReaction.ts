@@ -5,13 +5,13 @@ import {MessageReaction} from 'discord.js';
  * Partially mirrors the [Discord API Reaction structure](https://discord.com/developers/docs/resources/channel#reaction-object).
  */
 export interface CondensedReaction {
-  emoji: string;
+  emoji?: string;
   count?: number;
 }
 
 export function condenseReaction(reaction: MessageReaction): CondensedReaction {
   return {
-    emoji: reaction.emoji.id ?? reaction.emoji.name,
+    emoji: reaction.emoji.id ?? reaction.emoji.name ?? undefined,
     count: reaction.count ?? undefined,
   };
 }

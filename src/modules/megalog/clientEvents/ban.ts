@@ -1,4 +1,4 @@
-import {Guild, GuildAuditLogsActions} from 'discord.js';
+import {Guild, GuildAuditLogsActions, GuildBan} from 'discord.js';
 import {checkAuditLogEntryTargetId} from './utils/checkAuditLogEntryTargetId';
 import {
   ClientEventListenerType,
@@ -12,12 +12,12 @@ export type SupportedBanAuditLogClientEvent = 'guildBanAdd' | 'guildBanRemove';
 
 export type SupportedBanGlobalClientEvent = never;
 
-const guildToGuild = (guild: Guild): Guild => guild;
+const guildToGuild = (ban: GuildBan): Guild => ban.guild;
 
 function payloadToMatchFilter(
   action: keyof GuildAuditLogsActions
 ): PayloadToAuditLogMatchFilterResolver<'guildBanAdd' | 'guildBanRemove'> {
-  return (_, {id: userId}) => ({
+  return ({user: {id: userId}}) => ({
     action,
     checker: entry => checkAuditLogEntryTargetId(entry, userId),
   });

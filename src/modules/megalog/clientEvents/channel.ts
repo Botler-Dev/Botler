@@ -7,6 +7,7 @@ import {
   PartialDMChannel,
   Role,
   Snowflake,
+  TextBasedChannels,
   TextChannel,
   VoiceChannel,
   Webhook,
@@ -27,7 +28,7 @@ export type SupportedChannelAuditLogClientEvent =
 
 export type SupportedChannelGlobalClientEvent = never;
 
-const channelToGuild = (channel: Channel): Guild | undefined =>
+const channelToGuild = (channel: Channel | TextBasedChannels): Guild | undefined =>
   channel instanceof GuildChannel ? channel.guild : undefined;
 
 const channelToInvolved = (channel: Channel | PartialDMChannel): Snowflake[] => [channel.id];
@@ -44,11 +45,15 @@ function channelToMatchFilter(action: keyof GuildAuditLogsActions) {
 }
 
 enum ChannelType {
-  text = 0,
-  voice = 2,
-  category = 4,
-  news = 5,
-  store = 6,
+  GUILD_TEXT = 0,
+  GUILD_VOICE = 2,
+  GUILD_CATEGORY = 4,
+  GUILD_NEWS = 5,
+  GUILD_STORE = 6,
+  GUILD_NEWS_THREAD = 10,
+  GUILD_PUBLIC_THREAD = 11,
+  GUILD_PRIVATE_THREAD = 12,
+  GUILD_STAGE_VOICE = 13,
 }
 
 export const channelClientEventListenerDefinitions: ClientEventListenerDefinitions<
@@ -103,8 +108,10 @@ export const channelClientEventListenerDefinitions: ClientEventListenerDefinitio
                     // Tough listed in the docs, strangely this key never appears in the audit log.
                     // We could check individual permission overwrites but that would be too expensive.
                     return (
-                      oldChannel.permissionOverwrites.size === change.old.length &&
-                      newChannel.permissionOverwrites.size === change.new.length
+                      oldChannel.permissionOverwrites.cache.size ===
+                        (change.old as unknown[]).length &&
+                      newChannel.permissionOverwrites.cache.size ===
+                        (change.new as unknown[]).length
                     );
                   case 'nsfw':
                     return (
@@ -135,32 +142,28 @@ export const channelClientEventListenerDefinitions: ClientEventListenerDefinitio
             case 'CHANNEL_OVERWRITE_CREATE': {
               const entity = entry.extra as Role | GuildMember;
               return (
-                !oldChannel.permissionOverwrites.has(entity.id) &&
+                !oldChannel.permissionOverwrites.cache.has(entity.id) &&
                 // Checking the actual deny and allow permissions would be possible but it is 0 in most cases anyway.
-                newChannel.permissionOverwrites.has(entity.id)
+                newChannel.permissionOverwrites.cache.has(entity.id)
               );
             }
             case 'CHANNEL_OVERWRITE_UPDATE': {
               const entity = entry.extra as Role | GuildMember;
-              const oldPermissions = oldChannel.permissionOverwrites.get(entity.id);
-              const newPermissions = newChannel.permissionOverwrites.get(entity.id);
+              const oldPermissions = oldChannel.permissionOverwrites.cache.get(entity.id);
+              const newPermissions = newChannel.permissionOverwrites.cache.get(entity.id);
               if (!oldPermissions || !newPermissions) return false;
               return (entry.changes ?? []).every(change => {
                 switch (change.key) {
                   case 'deny':
                     return (
-                      oldPermissions.deny.bitfield === change.old &&
-                      newPermissions.deny.bitfield === change.new
+                      oldPermissions.deny.bitfield.toString() === change.old &&
+                      newPermissions.deny.bitfield.toString() === change.new
                     );
                   case 'allow':
                     return (
-                      oldPermissions.allow.bitfield === change.old &&
-                      newPermissions.allow.bitfield === change.new
+                      oldPermissions.allow.bitfield.toString() === change.old &&
+                      newPermissions.allow.bitfield.toString() === change.new
                     );
-                  // The legacy fields are easier to compare so we are using them.
-                  case 'deny_new':
-                  case 'allow_new':
-                    return true;
                   default:
                     return false;
                 }
@@ -169,8 +172,8 @@ export const channelClientEventListenerDefinitions: ClientEventListenerDefinitio
             case 'CHANNEL_OVERWRITE_DELETE': {
               const entity = entry.extra as Role | GuildMember;
               return (
-                oldChannel.permissionOverwrites.has(entity.id) &&
-                !newChannel.permissionOverwrites.has(entity.id)
+                oldChannel.permissionOverwrites.cache.has(entity.id) &&
+                !newChannel.permissionOverwrites.cache.has(entity.id)
               );
             }
             default:
@@ -207,7 +210,7 @@ export const channelClientEventListenerDefinitions: ClientEventListenerDefinitio
           entry.action === 'WEBHOOK_CREATE' ||
           entry.action === 'WEBHOOK_DELETE') &&
         entry.target instanceof Webhook &&
-        entry.target.channelID === channel.id,
+        entry.target.channelId === channel.id,
     }),
   },
 };

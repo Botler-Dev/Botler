@@ -1,5 +1,5 @@
 import {PrismaClient} from '@prisma/client';
-import {ChannelManager, Client, GuildManager, UserManager} from 'discord.js';
+import {ChannelManager, Client, GuildManager, Intents, UserManager} from 'discord.js';
 import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {container} from 'tsyringe';
 
@@ -50,7 +50,9 @@ export class Bot {
     this.cleaner = container.resolve(DatabaseCleaner);
 
     this.client = new Client({
-      disableMentions: 'everyone',
+      // TODO: let modules specify the intents they need
+      intents: Object.values(Intents.FLAGS),
+      allowedMentions: {parse: ['users', 'roles'], repliedUser: true},
       partials: ['USER', 'CHANNEL', 'GUILD_MEMBER', 'MESSAGE', 'REACTION'],
     });
     container.registerInstance(Client, this.client);

@@ -55,14 +55,13 @@ export const memberClientEventListenerDefinitions: ClientEventListenerDefinition
               switch (change.key) {
                 case '$add':
                   return (
-                    change.new?.every(
-                      ({id}: {id: Snowflake}) =>
-                        !oldMember.roles.cache.has(id) && newMember.roles.cache.has(id)
+                    (change.new as {id: Snowflake}[] | undefined)?.every(
+                      ({id}) => !oldMember.roles.cache.has(id) && newMember.roles.cache.has(id)
                     ) ?? false
                   );
                 case '$remove':
                   return (
-                    change.new?.every(
+                    (change.new as {id: Snowflake}[] | undefined)?.every(
                       ({id}: {id: Snowflake}) =>
                         oldMember.roles.cache.has(id) && !newMember.roles.cache.has(id)
                     ) ?? false

@@ -5,7 +5,7 @@ module.exports = {
   env: {
     es2020: true,
   },
-  plugins: ['@typescript-eslint', 'unicorn'],
+  plugins: ['@typescript-eslint', 'import', 'unicorn'],
   extends: [
     'airbnb-typescript/base',
     'plugin:@typescript-eslint/recommended',
@@ -21,7 +21,10 @@ module.exports = {
   },
   settings: {
     'import/resolver': {
-      node: {
+      'eslint-import-resolver-custom-alias': {
+        alias: {
+          '@': './src',
+        },
         extensions: ['.ts'],
       },
     },

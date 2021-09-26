@@ -1,4 +1,4 @@
-import {Client, TextBasedChannel} from 'discord.js';
+import {Client, TextBasedChannels} from 'discord.js';
 import {GlobalSettingsWrapper} from '@/settings';
 import type {ConcreteCommandCacheWrapper} from '../cache/CommandCacheWrapper';
 import type {Command} from '../command/Command';
@@ -57,7 +57,7 @@ export abstract class BaseExecutionContext<
   /**
    * Create a {@link MessageSender} for the provided channel.
    */
-  createSender(channel: TextBasedChannel): MessageSender {
+  createSender(channel: TextBasedChannels): MessageSender {
     return new MessageSender(this.globalSettings, this.client, channel);
   }
 

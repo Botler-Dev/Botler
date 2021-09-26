@@ -13,7 +13,7 @@ const messageEditEventTypeName = 'message-edit';
 
 async function generateDescription(message: Message | PartialMessage) {
   let innerDescription: string;
-  if (message.webhookID) {
+  if (message.webhookId) {
     const webhook = await message.fetchWebhook().catch(() => undefined);
     innerDescription = `${
       webhook ? `The webhook **\`${webhook.name}\`**` : 'A webhook'
@@ -65,7 +65,7 @@ export function messageEditEventType(
 
         const guildSettings = await guildSettingsManager.fetch(channel.guild);
         await channel.send({
-          embed,
+          embeds: [embed],
           files: !guildSettings.attachCondensedJson
             ? []
             : [

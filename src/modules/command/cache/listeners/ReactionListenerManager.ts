@@ -98,9 +98,9 @@ export class ReactionListenerManager extends ModelManager<PrismaClient['commandR
     }
   }
 
-  private static resolveEmojiIdentifier(emoji: EmojiResolvable | string): string {
+  private static resolveEmojiIdentifier(emoji: EmojiResolvable | string): string | undefined {
     if (typeof emoji === 'string') return emoji;
-    return emoji.id ?? emoji.name;
+    return emoji.id ?? emoji.name ?? undefined;
   }
 
   private resolveParameters<TMessageOptional extends undefined>(

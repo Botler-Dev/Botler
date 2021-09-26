@@ -15,8 +15,8 @@ export type SupportedGuildGlobalClientEvent = never;
 const guildToGuild = (guild: Guild): Guild => guild;
 
 enum DefaultMessageNotifications {
-  ALL = 0,
-  MENTIONS = 1,
+  ALL_MESSAGES = 0,
+  ONLY_MENTIONS = 1,
 }
 
 function getValueOfDefaultMessageNotifications(
@@ -40,7 +40,8 @@ enum ExplicitContentFilterLevels {
   ALL_MEMBERS = 2,
 }
 
-const inviteToGuild = (invite: Invite): Guild | undefined => invite.guild ?? undefined;
+const inviteToGuild = (invite: Invite): Guild | undefined =>
+  invite.guild instanceof Guild ? invite.guild : undefined;
 
 const inviteToInvolvedChannel = (invite: Invite): Snowflake[] => [invite.channel.id];
 
@@ -91,29 +92,30 @@ export const guildClientEventListenerDefinitions: ClientEventListenerDefinitions
                 (newGuild.banner ?? undefined) === change.new
               );
             case 'owner_id':
-              return oldGuild.ownerID === change.old && newGuild.ownerID === change.new;
+              return oldGuild.ownerId === change.old && newGuild.ownerId === change.new;
             case 'region':
-              return oldGuild.region === change.old && newGuild.region === change.new;
+              // Comparable property was removed in Discord.js v13
+              return true;
             case 'preferred_locale':
               return (
                 oldGuild.preferredLocale === change.old && newGuild.preferredLocale === change.new
               );
             case 'afk_channel_id':
               return (
-                (oldGuild.afkChannelID ?? undefined) === change.old &&
-                (newGuild.afkChannelID ?? undefined) === change.new
+                (oldGuild.afkChannelId ?? undefined) === change.old &&
+                (newGuild.afkChannelId ?? undefined) === change.new
               );
             case 'afk_timeout':
               return oldGuild.afkTimeout === change.old && newGuild.afkTimeout === change.new;
             case 'rules_channel_id':
               return (
-                (oldGuild.rulesChannelID ?? undefined) === change.old &&
-                (newGuild.rulesChannelID ?? undefined) === change.new
+                (oldGuild.rulesChannelId ?? undefined) === change.old &&
+                (newGuild.rulesChannelId ?? undefined) === change.new
               );
             case 'public_updates_channel_id':
               return (
-                (oldGuild.publicUpdatesChannelID ?? undefined) === change.old &&
-                (newGuild.publicUpdatesChannelID ?? undefined) === change.new
+                (oldGuild.publicUpdatesChannelId ?? undefined) === change.old &&
+                (newGuild.publicUpdatesChannelId ?? undefined) === change.new
               );
             case 'mfa_level':
               return oldGuild.mfaLevel === change.old && newGuild.mfaLevel === change.new;
@@ -140,19 +142,11 @@ export const guildClientEventListenerDefinitions: ClientEventListenerDefinitions
                 (oldGuild.vanityURLCode ?? undefined) === change.old &&
                 (newGuild.vanityURLCode ?? undefined) === change.new
               );
-            // Both add and remove seemingly don't get used anymore.
+            // Both add and remove don't get used anymore.
             case '$add':
-              return (
-                !oldGuild.roles.cache.has(change.new?.id) &&
-                newGuild.roles.cache.has(change.new?.id)
-              );
             case '$remove':
-              return (
-                oldGuild.roles.cache.has(change.new?.id) &&
-                !newGuild.roles.cache.has(change.new?.id)
-              );
+            // Could not find any relating guild setting that would be changed.
             case 'prune_delete_days':
-              // Could not find any relating guild setting that would be changed.
               return true;
             case 'widget_enabled':
               return (
@@ -161,13 +155,13 @@ export const guildClientEventListenerDefinitions: ClientEventListenerDefinitions
               );
             case 'widget_channel_id':
               return (
-                (oldGuild.widgetChannelID ?? undefined) === change.old &&
-                (newGuild.widgetChannelID ?? undefined) === change.new
+                (oldGuild.widgetChannelId ?? undefined) === change.old &&
+                (newGuild.widgetChannelId ?? undefined) === change.new
               );
             case 'system_channel_id':
               return (
-                (oldGuild.systemChannelID ?? undefined) === change.old &&
-                (newGuild.systemChannelID ?? undefined) === change.new
+                (oldGuild.systemChannelId ?? undefined) === change.old &&
+                (newGuild.systemChannelId ?? undefined) === change.new
               );
             default:
               return false;

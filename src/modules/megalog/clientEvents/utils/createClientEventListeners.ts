@@ -20,13 +20,11 @@ export type ClientEventListenerDefinitions<
   TGlobalEventNames extends keyof ClientEvents
 > = {
   [TEventName in TGuildEventNames]: GuildClientEventListenerDefinition<TEventName>;
-} &
-  {
-    [TEventName in TAuditLogEventNames]: AuditLogClientEventListenerDefinition<TEventName>;
-  } &
-  {
-    [TEventName in TGlobalEventNames]: GlobalClientEventListenerDefinition<TEventName>;
-  };
+} & {
+  [TEventName in TAuditLogEventNames]: AuditLogClientEventListenerDefinition<TEventName>;
+} & {
+  [TEventName in TGlobalEventNames]: GlobalClientEventListenerDefinition<TEventName>;
+};
 
 export type ClientEventSubscriptions = Partial<Record<keyof ClientEvents, Subscription>>;
 
