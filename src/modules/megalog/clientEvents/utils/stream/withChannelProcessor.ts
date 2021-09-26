@@ -1,9 +1,12 @@
 import {Logger} from '@/logger';
-import {ExportProxyClientEvents} from 'discord.js';
+import {
+  MegalogChannelProcessor,
+  MegalogEventType,
+} from '@/modules/megalog/eventType/MegalogEventType';
+import {ClientEvents} from 'discord.js';
 import {from, OperatorFunction} from 'rxjs';
 import {catchError, concatMap, filter, map} from 'rxjs/operators';
-import type {MegalogSupportedClientEvent} from '..';
-import {MegalogChannelProcessor, MegalogEventType} from '../../eventType/MegalogEventType';
+import type {MegalogSupportedClientEvent} from '../..';
 
 export interface MegalogEventTypeChannelProcessorPair<
   TEventName extends MegalogSupportedClientEvent
@@ -14,7 +17,7 @@ export interface MegalogEventTypeChannelProcessorPair<
 
 export function withChannelProcessor<TEventName extends MegalogSupportedClientEvent>(
   logger: Logger,
-  payload: ExportProxyClientEvents[TEventName]
+  payload: ClientEvents[TEventName]
 ): OperatorFunction<
   MegalogEventType<TEventName>,
   MegalogEventTypeChannelProcessorPair<TEventName>

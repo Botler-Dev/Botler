@@ -1,9 +1,8 @@
 import {Logger} from '@/logger';
+import {AuditLogMatchListener} from '@/modules/megalog/auditLog/AuditLogMatcher';
+import {MegalogAuditLogEntryProcessor} from '@/modules/megalog/eventType/MegalogEventType';
 import {from, lastValueFrom, OperatorFunction} from 'rxjs';
 import {catchError, map, mergeMap} from 'rxjs/operators';
-import {AuditLogMatchListener} from '../../auditLog/AuditLogMatcher';
-import {MegalogAuditLogEntryProcessor} from '../../eventType/MegalogEventType';
-
 /**
  * Wraps the array of incoming {@link MegalogAuditLogEntryProcessor} into an {@link AuditLogMatchListener}
  */

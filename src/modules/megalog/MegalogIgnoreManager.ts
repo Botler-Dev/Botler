@@ -54,7 +54,10 @@ export class MegalogIgnoreManager extends ModelManager<PrismaClient['megalogIgno
   }
 
   private removeCacheEntry(guildId: string, channelId: string): void {
-    this.cache.get(guildId)?.delete(channelId);
+    const channels = this.cache.get(guildId);
+    if (!channels) return;
+    if (channels.size === 1) this.cache.delete(guildId);
+    else channels.delete(channelId);
   }
 
   async ignore(channel: GuildChannel): Promise<void> {
@@ -83,14 +86,14 @@ export class MegalogIgnoreManager extends ModelManager<PrismaClient['megalogIgno
     return !!this.cache.get(channel.guild.id)?.has(channel.id);
   }
 
-  getIgnoredChannelIds(guildId: Snowflake): Snowflake[] {
-    return [...(this.cache.get(guildId)?.values() ?? [])];
+  getIgnoredChannelIds(guildId: Snowflake): ReadonlySet<Snowflake> {
+    return this.cache.get(guildId) ?? new Set();
   }
 
   getIgnoredChannels(guild: GuildResolvable): GuildChannel[] {
     const guildObject = this.client.guilds.resolve(guild);
     if (!guildObject) return [];
-    return this.getIgnoredChannelIds(guildObject.id)
+    return [...(this.cache.get(guildObject.id)?.values() ?? [])]
       .map(channelId => guildObject.channels.cache.get(channelId))
       .filter((channel): channel is NonNullable<typeof channel> => !!channel);
   }

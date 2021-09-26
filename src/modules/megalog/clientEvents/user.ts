@@ -1,13 +1,19 @@
-import {ExportProxyClientEvents} from 'discord.js';
-import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
+import {ClientEventListenerType} from './utils/createClientEventListener';
+import {ClientEventListenerDefinitions} from './utils/createClientEventListeners';
 
-export type MegalogSupportedUserClientEvent = Extract<keyof ExportProxyClientEvents, 'userUpdate'>;
+export type SupportedUserGuildClientEvent = never;
 
-export type AuditLogSupportedUserClientEvent = Extract<MegalogSupportedUserClientEvent, never>;
+export type SupportedUserAuditLogClientEvent = never;
 
-export function registerUserClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGlobalEvent(
-    'userUpdate',
-    async (guild, user) => !!(await guild.members.fetch(user.id).catch(() => {}))
-  );
-}
+export type SupportedUserGlobalClientEvent = 'userUpdate';
+
+export const userClientEventListenerDefinitions: ClientEventListenerDefinitions<
+  SupportedUserGuildClientEvent,
+  SupportedUserAuditLogClientEvent,
+  SupportedUserGlobalClientEvent
+> = {
+  userUpdate: {
+    type: ClientEventListenerType.Global,
+    relevanceFilter: async (guild, user) => !!(await guild.members.fetch(user.id).catch(() => {})),
+  },
+};

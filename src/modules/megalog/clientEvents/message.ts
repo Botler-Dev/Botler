@@ -1,24 +1,41 @@
-import {ExportProxyClientEvents} from 'discord.js';
+import {Guild, Message, PartialMessage, Snowflake} from 'discord.js';
 import {checkAuditLogEntryTargetId} from './utils/checkAuditLogEntryTargetId';
-import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
+import {ClientEventListenerType} from './utils/createClientEventListener';
+import {ClientEventListenerDefinitions} from './utils/createClientEventListeners';
 
-export type MegalogSupportedMessageClientEvent = Extract<
-  keyof ExportProxyClientEvents,
-  'message' | 'messageDelete' | 'messageDeleteBulk' | 'messageUpdate'
->;
+export type SupportedMessageGuildClientEvent = 'message' | 'messageUpdate';
 
-export type AuditLogSupportedMessageClientEvent = Extract<
-  MegalogSupportedMessageClientEvent,
-  'messageDelete' | 'messageDeleteBulk'
->;
+export type SupportedMessageAuditLogClientEvent = 'messageDelete' | 'messageDeleteBulk';
 
-export function registerMessageClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEvent('message', async message => message.guild ?? undefined);
+export type SupportedMessageGlobalClientEvent = never;
 
-  utils.listenToGuildEvent(
-    'messageDelete',
-    async message => message.guild ?? undefined,
-    async message => {
+const messageToGuild = (message: Message | PartialMessage): Guild | undefined =>
+  message.guild ?? undefined;
+
+const messageToInvolvedChannel = (message: Message | PartialMessage): Snowflake[] => [
+  message.channel.id,
+];
+
+export const messageClientEventListenerDefinitions: ClientEventListenerDefinitions<
+  SupportedMessageGuildClientEvent,
+  SupportedMessageAuditLogClientEvent,
+  SupportedMessageGlobalClientEvent
+> = {
+  message: {
+    type: ClientEventListenerType.Guild,
+    channelResolver: messageToInvolvedChannel,
+    guildResolver: messageToGuild,
+  },
+  messageUpdate: {
+    type: ClientEventListenerType.Guild,
+    guildResolver: messageToGuild,
+    channelResolver: messageToInvolvedChannel,
+  },
+  messageDelete: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: messageToGuild,
+    channelResolver: messageToInvolvedChannel,
+    filterResolver: message => {
       const {author, channel} = message;
       if (!author) return undefined;
       const channelId = channel.id;
@@ -31,13 +48,17 @@ export function registerMessageClientEventListeners(utils: MegalogClientEventUti
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (entry.extra as any)?.channel?.id === channelId,
       };
-    }
-  );
-
-  utils.listenToGuildEvent(
-    'messageDeleteBulk',
-    async messages => messages.first()?.guild ?? undefined,
-    async messages => {
+    },
+  },
+  messageDeleteBulk: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: messages => messages.first()?.guild ?? undefined,
+    channelResolver: messages => {
+      const channelId = messages.first()?.channel.id;
+      if (channelId === undefined) return [];
+      return [channelId];
+    },
+    filterResolver: messages => {
       const firstMessage = messages.first();
       if (!firstMessage) return undefined;
       const channelId = firstMessage.channel.id;
@@ -50,8 +71,6 @@ export function registerMessageClientEventListeners(utils: MegalogClientEventUti
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (entry.extra as any)?.count >= deleteCount,
       };
-    }
-  );
-
-  utils.listenToGuildEvent('messageUpdate', async oldMessage => oldMessage.guild ?? undefined);
-}
+    },
+  },
+};

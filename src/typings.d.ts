@@ -14,12 +14,6 @@ declare module 'discord.js' {
   type TextBasedChannelResolvable = Snowflake | TextBasedChannel;
 
   type AnyEmojiResolvable = EmojiResolvable | string;
-
-  /**
-   * Proxy export of {@link ClientEvents} because Discord.js does not directly export it.
-   * Technically breaks the encapsulation rule but it will throw an error if something ever changes so ¯\_(ツ)_/¯
-   */
-  type ExportProxyClientEvents = ClientEvents;
 }
 
 declare namespace NodeJS {

@@ -105,6 +105,7 @@ export class MegalogModule extends Module {
       this.logger,
       this.subscriptionManager,
       this.eventTypeManager,
+      this.ignoreManager,
       this.auditLogMatcher
     );
   }

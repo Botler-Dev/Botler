@@ -1,61 +1,72 @@
-import {ExportProxyClientEvents, GuildAuditLogsActions, Role} from 'discord.js';
+import {Guild, GuildAuditLogsActions, Role} from 'discord.js';
 import {checkAuditLogEntryTargetId} from './utils/checkAuditLogEntryTargetId';
 import {
-  MegalogClientEventUtils,
+  ClientEventListenerType,
   PayloadToAuditLogMatchFilterResolver,
-} from './utils/MegalogClientEventUtils';
+} from './utils/createClientEventListener';
+import {ClientEventListenerDefinitions} from './utils/createClientEventListeners';
 
-export type MegalogSupportedRoleClientEvent = Extract<
-  keyof ExportProxyClientEvents,
-  'roleCreate' | 'roleDelete' | 'roleUpdate'
->;
+export type SupportedRoleGuildClientEvent = never;
 
-export type AuditLogSupportedRoleClientEvent = Extract<
-  MegalogSupportedRoleClientEvent,
-  'roleCreate' | 'roleDelete' | 'roleUpdate'
->;
+export type SupportedRoleAuditLogClientEvent = 'roleCreate' | 'roleDelete' | 'roleUpdate';
 
-const roleToGuild = async (role: Role) => role.guild;
+export type SupportedRoleGlobalClientEvent = never;
+
+const roleToGuild = (role: Role): Guild => role.guild;
 
 function roleToMatchFilter(
   action: keyof GuildAuditLogsActions
 ): PayloadToAuditLogMatchFilterResolver<'roleCreate' | 'roleDelete'> {
-  return async ({id: roleId}) => ({
+  return ({id: roleId}) => ({
     action,
     checker: entry => checkAuditLogEntryTargetId(entry, roleId),
   });
 }
 
-export function registerRoleClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEvent('roleCreate', roleToGuild, roleToMatchFilter('ROLE_CREATE'));
-
-  utils.listenToGuildEvent('roleDelete', roleToGuild, roleToMatchFilter('ROLE_DELETE'));
-
-  utils.listenToGuildEvent('roleUpdate', roleToGuild, async (oldRole, newRole) => ({
-    action: 'ROLE_UPDATE',
-    checker: entry =>
-      checkAuditLogEntryTargetId(entry, oldRole.id) &&
-      (entry.changes ?? []).every(change => {
-        switch (change.key) {
-          case 'name':
-            return oldRole.name === change.old && newRole.name === change.new;
-          case 'permissions':
-            return (
-              oldRole.permissions.bitfield === change.old &&
-              newRole.permissions.bitfield === change.new
-            );
-          // Legacy key is easier to check.
-          case 'permissions_new':
-            return true;
-          case 'color':
-            return oldRole.color === change.old && newRole.color === change.new;
-          case 'hoist':
-            return oldRole.hoist === change.old && newRole.hoist === change.new;
-          case 'mentionable':
-            return oldRole.mentionable === change.old && newRole.mentionable === change.new;
-          default:
-            return false;
-        }
-      }),
-  }));
-}
+export const roleClientEventListenerDefinitions: ClientEventListenerDefinitions<
+  SupportedRoleGuildClientEvent,
+  SupportedRoleAuditLogClientEvent,
+  SupportedRoleGlobalClientEvent
+> = {
+  roleCreate: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: roleToGuild,
+    filterResolver: roleToMatchFilter('ROLE_CREATE'),
+  },
+  roleDelete: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: roleToGuild,
+    filterResolver: roleToMatchFilter('ROLE_DELETE'),
+  },
+  roleUpdate: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: roleToGuild,
+    filterResolver: (oldRole, newRole) => ({
+      action: 'ROLE_UPDATE',
+      checker: entry =>
+        checkAuditLogEntryTargetId(entry, oldRole.id) &&
+        (entry.changes ?? []).every(change => {
+          switch (change.key) {
+            case 'name':
+              return oldRole.name === change.old && newRole.name === change.new;
+            case 'permissions':
+              return (
+                oldRole.permissions.bitfield === change.old &&
+                newRole.permissions.bitfield === change.new
+              );
+            // Legacy key is easier to check.
+            case 'permissions_new':
+              return true;
+            case 'color':
+              return oldRole.color === change.old && newRole.color === change.new;
+            case 'hoist':
+              return oldRole.hoist === change.old && newRole.hoist === change.new;
+            case 'mentionable':
+              return oldRole.mentionable === change.old && newRole.mentionable === change.new;
+            default:
+              return false;
+          }
+        }),
+    }),
+  },
+};
