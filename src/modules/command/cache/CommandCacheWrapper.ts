@@ -1,12 +1,8 @@
 import {CommandCommandCache} from '@prisma/client';
 import dayjs, {Dayjs} from 'dayjs';
-import {
-  EmojiResolvable,
-  MessageResolvable,
-  TextBasedChannelResolvable,
-  UserResolvable,
-} from 'discord.js';
+import {EmojiResolvable, MessageResolvable, UserResolvable} from 'discord.js';
 import {CachedEntityWrapper} from '@/database';
+import {TextBasedChannelResolvable} from '@/utils/resolve';
 import {Command} from '../command/Command';
 import {ReactionAction} from '../executionContexts/ReactionExecutionContext';
 import type {CommandCacheManager} from './CommandCacheManager';

@@ -1,37 +1,41 @@
-import {ExportProxyClientEvents, Guild, GuildAuditLogsActions} from 'discord.js';
+import {Guild, GuildAuditLogsActions, GuildBan} from 'discord.js';
 import {checkAuditLogEntryTargetId} from './utils/checkAuditLogEntryTargetId';
 import {
-  MegalogClientEventUtils,
+  ClientEventListenerType,
   PayloadToAuditLogMatchFilterResolver,
-} from './utils/MegalogClientEventUtils';
+} from './utils/createClientEventListener';
+import {ClientEventListenerDefinitions} from './utils/createClientEventListeners';
 
-export type MegalogSupportedBanClientEvent = Extract<
-  keyof ExportProxyClientEvents,
-  'guildBanAdd' | 'guildBanRemove'
->;
+export type SupportedBanGuildClientEvent = never;
 
-export type AuditLogSupportedBanClientEvent = Extract<
-  MegalogSupportedBanClientEvent,
-  'guildBanAdd' | 'guildBanRemove'
->;
+export type SupportedBanAuditLogClientEvent = 'guildBanAdd' | 'guildBanRemove';
 
-const guildToGuild = async (guild: Guild) => guild;
+export type SupportedBanGlobalClientEvent = never;
+
+const guildToGuild = (ban: GuildBan): Guild => ban.guild;
 
 function payloadToMatchFilter(
   action: keyof GuildAuditLogsActions
 ): PayloadToAuditLogMatchFilterResolver<'guildBanAdd' | 'guildBanRemove'> {
-  return async (_, {id: userId}) => ({
+  return ({user: {id: userId}}) => ({
     action,
     checker: entry => checkAuditLogEntryTargetId(entry, userId),
   });
 }
 
-export function registerBanClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEvent('guildBanAdd', guildToGuild, payloadToMatchFilter('MEMBER_BAN_ADD'));
-
-  utils.listenToGuildEvent(
-    'guildBanRemove',
-    guildToGuild,
-    payloadToMatchFilter('MEMBER_BAN_REMOVE')
-  );
-}
+export const banClientEventListenerDefinitions: ClientEventListenerDefinitions<
+  SupportedBanGuildClientEvent,
+  SupportedBanAuditLogClientEvent,
+  SupportedBanGlobalClientEvent
+> = {
+  guildBanAdd: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: guildToGuild,
+    filterResolver: payloadToMatchFilter('MEMBER_BAN_ADD'),
+  },
+  guildBanRemove: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: guildToGuild,
+    filterResolver: payloadToMatchFilter('MEMBER_BAN_REMOVE'),
+  },
+};

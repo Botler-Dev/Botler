@@ -4,6 +4,8 @@ import {Message, MessageEmbed, PartialMessage} from 'discord.js';
 import {messageMegalogEventCategoryName} from '.';
 import {condenseMessageEdit} from '../../condensers/condenseMessageEdit';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
+import {MegalogGuildSettingsManager} from '../../guildSettings/MegalogGuildSettingsManager';
+import {MegalogSubscriptionManager} from '../../MegalogSubscriptionManager';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
 import {addContentField} from './utils/addContentField';
 
@@ -11,7 +13,7 @@ const messageEditEventTypeName = 'message-edit';
 
 async function generateDescription(message: Message | PartialMessage) {
   let innerDescription: string;
-  if (message.webhookID) {
+  if (message.webhookId) {
     const webhook = await message.fetchWebhook().catch(() => undefined);
     innerDescription = `${
       webhook ? `The webhook **\`${webhook.name}\`**` : 'A webhook'
@@ -25,7 +27,9 @@ async function generateDescription(message: Message | PartialMessage) {
 }
 
 export function messageEditEventType(
-  globalSettings: GlobalSettingsWrapper
+  globalSettings: GlobalSettingsWrapper,
+  guildSettingsManager: MegalogGuildSettingsManager,
+  subscriptionManager: MegalogSubscriptionManager
 ): MegalogEventType<'messageUpdate'> {
   return {
     name: messageEditEventTypeName,
@@ -33,7 +37,13 @@ export function messageEditEventType(
     category: messageMegalogEventCategoryName,
     clientEventName: 'messageUpdate',
     processClientEvent: async (oldMessage, newMessage) => {
-      if (oldMessage.editedTimestamp === newMessage.editedTimestamp) return undefined;
+      if (
+        oldMessage.editedTimestamp === newMessage.editedTimestamp ||
+        (oldMessage.author &&
+          oldMessage.author.id === oldMessage.client.user?.id &&
+          subscriptionManager.channelHasSubscriptions(oldMessage.channel))
+      )
+        return undefined;
       return async channel => {
         let message = newMessage;
         if (!message.author) message = await newMessage.fetch().catch(() => message);
@@ -53,10 +63,17 @@ export function messageEditEventType(
           addContentField(embed, 'Text after', newMessage.content);
         }
 
-        const json = jsonToBuffer(condenseMessageEdit(oldMessage, newMessage));
+        const guildSettings = await guildSettingsManager.fetch(channel.guild);
         await channel.send({
-          embed,
-          files: [{attachment: json, name: 'message-edit-json'}],
+          embeds: [embed],
+          files: !guildSettings.attachCondensedJson
+            ? []
+            : [
+                {
+                  attachment: jsonToBuffer(condenseMessageEdit(oldMessage, newMessage)),
+                  name: `message-edit${guildSettings.condensedFileNameEnding}`,
+                },
+              ],
         });
       };
     },

@@ -1,4 +1,5 @@
-import {Collection, ReadonlyCollection} from 'discord.js';
+import {ReadonlyCollection} from '@/utils/ReadonlyCollection';
+import {Collection} from 'discord.js';
 import {CachedEntityWrapper} from '../wrapper/CachedEntityWrapper';
 import {ModelManager} from './ModelManager';
 

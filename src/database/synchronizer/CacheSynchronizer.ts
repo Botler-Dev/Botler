@@ -1,6 +1,7 @@
-import {Collection, ReadonlyCollection} from 'discord.js';
+import {Collection} from 'discord.js';
 import {merge, Observable, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {ReadonlyCollection} from '@/utils/ReadonlyCollection';
 import {Entity} from '../wrapper/EntityWrapper';
 import {DatabaseEventHub} from '../DatabaseEventHub';
 import {getTableDeleteStream, getTableNonDeleteStream} from './changeStreams';

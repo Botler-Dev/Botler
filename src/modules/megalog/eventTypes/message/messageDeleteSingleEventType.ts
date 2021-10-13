@@ -4,7 +4,8 @@ import {Message, MessageEmbed, PartialMessage} from 'discord.js';
 import {messageMegalogEventCategoryName} from '.';
 import {condenseSingleMessageDeletion} from '../../condensers/condenseSingleMessageDeletion';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
-import {MegalogChannelManager} from '../../MegalogChannelManager';
+import {MegalogGuildSettingsManager} from '../../guildSettings/MegalogGuildSettingsManager';
+import {MegalogSubscriptionManager} from '../../MegalogSubscriptionManager';
 import {jsonToBuffer} from '../../utils/jsonToBuffer';
 import {attachmentSendEventType, getCachedAttachments} from './attachmentSendEventType';
 import {addContentField} from './utils/addContentField';
@@ -14,7 +15,7 @@ import {toDiscordMegaByteString} from './utils/toDiscordMegaByteString';
 const messageDeleteSingleEventTypeName = 'message-delete-single';
 
 async function generateInnerDescription(message: Message | PartialMessage) {
-  if (message.webhookID) {
+  if (message.webhookId) {
     const webhook = await message.fetchWebhook().catch(() => undefined);
     return `A message from ${webhook ? `the webhook **\`${webhook.name}\`**` : `a webhook`} in ${
       message.channel
@@ -27,7 +28,8 @@ async function generateInnerDescription(message: Message | PartialMessage) {
 
 export function messageDeleteSingleEventType(
   globalSettings: GlobalSettingsWrapper,
-  channelManager: MegalogChannelManager
+  subscriptionManager: MegalogSubscriptionManager,
+  guildSettingsManager: MegalogGuildSettingsManager
 ): MegalogEventType<'messageDelete'> {
   return {
     name: messageDeleteSingleEventTypeName,
@@ -59,16 +61,21 @@ export function messageDeleteSingleEventType(
       const cachedAttachments =
         message.attachments.size === 0
           ? undefined
-          : await getCachedAttachments(channelManager, channel.guild, message.id);
-      const condensedBuffer = jsonToBuffer(
-        condenseSingleMessageDeletion(message, cachedAttachments, dayjs().valueOf())
-      );
+          : await getCachedAttachments(subscriptionManager, channel.guild, message.id);
+
+      const guildSettings = await guildSettingsManager.fetch(channel.guild);
+
+      const condensedBuffer = !guildSettings.attachCondensedJson
+        ? undefined
+        : jsonToBuffer(
+            condenseSingleMessageDeletion(message, cachedAttachments, dayjs().valueOf())
+          );
       const partitions = !cachedAttachments
         ? undefined
         : partitionAttachments(
-            cachedAttachments.array(),
+            [...cachedAttachments.values()],
             channel.guild.premiumTier,
-            condensedBuffer.byteLength
+            condensedBuffer?.byteLength
           );
       if (message.attachments.size > 0) {
         embed.addField(
@@ -91,17 +98,24 @@ export function messageDeleteSingleEventType(
         );
       }
       const logMessage = await channel.send({
-        embed,
+        embeds: [embed],
         files: [
           ...(partitions?.sendable ?? []),
-          {attachment: condensedBuffer, name: 'single-message-deletion-json'},
+          ...(!condensedBuffer
+            ? []
+            : [
+                {
+                  attachment: condensedBuffer,
+                  name: `single-message-deletion${guildSettings.condensedFileNameEnding}`,
+                },
+              ]),
         ],
       });
       return async auditEntry => {
         embed.setDescription(`**${innerDescription} probably by ${auditEntry.executor}.**`);
         // The auditEntry.reason is ignored because single message deletions by bots
         // are not logged and thus no reason is ever specified.
-        await logMessage.edit(embed);
+        await logMessage.edit({embeds: [embed]});
       };
     },
   };

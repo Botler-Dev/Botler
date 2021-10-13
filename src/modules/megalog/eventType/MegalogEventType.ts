@@ -1,5 +1,8 @@
-import {ExportProxyClientEvents, GuildAuditLogsEntry, TextChannel} from 'discord.js';
-import type {AuditLogSupportedClientEvent, MegalogSupportedClientEvent} from '../clientEvents';
+import {ClientEvents, GuildAuditLogsEntry, TextChannel} from 'discord.js';
+import type {
+  MegalogSupportedClientEvent,
+  MegalogSupportedAuditLogClientEvent,
+} from '../clientEvents';
 
 /**
  * Unique name of a {@link MegalogEventType} in kebab-case.
@@ -21,7 +24,7 @@ export type MegalogEventTypeResolvable = MegalogEventTypeName | MegalogEventType
  * in the returned {@link MegalogChannelProcessor}.
  */
 export type MegalogClientEventProcessor<TClientEventName extends MegalogSupportedClientEvent> = (
-  ...args: ExportProxyClientEvents[TClientEventName]
+  ...args: ClientEvents[TClientEventName]
 ) => Promise<undefined | MegalogChannelProcessor<TClientEventName>>;
 
 /**
@@ -30,7 +33,7 @@ export type MegalogClientEventProcessor<TClientEventName extends MegalogSupporte
 export type MegalogChannelProcessor<TClientEventName extends MegalogSupportedClientEvent> = (
   channel: TextChannel
 ) => Promise<
-  TClientEventName extends AuditLogSupportedClientEvent
+  TClientEventName extends MegalogSupportedAuditLogClientEvent
     ? MegalogAuditLogEntryProcessor | undefined
     : void
 >;

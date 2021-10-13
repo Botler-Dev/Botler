@@ -36,7 +36,7 @@ export async function getSettingsWrapper<TWrapper extends SettingsWrapper>(
   wrapperCreator: SettingsWrapperCreator<TWrapper>,
   updateListener?: SettingsUpdateListener<TWrapper['entity']>
 ): Promise<TWrapper> {
-  let cache: TWrapper | undefined;
+  let cache: TWrapper | undefined = undefined;
 
   const nonDeleteStream = (
     await getTableNonDeleteStream<TWrapper['entity']>(eventHub, tableName)

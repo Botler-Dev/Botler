@@ -1,43 +1,54 @@
-import {ExportProxyClientEvents, GuildAuditLogsActions, GuildEmoji} from 'discord.js';
+import {Guild, GuildAuditLogsActions, GuildEmoji} from 'discord.js';
 import {AuditLogMatchFilter} from '../auditLog/AuditLogMatcher';
 import {checkAuditLogEntryTargetId} from './utils/checkAuditLogEntryTargetId';
-import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
+import {ClientEventListenerType} from './utils/createClientEventListener';
+import {ClientEventListenerDefinitions} from './utils/createClientEventListeners';
 
-export type MegalogSupportedEmojiClientEvent = Extract<
-  keyof ExportProxyClientEvents,
-  'emojiCreate' | 'emojiDelete' | 'emojiUpdate'
->;
+export type SupportedEmojiGuildClientEvent = never;
 
-export type AuditLogSupportedEmojiClientEvent = Extract<
-  MegalogSupportedEmojiClientEvent,
-  'emojiCreate' | 'emojiDelete' | 'emojiUpdate'
->;
+export type SupportedEmojiAuditLogClientEvent = 'emojiCreate' | 'emojiDelete' | 'emojiUpdate';
 
-const emojiToGuild = async (emoji: GuildEmoji) => emoji.guild;
+export type SupportedEmojiGlobalClientEvent = never;
+
+const emojiToGuild = (emoji: GuildEmoji): Guild => emoji.guild;
 
 function emojiToFilterMatch(action: keyof GuildAuditLogsActions) {
-  return async (emoji: GuildEmoji): Promise<AuditLogMatchFilter> => {
-    const emojiId = emoji.id;
-    return {action, checker: entry => checkAuditLogEntryTargetId(entry, emojiId)};
-  };
+  return ({id: emojiId}: GuildEmoji): AuditLogMatchFilter => ({
+    action,
+    checker: entry => checkAuditLogEntryTargetId(entry, emojiId),
+  });
 }
 
-export function registerEmojiClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEvent('emojiCreate', emojiToGuild, emojiToFilterMatch('EMOJI_CREATE'));
-
-  utils.listenToGuildEvent('emojiDelete', emojiToGuild, emojiToFilterMatch('EMOJI_DELETE'));
-
-  utils.listenToGuildEvent('emojiUpdate', emojiToGuild, async (oldEmoji, newEmoji) => ({
-    action: 'EMOJI_UPDATE',
-    checker: entry =>
-      checkAuditLogEntryTargetId(entry, oldEmoji.id) &&
-      (entry.changes ?? []).every(change => {
-        switch (change.key) {
-          case 'name':
-            return oldEmoji.name === change.old && newEmoji.name === change.new;
-          default:
-            return false;
-        }
-      }),
-  }));
-}
+export const emojiClientEventListenerDefinitions: ClientEventListenerDefinitions<
+  SupportedEmojiGuildClientEvent,
+  SupportedEmojiAuditLogClientEvent,
+  SupportedEmojiGlobalClientEvent
+> = {
+  emojiCreate: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: emojiToGuild,
+    filterResolver: emojiToFilterMatch('EMOJI_CREATE'),
+  },
+  emojiDelete: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: emojiToGuild,
+    filterResolver: emojiToFilterMatch('EMOJI_DELETE'),
+  },
+  emojiUpdate: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: emojiToGuild,
+    filterResolver: (oldEmoji, newEmoji) => ({
+      action: 'EMOJI_UPDATE',
+      checker: entry =>
+        checkAuditLogEntryTargetId(entry, oldEmoji.id) &&
+        (entry.changes ?? []).every(change => {
+          switch (change.key) {
+            case 'name':
+              return oldEmoji.name === change.old && newEmoji.name === change.new;
+            default:
+              return false;
+          }
+        }),
+    }),
+  },
+};

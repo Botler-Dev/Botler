@@ -79,7 +79,7 @@ export class AuditLogMatcher {
     listener: AuditLogMatchListener,
     filter: AuditLogMatchFilter = {}
   ): boolean {
-    if (!guild.me?.hasPermission('VIEW_AUDIT_LOG')) return false;
+    if (!guild.me?.permissions.has('VIEW_AUDIT_LOG')) return false;
     this.getGuildQueue(guild).addEntry(listener, filter);
     return true;
   }

@@ -1,22 +1,27 @@
-import {ExportProxyClientEvents} from 'discord.js';
+import {Snowflake} from 'discord.js';
 import {checkAuditLogEntryTargetId} from './utils/checkAuditLogEntryTargetId';
-import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
+import {ClientEventListenerType} from './utils/createClientEventListener';
+import {ClientEventListenerDefinitions} from './utils/createClientEventListeners';
 
-export type MegalogSupportedVoiceClientEvent = Extract<
-  keyof ExportProxyClientEvents,
-  'voiceStateUpdate'
->;
+export type SupportedVoiceGuildClientEvent = never;
 
-export type AuditLogSupportedVoiceClientEvent = Extract<
-  MegalogSupportedVoiceClientEvent,
-  'voiceStateUpdate'
->;
+export type SupportedVoiceAuditLogClientEvent = 'voiceStateUpdate';
 
-export function registerVoiceClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEvent(
-    'voiceStateUpdate',
-    async state => state.guild,
-    async (oldState, newState) => ({
+export type SupportedVoiceGlobalClientEvent = never;
+
+export const voiceClientEventListenerDefinitions: ClientEventListenerDefinitions<
+  SupportedVoiceGuildClientEvent,
+  SupportedVoiceAuditLogClientEvent,
+  SupportedVoiceGlobalClientEvent
+> = {
+  voiceStateUpdate: {
+    type: ClientEventListenerType.AuditLog,
+    guildResolver: oldState => oldState.guild,
+    channelResolver: (oldState, newState) =>
+      [oldState.channel?.id, newState.channel?.id].filter(
+        (id): id is Snowflake => id !== undefined
+      ),
+    filterResolver: (oldState, newState) => ({
       checker: entry => {
         switch (entry.action) {
           case 'MEMBER_DISCONNECT':
@@ -24,7 +29,7 @@ export function registerVoiceClientEventListeners(utils: MegalogClientEventUtils
           case 'MEMBER_MOVE': {
             // Discord.js' bad typings do not define the extra type properly.
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const destinationId = (entry.extra as any)?.channel?.id;
+            const destinationId: Snowflake = (entry.extra as any)?.channel?.id;
             return oldState.channel?.id !== destinationId && newState.channel?.id === destinationId;
           }
           case 'MEMBER_UPDATE':
@@ -51,6 +56,6 @@ export function registerVoiceClientEventListeners(utils: MegalogClientEventUtils
             return false;
         }
       },
-    })
-  );
-}
+    }),
+  },
+};

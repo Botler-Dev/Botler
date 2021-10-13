@@ -1,16 +1,14 @@
 import {CommandResponseListener, Prisma, PrismaClient} from '@prisma/client';
-import {
-  Message,
-  Snowflake,
-  TextBasedChannelResolvable,
-  UserManager,
-  UserResolvable,
-} from 'discord.js';
+import {Message, Snowflake, UserManager, UserResolvable} from 'discord.js';
 import {from} from 'rxjs';
 import {mergeAll} from 'rxjs/operators';
 import {injectable} from 'tsyringe';
 import {DatabaseEventHub, ModelManager} from '@/database';
-import {resolveIdChecked, resolveTextBasedChannelId} from '@/utils/resolve';
+import {
+  resolveIdChecked,
+  resolveTextBasedChannelId,
+  TextBasedChannelResolvable,
+} from '@/utils/resolve';
 import {ListenerCriterionCache} from './ListenerCriterionCache';
 
 @injectable()
@@ -30,15 +28,13 @@ export class ResponseListenerManager extends ModelManager<PrismaClient['commandR
       )
     )
       .pipe(mergeAll())
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      .subscribe(entity => this.cache.remove(entity.cacheId!, entity.userId || undefined));
+      .subscribe(entity => this.cache.remove(entity.cacheId, entity.userId || undefined));
   }
 
   async initialize(): Promise<void> {
     const listeners = await this.model.findMany();
     listeners.forEach(listener =>
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.cache.add(listener.cacheId!, listener.channelId, listener.userId || undefined)
+      this.cache.add(listener.cacheId, listener.channelId, listener.userId || undefined)
     );
   }
 
@@ -86,7 +82,7 @@ export class ResponseListenerManager extends ModelManager<PrismaClient['commandR
   }
 
   findCacheIds(message: Message): number[] {
-    // eslint-disable-next-line unicorn/no-array-callback-reference
+    // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-method-this-argument
     return this.cache.find(message.channel.id, message.author.id);
   }
 }

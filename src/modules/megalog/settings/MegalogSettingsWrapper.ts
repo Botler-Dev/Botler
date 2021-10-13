@@ -29,4 +29,12 @@ export class MegalogSettingsWrapper extends SettingsWrapper<MegalogSettings> {
   get maxAuditLogMatchTries(): number {
     return this.entity?.maxAuditLogMatchTries ?? 10;
   }
+
+  get guildAttachCondensedJsonDefault(): boolean {
+    return this.entity?.guildAttachCondensedJsonDefault ?? true;
+  }
+
+  get guildShowCondensedPreviewDefault(): boolean {
+    return this.entity?.guildShowCondensedPreviewDefault ?? false;
+  }
 }

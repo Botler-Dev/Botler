@@ -16,5 +16,5 @@ export * from './eventTypes/message/attachmentSendEventType';
 export * from './eventTypes/message/messageDeleteSingleEventType';
 export * from './eventTypes/message/messageEditEventType';
 
-export * from './MegalogChannelManager';
+export * from './MegalogSubscriptionManager';
 export * from './MegalogModule';

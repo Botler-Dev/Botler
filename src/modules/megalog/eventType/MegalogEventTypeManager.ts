@@ -67,6 +67,10 @@ export class MegalogEventTypeManager {
     this.logger.info(`Registered event type "${event.name}".`);
   }
 
+  registerEventTypes(...events: MegalogEventType[]): void {
+    events.forEach(event => this.registerEventType(event));
+  }
+
   /**
    * Get all {@link MegalogEventType}s that listen to a certain {@link MegalogSupportedClientEvent}.
    */

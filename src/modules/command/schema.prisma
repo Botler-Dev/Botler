@@ -18,18 +18,15 @@ model CommandCommandCache {
   responseListeners CommandResponseListener[]
 }
 
-// All listeners have cacheId as optional because Prisma didn't have support for cascading deletes
-// TODO: change to required as cascading deletes is now a feature (in preview)
-
 model CommandReactionListener {
   id        Int                                 @id @default(autoincrement())
   messageId String                              @db.VarChar(20)
   userId    String                              @db.VarChar(20)
   emojiId   String                              @db.VarChar(20)
   action    CommandReactionListenerActionFilter
-  cacheId   Int?
+  cacheId   Int
 
-  cache CommandCommandCache? @relation(fields: [cacheId], references: [id])
+  cache CommandCommandCache @relation(fields: [cacheId], references: [id], onDelete: Cascade)
 
   @@unique([messageId, userId, emojiId, action, cacheId])
 }
@@ -44,9 +41,9 @@ model CommandResponseListener {
   id        Int    @id @default(autoincrement())
   channelId String @db.VarChar(20)
   userId    String @db.VarChar(20)
-  cacheId   Int?
+  cacheId   Int
 
-  cache CommandCommandCache? @relation(fields: [cacheId], references: [id])
+  cache CommandCommandCache @relation(fields: [cacheId], references: [id], onDelete: Cascade)
 
   @@unique([channelId, userId, cacheId])
 }

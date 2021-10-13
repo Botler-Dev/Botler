@@ -1,12 +1,12 @@
 import {Logger} from '@/logger';
-import {TextChannel} from 'discord.js';
-import {from, OperatorFunction} from 'rxjs';
-import {catchError, concatMap, filter} from 'rxjs/operators';
-import type {AuditLogSupportedClientEvent, MegalogSupportedClientEvent} from '..';
 import {
   MegalogAuditLogEntryProcessor,
   MegalogChannelProcessor,
-} from '../../eventType/MegalogEventType';
+} from '@/modules/megalog/eventType/MegalogEventType';
+import {TextChannel} from 'discord.js';
+import {from, OperatorFunction} from 'rxjs';
+import {catchError, concatMap, filter} from 'rxjs/operators';
+import type {MegalogSupportedAuditLogClientEvent, MegalogSupportedClientEvent} from '../..';
 
 export function processChannel<TEventName extends MegalogSupportedClientEvent>(
   logger: Logger,
@@ -22,7 +22,7 @@ export function processChannel<TEventName extends MegalogSupportedClientEvent>(
           filter(
             (
               entryProcessor
-            ): entryProcessor is TEventName extends AuditLogSupportedClientEvent
+            ): entryProcessor is TEventName extends MegalogSupportedAuditLogClientEvent
               ? MegalogAuditLogEntryProcessor
               : never => !!entryProcessor
           )

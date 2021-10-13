@@ -2,7 +2,7 @@ import {ColorType, GlobalSettingsWrapper} from '@/settings';
 import {Collection, Guild, MessageAttachment, MessageEmbed, Snowflake} from 'discord.js';
 import {messageMegalogEventCategoryName} from '.';
 import {MegalogEventType} from '../../eventType/MegalogEventType';
-import {MegalogChannelManager} from '../../MegalogChannelManager';
+import {MegalogSubscriptionManager} from '../../MegalogSubscriptionManager';
 import {partitionAttachments} from './utils/partitionAttachments';
 import {toDiscordMegaByteString} from './utils/toDiscordMegaByteString';
 
@@ -12,7 +12,8 @@ const generateFooter = (messageId: Snowflake) =>
   `Message ID: ${messageId} | ${attachmentSendEventTypeName}`;
 
 export function attachmentSendEventType(
-  globalSettings: GlobalSettingsWrapper
+  globalSettings: GlobalSettingsWrapper,
+  subscriptionManager: MegalogSubscriptionManager
 ): MegalogEventType<'message'> {
   return {
     name: attachmentSendEventTypeName,
@@ -21,13 +22,18 @@ export function attachmentSendEventType(
     category: messageMegalogEventCategoryName,
     clientEventName: 'message',
     processClientEvent: async message => {
-      if (message.attachments.size === 0) return undefined;
+      if (
+        message.attachments.size === 0 ||
+        (message.author.id === message.client.user?.id &&
+          subscriptionManager.channelHasSubscriptions(message.channel))
+      )
+        return undefined;
       return async channel => {
         if (message.author.id === message.client.user?.id && message.channel.id === channel.id)
           return;
 
         const partitions = partitionAttachments(
-          message.attachments.array(),
+          [...message.attachments.values()],
           channel.guild.premiumTier
         );
         const embed = new MessageEmbed()
@@ -54,7 +60,7 @@ export function attachmentSendEventType(
               .join('\n')
           );
         await channel.send({
-          embed,
+          embeds: [embed],
           files: partitions.sendable,
         });
       };
@@ -68,11 +74,11 @@ export type CachedAttachments = Collection<string, MessageAttachment>;
  * Gets the cached attachments for a message if the cache can be found.
  */
 export async function getCachedAttachments(
-  channelManager: MegalogChannelManager,
+  subscriptionManager: MegalogSubscriptionManager,
   guild: Guild,
   messageId: Snowflake
 ): Promise<CachedAttachments | undefined> {
-  const logChannel = channelManager.getChannel(attachmentSendEventTypeName, guild);
+  const logChannel = subscriptionManager.getSubscribedChannel(attachmentSendEventTypeName, guild);
   if (!logChannel) return undefined;
   const messages = await logChannel.messages.fetch({limit: 20, around: messageId});
   const targetFooter = generateFooter(messageId);

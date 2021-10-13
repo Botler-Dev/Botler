@@ -6,10 +6,25 @@ model MegalogLogChannel {
   @@id([eventName, guildId])
 }
 
+model MegalogIgnoreChannel {
+  guildId   String @db.VarChar(20)
+  channelId String @db.VarChar(20)
+
+  @@id([guildId, channelId])
+}
+
 model MegalogSettings {
-  version                     Int  @id @default(autoincrement())
-  auditLogMatchTryInterval    Int?
-  auditLogFetchSize           Int?
-  maxAuditLogMatchQueueLength Int?
-  maxAuditLogMatchTries       Int?
+  version                          Int      @id @default(autoincrement())
+  auditLogMatchTryInterval         Int?
+  auditLogFetchSize                Int?
+  maxAuditLogMatchQueueLength      Int?
+  maxAuditLogMatchTries            Int?
+  guildAttachCondensedJsonDefault  Boolean?
+  guildShowCondensedPreviewDefault Boolean?
+}
+
+model MegalogGuildSettings {
+  guildId              String   @id @db.VarChar(20)
+  attachCondensedJson  Boolean?
+  showCondensedPreview Boolean?
 }

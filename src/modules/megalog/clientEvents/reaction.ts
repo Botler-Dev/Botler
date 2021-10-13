@@ -1,27 +1,47 @@
-import {ExportProxyClientEvents, MessageReaction} from 'discord.js';
-import {MegalogClientEventUtils} from './utils/MegalogClientEventUtils';
+import {Guild, MessageReaction, PartialMessageReaction, Snowflake} from 'discord.js';
+import {ClientEventListenerType} from './utils/createClientEventListener';
+import {ClientEventListenerDefinitions} from './utils/createClientEventListeners';
 
-export type MegalogSupportedReactionClientEvent = Extract<
-  keyof ExportProxyClientEvents,
+export type SupportedReactionGuildClientEvent =
   | 'messageReactionAdd'
   | 'messageReactionRemove'
   | 'messageReactionRemoveAll'
-  | 'messageReactionRemoveEmoji'
->;
+  | 'messageReactionRemoveEmoji';
 
-export type AuditLogSupportedReactionClientEvent = Extract<
-  MegalogSupportedReactionClientEvent,
-  never
->;
+export type SupportedReactionAuditLogClientEvent = never;
 
-const reactionToGuild = async (reaction: MessageReaction) => reaction.message.guild ?? undefined;
+export type SupportedReactionGlobalClientEvent = never;
 
-export function registerReactionClientEventListeners(utils: MegalogClientEventUtils): void {
-  utils.listenToGuildEvent('messageReactionAdd', reactionToGuild);
+const reactionToGuild = (reaction: MessageReaction | PartialMessageReaction): Guild | undefined =>
+  reaction.message.guild ?? undefined;
 
-  utils.listenToGuildEvent('messageReactionRemove', reactionToGuild);
+const reactionToInvolvedChannel = (
+  reaction: MessageReaction | PartialMessageReaction
+): Snowflake[] => [reaction.message.channel.id];
 
-  utils.listenToGuildEvent('messageReactionRemoveAll', async message => message.guild ?? undefined);
-
-  utils.listenToGuildEvent('messageReactionRemoveEmoji', reactionToGuild);
-}
+export const reactionClientEventListenerDefinitions: ClientEventListenerDefinitions<
+  SupportedReactionGuildClientEvent,
+  SupportedReactionAuditLogClientEvent,
+  SupportedReactionGlobalClientEvent
+> = {
+  messageReactionAdd: {
+    type: ClientEventListenerType.Guild,
+    guildResolver: reactionToGuild,
+    channelResolver: reactionToInvolvedChannel,
+  },
+  messageReactionRemove: {
+    type: ClientEventListenerType.Guild,
+    guildResolver: reactionToGuild,
+    channelResolver: reactionToInvolvedChannel,
+  },
+  messageReactionRemoveAll: {
+    type: ClientEventListenerType.Guild,
+    guildResolver: message => message.guild ?? undefined,
+    channelResolver: message => [message.channel.id],
+  },
+  messageReactionRemoveEmoji: {
+    type: ClientEventListenerType.Guild,
+    guildResolver: reactionToGuild,
+    channelResolver: reactionToInvolvedChannel,
+  },
+};
